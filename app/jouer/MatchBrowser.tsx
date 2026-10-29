@@ -29,15 +29,31 @@ function saveName(name: string) {
 export default function MatchBrowser({ matches }: { matches: Match[] }) {
   const [day, setDay] = useState<string | null>(null);
   const [format, setFormat] = useState<MatchFormat | null>(null);
+  const [area, setArea] = useState<string | null>(null);
   const [selected, setSelected] = useState<Match | null>(null);
   const [name, setName] = useState("");
 
   const days = useMemo(() => Array.from(new Set(matches.map((m) => m.date))), [matches]);
   const formats = FORMATS.filter((f) => matches.some((m) => m.format === f));
+  const areas = useMemo(
+    () => Array.from(new Set(matches.map((m) => m.area).filter(Boolean))).sort((a, b) => a.localeCompare(b, "fr")),
+    [matches],
+  );
 
   const filtered = matches.filter(
-    (m) => (day === null || m.date === day) && (format === null || m.format === format),
+    (m) =>
+      (day === null || m.date === day) &&
+      (format === null || m.format === format) &&
+      (area === null || m.area === area),
   );
+  const filtering = day !== null || format !== null || area !== null;
+  const openCount = filtered.filter((m) => !isFull(m)).length;
+
+  function resetFilters() {
+    setDay(null);
+    setFormat(null);
+    setArea(null);
+  }
 
   function openBooking(m: Match) {
     setName((n) => n || readSavedName());
@@ -82,10 +98,34 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
             <Chip key={f} on={format === f} onClick={() => setFormat(f)}>{f}</Chip>
           ))}
         </FilterRow>
+        {areas.length > 1 && (
+          <FilterRow label="Quartier">
+            <Chip on={area === null} onClick={() => setArea(null)}>Tous</Chip>
+            {areas.map((a) => (
+              <Chip key={a} on={area === a} onClick={() => setArea(a)}>{a}</Chip>
+            ))}
+          </FilterRow>
+        )}
+      </div>
+
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4" aria-live="polite">
+        <p className="text-sm text-ink-muted">
+          <span className="font-bold text-ink">{filtered.length}</span> {filtered.length > 1 ? "matchs" : "match"}
+          {filtered.length > 0 && (
+            <>
+              {" "}· <span className="font-bold text-primary">{openCount}</span> {openCount > 1 ? "ouverts" : "ouvert"} à la réservation
+            </>
+          )}
+        </p>
+        {filtering && (
+          <button type="button" onClick={resetFilters} className="text-sm font-semibold text-primary hover:underline">
+            Réinitialiser les filtres
+          </button>
+        )}
       </div>
 
       {filtered.length > 0 ? (
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((m) => (
             <MatchCard
               key={m.id}
@@ -107,7 +147,12 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
       ) : (
         <div className="card mt-8 p-8 text-center">
           <p className="headline text-3xl">Walou pour l&apos;instant</p>
-          <p className="mt-2 text-ink-muted">Aucun match avec ces filtres. Essaie un autre jour ou format.</p>
+          <p className="mt-2 text-ink-muted">Aucun match avec ces filtres. Essaie un autre jour, format ou quartier.</p>
+          {filtering && (
+            <button type="button" onClick={resetFilters} className="btn-ghost mt-6">
+              Voir tous les matchs
+            </button>
+          )}
         </div>
       )}
 

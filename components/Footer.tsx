@@ -41,7 +41,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-forest-light">
-        <p className="container-page py-5 text-xs text-white/70">
+        <p className="container-page pb-24 pt-5 text-xs text-white/70 sm:pb-5">
           © {new Date().getFullYear()} AJI TL3AB · {CITY} · Yallah, chouf-nak f terrain.
         </p>
       </div>

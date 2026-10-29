@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getUpcomingMatches } from "@/lib/matches-source";
+import InfoStrip from "@/components/InfoStrip";
 import MatchBrowser from "./MatchBrowser";
 
 export const metadata: Metadata = {
@@ -23,6 +24,15 @@ export default async function JouerPage() {
       <p className="mt-4 max-w-xl text-ink-muted">
         Filtre par jour et par format, choisis ton créneau et réserve en 30 secondes via WhatsApp.
       </p>
+      <InfoStrip
+        className="mt-8"
+        items={[
+          { icon: "cash", label: "Paiement", value: "Sur place, espèces ou virement" },
+          { icon: "clock", label: "Arrivée", value: "10 min avant le coup d'envoi" },
+          { icon: "ball", label: "Fourni", value: "Ballon, chasubles, équipes" },
+          { icon: "calendar", label: "Annulation", value: "Gratuite jusqu'à 24h avant" },
+        ]}
+      />
       <div className="mt-10">
         <MatchBrowser matches={matches} />
       </div>

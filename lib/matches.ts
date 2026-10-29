@@ -16,6 +16,33 @@ export function isFull(m: Match): boolean {
   return spotsLeft(m) === 0;
 }
 
+/** At or below this many spots left, a match is flagged "Dernières places". */
+export const ALMOST_FULL_SPOTS = 2;
+
+export function isAlmostFull(m: Match): boolean {
+  const left = spotsLeft(m);
+  return left > 0 && left <= ALMOST_FULL_SPOTS;
+}
+
+export function mapsLink(m: Match): string {
+  const query = [m.pitch, m.area, "Marrakech"].filter(Boolean).join(", ");
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
+/** Today's date in Marrakech as YYYY-MM-DD. */
+function marrakechToday(now: Date): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(now);
+}
+
+/** "Aujourd'hui", "Demain" or null. */
+export function relativeDayLabel(date: string, now: Date = new Date()): string | null {
+  const today = marrakechToday(now);
+  const tomorrow = marrakechToday(new Date(now.getTime() + 24 * 60 * 60 * 1000));
+  if (date === today) return "Aujourd'hui";
+  if (date === tomorrow) return "Demain";
+  return null;
+}
+
 /** "ven. 30 oct." */
 export function formatDay(date: string): string {
   return new Intl.DateTimeFormat("fr-FR", {

@@ -1,7 +1,10 @@
 import Link from "next/link";
+import InfoStrip from "@/components/InfoStrip";
 import MatchCard from "@/components/MatchCard";
+import { Icon } from "@/components/Icons";
+import RelativeDay from "@/components/RelativeDay";
 import ResultCard from "@/components/ResultCard";
-import { isFull } from "@/lib/matches";
+import { formatDay, formatTime, isFull, spotsLeft } from "@/lib/matches";
 import { getRecentResults, getUpcomingMatches } from "@/lib/matches-source";
 import { whatsappLink } from "@/lib/config";
 
@@ -50,7 +53,13 @@ const FAQ = [
 ];
 
 export default async function HomePage() {
-  const [upcoming, results] = await Promise.all([getUpcomingMatches(3), getRecentResults(4)]);
+  const [allUpcoming, results] = await Promise.all([getUpcomingMatches(), getRecentResults(4)]);
+  const upcoming = allUpcoming.slice(0, 3);
+  const nextOpen = allUpcoming.find((m) => !isFull(m));
+  const openMatches = allUpcoming.filter((m) => !isFull(m));
+  const minPrice = allUpcoming.length > 0 ? Math.min(...allUpcoming.map((m) => m.priceMad)) : null;
+  const pitchCount = new Set(allUpcoming.map((m) => m.pitch)).size;
+  const formats = ["5v5", "7v7", "9v9"].filter((f) => allUpcoming.some((m) => m.format === f));
 
   return (
     <>
@@ -65,25 +74,78 @@ export default async function HomePage() {
             backgroundSize: "56px 56px",
           }}
         />
-        <div className="container-page relative py-20 sm:py-28 lg:py-36">
-          <p className="eyebrow">Football · Marrakech</p>
-          <h1 className="headline mt-4 text-[22vw] sm:text-[11rem] lg:text-[13rem]">
-            Aji tl3ab<span className="text-primary">.</span>
-          </h1>
-          <p className="mt-6 max-w-xl text-lg text-ink-muted sm:text-xl">
-            Rejoins des matchs <strong className="text-ink">5v5, 7v7 et 9v9</strong> partout à Marrakech.
-            Seul ou avec tes potes, tu réserves ta place, on s&apos;occupe du terrain et des équipes.
-          </p>
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <Link href="/jouer" className="btn-primary px-8 py-4 text-base">
-              Réserve ta place
-            </Link>
-            <a href="#comment-ca-marche" className="btn-ghost px-8 py-4 text-base">
-              Kifach ? Comment ça marche
-            </a>
+        <div className="container-page relative grid items-end gap-10 py-16 sm:py-24 lg:grid-cols-[1fr_22rem] lg:py-28">
+          <div>
+            <p className="eyebrow">Football · Marrakech</p>
+            <h1 className="headline mt-4 text-[22vw] sm:text-[11rem] lg:text-[8.5rem] xl:text-[9.5rem]">
+              Aji tl3ab<span className="text-primary">.</span>
+            </h1>
+            <p className="mt-6 max-w-xl text-lg text-ink-muted sm:text-xl">
+              Rejoins des matchs <strong className="text-ink">5v5, 7v7 et 9v9</strong> partout à Marrakech.
+              Seul ou avec tes potes, tu réserves ta place, on s&apos;occupe du terrain et des équipes.
+            </p>
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+              <Link href="/jouer" className="btn-primary px-8 py-4 text-base">
+                Réserve ta place
+              </Link>
+              <a href="#comment-ca-marche" className="btn-ghost px-8 py-4 text-base">
+                Kifach ? Comment ça marche
+              </a>
+            </div>
           </div>
+
+          {nextOpen && (
+            <Link
+              href="/jouer"
+              className="group block rounded-2xl bg-forest p-6 text-white shadow-xl shadow-forest/20 transition hover:bg-forest-light"
+            >
+              <p className="eyebrow flex items-center gap-2 text-highlight">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-highlight opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-highlight" />
+                </span>
+                Prochain match
+              </p>
+              <div className="mt-4 flex items-end justify-between gap-3">
+                <div>
+                  <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-white/70">
+                    <span className="capitalize">{formatDay(nextOpen.date)}</span>
+                    <RelativeDay date={nextOpen.date} />
+                  </p>
+                  <p className="headline mt-1 text-6xl">{formatTime(nextOpen.time)}</p>
+                </div>
+                <span className="headline rounded-lg bg-highlight px-3 py-1.5 text-2xl text-highlight-ink">{nextOpen.format}</span>
+              </div>
+              <p className="mt-4 flex items-center gap-2 text-sm">
+                <Icon name="pin" className="h-4 w-4 text-highlight" />
+                <span className="font-semibold">{nextOpen.pitch}</span>
+                {nextOpen.area && <span className="text-white/70">· {nextOpen.area}</span>}
+              </p>
+              <div className="mt-5 flex items-center justify-between gap-3 border-t border-forest-light pt-4">
+                <p className="text-sm">
+                  <span className="font-bold text-highlight">{spotsLeft(nextOpen)}</span>{" "}
+                  {spotsLeft(nextOpen) > 1 ? "places" : "place"} · <span className="font-bold">{nextOpen.priceMad} MAD</span>
+                </p>
+                <span className="text-sm font-bold uppercase tracking-wide text-highlight group-hover:underline">Réserver →</span>
+              </div>
+            </Link>
+          )}
         </div>
       </section>
+
+      {/* Quick facts */}
+      {allUpcoming.length > 0 && (
+        <section className="container-page -mt-px pt-10 sm:pt-12" aria-label="En bref">
+          <InfoStrip
+            items={[
+              { icon: "cash", label: "Prix", value: minPrice !== null ? `Dès ${minPrice} MAD / joueur` : "Sur chaque match" },
+              { icon: "ball", label: "Formats", value: formats.join(" · ") },
+              { icon: "pin", label: "Terrains", value: `${pitchCount} ${pitchCount > 1 ? "terrains" : "terrain"} à Marrakech` },
+              { icon: "calendar", label: "À venir", value: `${openMatches.length} ${openMatches.length > 1 ? "matchs ouverts" : "match ouvert"}` },
+            ]}
+          />
+        </section>
+      )}
 
       {/* How it works */}
       <section id="comment-ca-marche" className="container-page scroll-mt-20 py-16 sm:py-24">

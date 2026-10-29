@@ -17,3 +17,29 @@ export function InstagramIcon({ className = "h-5 w-5" }: IconProps) {
     </svg>
   );
 }
+
+const PATHS = {
+  calendar: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" /></>,
+  clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
+  pin: <><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></>,
+  level: <path d="M5 20v-5M12 20V10M19 20V4" />,
+  users: <><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a5.5 5.5 0 0 1 3.5 6" /></>,
+  cash: <><rect x="2.5" y="6" width="19" height="12" rx="2" /><circle cx="12" cy="12" r="2.5" /><path d="M6 9.5v5M18 9.5v5" /></>,
+  ball: <><circle cx="12" cy="12" r="9" /><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" /><path d="M12 3v4.5M21 10l-5 .4M17.5 19.5l-3-4.4M6.5 19.5l3-4.4M3 10l5 .4" /></>,
+  chat: <path d="M4 5h16v11H9l-5 4z" />,
+  shield: <><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z" /><path d="M8.5 12l2.5 2.5 4.5-5" /></>,
+  truck: <><path d="M2.5 6h11v10h-11zM13.5 9.5h4l3 3.5v3h-7" /><circle cx="6.5" cy="17.5" r="1.8" /><circle cx="17" cy="17.5" r="1.8" /></>,
+  store: <><path d="M4 9.5V20h16V9.5M3 9.5L5 4h14l2 5.5z" /><path d="M9.5 20v-5h5v5" /></>,
+  gift: <><rect x="3.5" y="8" width="17" height="4" /><path d="M5 12v8.5h14V12M12 8v12.5M12 8C10.5 4 7 4 7 6s3 2 5 2c2 0 5 0 5-2s-3.5-2-5 2" /></>,
+  route: <><circle cx="6" cy="18" r="2.5" /><circle cx="18" cy="6" r="2.5" /><path d="M8.5 18H16a3.5 3.5 0 0 0 0-7H8a3.5 3.5 0 0 1 0-7h7.5" /></>,
+} as const;
+
+export type IconName = keyof typeof PATHS;
+
+export function Icon({ name, className = "h-5 w-5" }: IconProps & { name: IconName }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {PATHS[name]}
+    </svg>
+  );
+}

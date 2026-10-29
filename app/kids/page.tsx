@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import InfoStrip from "@/components/InfoStrip";
 import KidsSignup from "./KidsSignup";
 
 export const metadata: Metadata = {
@@ -63,6 +64,15 @@ export default function KidsPage() {
             </a>
           </div>
           <p className="mt-4 text-sm text-ink-muted">✔ Première séance offerte · ✔ Sans engagement</p>
+          <InfoStrip
+            className="mt-10"
+            items={[
+              { icon: "users", label: "Âge", value: "5 à 14 ans, 3 groupes" },
+              { icon: "calendar", label: "Séances", value: "Mercredi, samedi, dimanche" },
+              { icon: "pin", label: "Lieu", value: "Complexe Massira" },
+              { icon: "cash", label: "Tarif", value: "Dès 350 MAD / mois" },
+            ]}
+          />
         </div>
       </section>
 
