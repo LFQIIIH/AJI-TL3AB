@@ -5,22 +5,32 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Brand palette — dark base, one bold accent.
-        night: {
-          DEFAULT: "#0B0B0D", // page background
-          900: "#0B0B0D",
-          800: "#141418", // cards / raised surfaces
-          700: "#1E1E24", // borders, inputs
-          600: "#2A2A33",
+        // Brand palette — light base, deep green chrome, lime highlights.
+        canvas: {
+          DEFAULT: "#F5F7F2", // main background
+          deep: "#EAEFE4", // alternate section bands
         },
-        chalk: {
-          DEFAULT: "#F5F5F0", // primary text
-          muted: "#A1A1AA", // secondary text
+        surface: "#FFFFFF", // cards and input fields
+        forest: {
+          DEFAULT: "#12372A", // navigation and footer
+          light: "#1D4A3A", // borders / hovers on forest
         },
-        accent: {
-          DEFAULT: "#C8FF00", // electric lime
-          hover: "#B4E600",
-          ink: "#0B0B0D", // text on accent
+        primary: {
+          DEFAULT: "#1E8E5A", // primary buttons, accent text on light bg
+          hover: "#187A4C",
+          ink: "#FFFFFF", // text on primary
+        },
+        highlight: {
+          DEFAULT: "#C7F36B", // highlights and active states
+          ink: "#12372A", // text on highlight
+        },
+        ink: {
+          DEFAULT: "#17212B", // main text
+          muted: "#5A6672", // secondary text
+        },
+        line: {
+          DEFAULT: "#DDE3D7", // borders, dividers, tracks
+          strong: "#C3CCBD",
         },
       },
       fontFamily: {

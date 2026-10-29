@@ -107,15 +107,15 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
       ) : (
         <div className="card mt-8 p-8 text-center">
           <p className="headline text-3xl">Walou pour l&apos;instant</p>
-          <p className="mt-2 text-chalk-muted">Aucun match avec ces filtres. Essaie un autre jour ou format.</p>
+          <p className="mt-2 text-ink-muted">Aucun match avec ces filtres. Essaie un autre jour ou format.</p>
         </div>
       )}
 
       <Modal open={selected !== null} onClose={() => setSelected(null)} title="Réserve ta place">
         {selected && (
           <form onSubmit={confirmBooking} className="space-y-4">
-            <p className="text-sm text-chalk-muted">
-              <span className="font-semibold text-chalk">{selected.format}</span> ·{" "}
+            <p className="text-sm text-ink-muted">
+              <span className="font-semibold text-ink">{selected.format}</span> ·{" "}
               <span className="capitalize">{formatDayLong(selected.date)}</span> · {formatTime(selected.time)} ·{" "}
               {selected.pitch}
             </p>
@@ -135,7 +135,7 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
             <button type="submit" className="btn-primary w-full" disabled={!name.trim()}>
               Continuer sur WhatsApp
             </button>
-            <p className="text-center text-xs text-chalk-muted">On confirme ta place directement sur WhatsApp.</p>
+            <p className="text-center text-xs text-ink-muted">On confirme ta place directement sur WhatsApp.</p>
           </form>
         )}
       </Modal>

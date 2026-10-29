@@ -17,10 +17,10 @@ export default function Navbar() {
   useEffect(() => setOpen(false), [pathname]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-night-700 bg-night/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-forest-light bg-forest text-white">
       <nav className="container-page flex h-16 items-center justify-between">
         <Link href="/" className="headline text-2xl">
-          Aji <span className="text-accent">tl3ab</span>
+          Aji <span className="text-highlight">tl3ab</span>
         </Link>
 
         <ul className="hidden items-center gap-8 md:flex">
@@ -28,8 +28,8 @@ export default function Navbar() {
             <li key={l.href}>
               <Link
                 href={l.href}
-                className={`text-sm font-semibold uppercase tracking-wide transition hover:text-accent ${
-                  pathname === l.href ? "text-accent" : "text-chalk"
+                className={`text-sm font-semibold uppercase tracking-wide transition hover:text-highlight ${
+                  pathname === l.href ? "text-highlight" : "text-white"
                 }`}
               >
                 {l.label}
@@ -57,13 +57,13 @@ export default function Navbar() {
       </nav>
 
       {open && (
-        <div className="border-t border-night-700 md:hidden">
+        <div className="border-t border-forest-light md:hidden">
           <ul className="container-page flex flex-col py-4">
             {LINKS.map((l) => (
               <li key={l.href}>
                 <Link
                   href={l.href}
-                  className={`headline block py-3 text-4xl ${pathname === l.href ? "text-accent" : ""}`}
+                  className={`headline block py-3 text-4xl ${pathname === l.href ? "text-highlight" : ""}`}
                 >
                   {l.label}
                 </Link>

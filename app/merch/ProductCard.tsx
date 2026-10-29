@@ -25,7 +25,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <article className="card flex flex-col overflow-hidden">
-      <div className="relative aspect-square bg-night-800">
+      <div className="relative aspect-square bg-surface">
         <Image
           src={product.images[imageIdx]}
           alt={product.name}
@@ -35,7 +35,7 @@ export default function ProductCard({ product }: { product: Product }) {
           unoptimized
         />
         {product.preorder && (
-          <span className="absolute left-3 top-3 rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase tracking-wide text-accent-ink">
+          <span className="absolute left-3 top-3 rounded-full bg-highlight px-3 py-1 text-xs font-bold uppercase tracking-wide text-highlight-ink">
             Précommande
           </span>
         )}
@@ -48,7 +48,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 onClick={() => setImageIdx(i)}
                 aria-label={`Image ${i + 1}`}
                 aria-pressed={i === imageIdx}
-                className={`h-2.5 w-2.5 rounded-full transition ${i === imageIdx ? "bg-accent" : "bg-chalk/40 hover:bg-chalk"}`}
+                className={`h-2.5 w-2.5 rounded-full transition ${i === imageIdx ? "bg-primary" : "bg-ink/30 hover:bg-ink/60"}`}
               />
             ))}
           </div>
@@ -59,10 +59,10 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="flex items-start justify-between gap-3">
           <h2 className="headline text-3xl">{product.name}</h2>
           <p className="shrink-0 pt-1">
-            <span className="headline text-2xl">{product.priceMad}</span> <span className="text-sm text-chalk-muted">MAD</span>
+            <span className="headline text-2xl">{product.priceMad}</span> <span className="text-sm text-ink-muted">MAD</span>
           </p>
         </div>
-        {product.description && <p className="mt-2 text-sm text-chalk-muted">{product.description}</p>}
+        {product.description && <p className="mt-2 text-sm text-ink-muted">{product.description}</p>}
 
         <fieldset className="mt-5">
           <legend className="eyebrow mb-2">Taille</legend>

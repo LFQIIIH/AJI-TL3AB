@@ -55,23 +55,23 @@ export default async function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-night-700">
+      <section className="relative overflow-hidden border-b border-line">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-[0.07]"
           style={{
             backgroundImage:
-              "linear-gradient(to right, #C8FF00 1px, transparent 1px), linear-gradient(to bottom, #C8FF00 1px, transparent 1px)",
+              "linear-gradient(to right, #1E8E5A 1px, transparent 1px), linear-gradient(to bottom, #1E8E5A 1px, transparent 1px)",
             backgroundSize: "56px 56px",
           }}
         />
         <div className="container-page relative py-20 sm:py-28 lg:py-36">
           <p className="eyebrow">Football · Marrakech</p>
           <h1 className="headline mt-4 text-[22vw] sm:text-[11rem] lg:text-[13rem]">
-            Aji tl3ab<span className="text-accent">.</span>
+            Aji tl3ab<span className="text-primary">.</span>
           </h1>
-          <p className="mt-6 max-w-xl text-lg text-chalk-muted sm:text-xl">
-            Rejoins des matchs <strong className="text-chalk">5v5, 7v7 et 9v9</strong> partout à Marrakech.
+          <p className="mt-6 max-w-xl text-lg text-ink-muted sm:text-xl">
+            Rejoins des matchs <strong className="text-ink">5v5, 7v7 et 9v9</strong> partout à Marrakech.
             Seul ou avec tes potes, tu réserves ta place, on s&apos;occupe du terrain et des équipes.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
@@ -92,23 +92,23 @@ export default async function HomePage() {
         <ol className="mt-10 grid gap-4 md:grid-cols-3">
           {STEPS.map((s) => (
             <li key={s.n} className="card p-6">
-              <span className="headline text-6xl text-accent">{s.n}</span>
+              <span className="headline text-6xl text-primary">{s.n}</span>
               <h3 className="headline mt-4 text-3xl">{s.title}</h3>
-              <p className="mt-2 text-chalk-muted">{s.text}</p>
+              <p className="mt-2 text-ink-muted">{s.text}</p>
             </li>
           ))}
         </ol>
       </section>
 
       {/* Upcoming matches */}
-      <section className="border-y border-night-700 bg-night-800/40">
+      <section className="border-y border-line bg-canvas-deep">
         <div className="container-page py-16 sm:py-24">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <p className="eyebrow">Prochains matchs</p>
               <h2 className="headline mt-3 text-5xl sm:text-7xl">Ça joue bientôt</h2>
             </div>
-            <Link href="/jouer" className="text-sm font-bold uppercase tracking-wide text-accent hover:underline">
+            <Link href="/jouer" className="text-sm font-bold uppercase tracking-wide text-primary hover:underline">
               Voir tous les matchs →
             </Link>
           </div>
@@ -133,7 +133,7 @@ export default async function HomePage() {
           ) : (
             <div className="card mt-10 p-8 text-center">
               <p className="headline text-3xl">Nouveaux matchs très bientôt</p>
-              <p className="mt-2 text-chalk-muted">Suis-nous sur Instagram ou écris-nous sur WhatsApp pour être prévenu.</p>
+              <p className="mt-2 text-ink-muted">Suis-nous sur Instagram ou écris-nous sur WhatsApp pour être prévenu.</p>
             </div>
           )}
         </div>
@@ -144,7 +144,7 @@ export default async function HomePage() {
         <section id="historique" className="container-page scroll-mt-20 pt-16 sm:pt-24">
           <p className="eyebrow">Historique</p>
           <h2 className="headline mt-3 text-5xl sm:text-7xl">Derniers résultats</h2>
-          <p className="mt-4 max-w-xl text-chalk-muted">Chkoun rbe7 ? Les scores des derniers matchs, et le MVP de chaque soirée.</p>
+          <p className="mt-4 max-w-xl text-ink-muted">Chkoun rbe7 ? Les scores des derniers matchs, et le MVP de chaque soirée.</p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
             {results.map((m) => (
               <ResultCard key={m.id} match={m} />
@@ -155,37 +155,39 @@ export default async function HomePage() {
 
       {/* Kids + Merch teasers */}
       <section className="container-page grid gap-4 py-16 sm:py-24 md:grid-cols-2">
-        <Link href="/kids" className="card group relative overflow-hidden p-8 transition hover:border-accent sm:p-10">
+        <Link href="/kids" className="card group relative overflow-hidden p-8 transition hover:border-primary sm:p-10">
           <p className="eyebrow">Kids Academy</p>
           <h2 className="headline mt-3 text-5xl sm:text-6xl">
-            Sghar f l&apos;3mer, <span className="text-accent">kbar</span> f terrain
+            Sghar f l&apos;3mer, <span className="text-primary">kbar</span> f terrain
           </h2>
-          <p className="mt-4 max-w-sm text-chalk-muted">
+          <p className="mt-4 max-w-sm text-ink-muted">
             Entraînements encadrés pour les 5–14 ans, par groupes d&apos;âge, avec des coachs diplômés.
           </p>
-          <span className="mt-8 inline-block text-sm font-bold uppercase tracking-wide text-accent group-hover:underline">
+          <span className="mt-8 inline-block text-sm font-bold uppercase tracking-wide text-primary group-hover:underline">
             Découvrir l&apos;académie →
           </span>
         </Link>
-        <Link href="/merch" className="card group relative overflow-hidden bg-accent p-8 text-accent-ink transition hover:bg-accent-hover sm:p-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em]">Merch</p>
-          <h2 className="headline mt-3 text-5xl sm:text-6xl">Porte les couleurs</h2>
+        <Link href="/merch" className="group relative overflow-hidden rounded-2xl bg-forest p-8 text-white transition hover:bg-forest-light sm:p-10">
+          <p className="eyebrow text-highlight">Merch</p>
+          <h2 className="headline mt-3 text-5xl sm:text-6xl">
+            Porte les <span className="text-highlight">couleurs</span>
+          </h2>
           <p className="mt-4 max-w-sm opacity-80">
             Maillots, t-shirts et casquettes AJI TL3AB. Certaines pièces en précommande — premier arrivé, premier servi.
           </p>
-          <span className="mt-8 inline-block text-sm font-bold uppercase tracking-wide group-hover:underline">
+          <span className="mt-8 inline-block text-sm font-bold uppercase tracking-wide text-highlight group-hover:underline">
             Voir la boutique →
           </span>
         </Link>
       </section>
 
       {/* FAQ */}
-      <section className="border-t border-night-700">
+      <section className="border-t border-line">
         <div className="container-page grid gap-10 py-16 sm:py-24 lg:grid-cols-[1fr_2fr]">
           <div>
             <p className="eyebrow">FAQ</p>
             <h2 className="headline mt-3 text-5xl sm:text-7xl">Des questions ?</h2>
-            <p className="mt-4 text-chalk-muted">Ma l9itich jawab ? Écris-nous directement.</p>
+            <p className="mt-4 text-ink-muted">Ma l9itich jawab ? Écris-nous directement.</p>
             <a
               href={whatsappLink("Salam, 3ndi wa7d so2al :")}
               target="_blank"
@@ -195,14 +197,14 @@ export default async function HomePage() {
               Poser une question
             </a>
           </div>
-          <div className="divide-y divide-night-700 border-y border-night-700">
+          <div className="divide-y divide-line border-y border-line">
             {FAQ.map((f) => (
               <details key={f.q} className="group py-5">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold [&::-webkit-details-marker]:hidden">
                   {f.q}
-                  <span className="headline text-3xl text-accent transition group-open:rotate-45">+</span>
+                  <span className="headline text-3xl text-primary transition group-open:rotate-45">+</span>
                 </summary>
-                <p className="mt-3 text-chalk-muted">{f.a}</p>
+                <p className="mt-3 text-ink-muted">{f.a}</p>
               </details>
             ))}
           </div>

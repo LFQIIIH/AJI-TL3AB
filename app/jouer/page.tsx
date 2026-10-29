@@ -18,9 +18,9 @@ export default async function JouerPage() {
     <div className="container-page py-12 sm:py-16">
       <p className="eyebrow">Matchs à venir</p>
       <h1 className="headline mt-3 text-6xl sm:text-8xl">
-        Fin <span className="text-accent">bghiti</span> tl3ab ?
+        Fin <span className="text-primary">bghiti</span> tl3ab ?
       </h1>
-      <p className="mt-4 max-w-xl text-chalk-muted">
+      <p className="mt-4 max-w-xl text-ink-muted">
         Filtre par jour et par format, choisis ton créneau et réserve en 30 secondes via WhatsApp.
       </p>
       <div className="mt-10">

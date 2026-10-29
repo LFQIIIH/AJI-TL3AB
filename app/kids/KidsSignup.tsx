@@ -72,7 +72,7 @@ export default function KidsSignup({ label = "Inscrire mon enfant", className = 
           <button type="submit" className="btn-primary w-full" disabled={!valid}>
             Continuer sur WhatsApp
           </button>
-          <p className="text-center text-xs text-chalk-muted">
+          <p className="text-center text-xs text-ink-muted">
             Première séance d&apos;essai offerte. On vous recontacte pour confirmer le groupe.
           </p>
         </form>

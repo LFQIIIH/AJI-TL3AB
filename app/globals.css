@@ -4,14 +4,14 @@
 
 @layer base {
   html {
-    @apply bg-night text-chalk antialiased;
-    color-scheme: dark;
+    @apply bg-canvas text-ink antialiased;
+    color-scheme: light;
   }
   body {
-    @apply min-h-dvh bg-night font-sans;
+    @apply min-h-dvh bg-canvas font-sans;
   }
   ::selection {
-    @apply bg-accent text-accent-ink;
+    @apply bg-highlight text-highlight-ink;
   }
 }
 
@@ -23,30 +23,30 @@
     @apply font-display uppercase leading-[0.9] tracking-headline;
   }
   .eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.2em] text-accent;
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-primary;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold uppercase tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-night disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold uppercase tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
-    @apply btn bg-accent text-accent-ink hover:bg-accent-hover;
+    @apply btn bg-primary text-primary-ink hover:bg-primary-hover;
   }
   .btn-ghost {
-    @apply btn border border-night-600 text-chalk hover:border-chalk;
+    @apply btn border border-line-strong bg-surface text-ink hover:border-ink;
   }
   .card {
-    @apply rounded-2xl border border-night-700 bg-night-800;
+    @apply rounded-2xl border border-line bg-surface;
   }
   .chip {
     @apply rounded-full border px-4 py-2 text-sm font-semibold transition;
   }
   .chip-on {
-    @apply border-accent bg-accent text-accent-ink;
+    @apply border-highlight bg-highlight text-highlight-ink;
   }
   .chip-off {
-    @apply border-night-600 text-chalk-muted hover:border-chalk hover:text-chalk;
+    @apply border-line-strong bg-surface text-ink-muted hover:border-ink hover:text-ink;
   }
   .input {
-    @apply w-full rounded-xl border border-night-600 bg-night px-4 py-3 text-chalk placeholder:text-chalk-muted/60 focus:border-accent focus:outline-none;
+    @apply w-full rounded-xl border border-line-strong bg-surface px-4 py-3 text-ink placeholder:text-ink-muted/60 focus:border-primary focus:outline-none;
   }
 }
