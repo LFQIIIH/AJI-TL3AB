@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-night text-chalk antialiased;
+    color-scheme: dark;
+  }
+  body {
+    @apply min-h-dvh bg-night font-sans;
+  }
+  ::selection {
+    @apply bg-accent text-accent-ink;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+  }
+  .headline {
+    @apply font-display uppercase leading-[0.9] tracking-headline;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-accent;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold uppercase tracking-wide transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-night disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-accent text-accent-ink hover:bg-accent-hover;
+  }
+  .btn-ghost {
+    @apply btn border border-night-600 text-chalk hover:border-chalk;
+  }
+  .card {
+    @apply rounded-2xl border border-night-700 bg-night-800;
+  }
+  .chip {
+    @apply rounded-full border px-4 py-2 text-sm font-semibold transition;
+  }
+  .chip-on {
+    @apply border-accent bg-accent text-accent-ink;
+  }
+  .chip-off {
+    @apply border-night-600 text-chalk-muted hover:border-chalk hover:text-chalk;
+  }
+  .input {
+    @apply w-full rounded-xl border border-night-600 bg-night px-4 py-3 text-chalk placeholder:text-chalk-muted/60 focus:border-accent focus:outline-none;
+  }
+}

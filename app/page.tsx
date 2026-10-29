@@ -1,0 +1,197 @@
+import Link from "next/link";
+import MatchCard from "@/components/MatchCard";
+import { getUpcomingMatches, isFull } from "@/lib/matches";
+import { whatsappLink } from "@/lib/config";
+
+// Re-render hourly so "next matches" stays current.
+export const revalidate = 3600;
+
+const STEPS = [
+  {
+    n: "01",
+    title: "Choisis un match",
+    text: "5v5, 7v7 ou 9v9 — filtre par jour, quartier et niveau. Y a toujours un match pour toi.",
+  },
+  {
+    n: "02",
+    title: "Réserve",
+    text: "Un clic, ton prénom, et on confirme ta place sur WhatsApp. Bla compte, bla app.",
+  },
+  {
+    n: "03",
+    title: "Pointe-toi",
+    text: "Arrive 10 min avant avec tes crampons. Les équipes, le ballon, les chasubles : c'est nous.",
+  },
+];
+
+const FAQ = [
+  {
+    q: "Je viens seul, c'est possible ?",
+    a: "Bien sûr. La majorité des joueurs viennent seuls ou à deux. On équilibre les équipes sur place — ghir aji.",
+  },
+  {
+    q: "Comment je paie ?",
+    a: "Sur place, en espèces ou par virement avant le match. Le prix est indiqué sur chaque match, en MAD par joueur.",
+  },
+  {
+    q: "C'est quoi les niveaux ?",
+    a: "Débutant, Intermédiaire, Confirmé ou Tous niveaux. Sois honnête avec toi-même, tout le monde passe un meilleur match.",
+  },
+  {
+    q: "Et si je dois annuler ?",
+    a: "Préviens-nous sur WhatsApp au moins 24h avant pour libérer ta place. Au-delà, la place reste due.",
+  },
+  {
+    q: "Il faut ramener quoi ?",
+    a: "Crampons moulés ou baskets selon le terrain, une bouteille d'eau, et la motivation. Le reste on gère.",
+  },
+];
+
+export default function HomePage() {
+  const upcoming = getUpcomingMatches(3);
+
+  return (
+    <>
+      {/* Hero */}
+      <section className="relative overflow-hidden border-b border-night-700">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, #C8FF00 1px, transparent 1px), linear-gradient(to bottom, #C8FF00 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+          }}
+        />
+        <div className="container-page relative py-20 sm:py-28 lg:py-36">
+          <p className="eyebrow">Football · Marrakech</p>
+          <h1 className="headline mt-4 text-[22vw] sm:text-[11rem] lg:text-[13rem]">
+            Aji tl3ab<span className="text-accent">.</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-lg text-chalk-muted sm:text-xl">
+            Rejoins des matchs <strong className="text-chalk">5v5, 7v7 et 9v9</strong> partout à Marrakech.
+            Seul ou avec tes potes, tu réserves ta place, on s&apos;occupe du terrain et des équipes.
+          </p>
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <Link href="/jouer" className="btn-primary px-8 py-4 text-base">
+              Réserve ta place
+            </Link>
+            <a href="#comment-ca-marche" className="btn-ghost px-8 py-4 text-base">
+              Kifach ? Comment ça marche
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section id="comment-ca-marche" className="container-page scroll-mt-20 py-16 sm:py-24">
+        <p className="eyebrow">Comment ça marche</p>
+        <h2 className="headline mt-3 text-5xl sm:text-7xl">3 étapes, c&apos;est tout</h2>
+        <ol className="mt-10 grid gap-4 md:grid-cols-3">
+          {STEPS.map((s) => (
+            <li key={s.n} className="card p-6">
+              <span className="headline text-6xl text-accent">{s.n}</span>
+              <h3 className="headline mt-4 text-3xl">{s.title}</h3>
+              <p className="mt-2 text-chalk-muted">{s.text}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* Upcoming matches */}
+      <section className="border-y border-night-700 bg-night-800/40">
+        <div className="container-page py-16 sm:py-24">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <p className="eyebrow">Prochains matchs</p>
+              <h2 className="headline mt-3 text-5xl sm:text-7xl">Ça joue bientôt</h2>
+            </div>
+            <Link href="/jouer" className="text-sm font-bold uppercase tracking-wide text-accent hover:underline">
+              Voir tous les matchs →
+            </Link>
+          </div>
+          {upcoming.length > 0 ? (
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {upcoming.map((m) => (
+                <MatchCard
+                  key={m.id}
+                  match={m}
+                  action={
+                    isFull(m) ? (
+                      <span className="btn-ghost cursor-default px-5 py-2.5 opacity-50">Complet</span>
+                    ) : (
+                      <Link href="/jouer" className="btn-primary px-5 py-2.5">
+                        Réserver
+                      </Link>
+                    )
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="card mt-10 p-8 text-center">
+              <p className="headline text-3xl">Nouveaux matchs très bientôt</p>
+              <p className="mt-2 text-chalk-muted">Suis-nous sur Instagram ou écris-nous sur WhatsApp pour être prévenu.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Kids + Merch teasers */}
+      <section className="container-page grid gap-4 py-16 sm:py-24 md:grid-cols-2">
+        <Link href="/kids" className="card group relative overflow-hidden p-8 transition hover:border-accent sm:p-10">
+          <p className="eyebrow">Kids Academy</p>
+          <h2 className="headline mt-3 text-5xl sm:text-6xl">
+            Sghar f l&apos;3mer, <span className="text-accent">kbar</span> f terrain
+          </h2>
+          <p className="mt-4 max-w-sm text-chalk-muted">
+            Entraînements encadrés pour les 5–14 ans, par groupes d&apos;âge, avec des coachs diplômés.
+          </p>
+          <span className="mt-8 inline-block text-sm font-bold uppercase tracking-wide text-accent group-hover:underline">
+            Découvrir l&apos;académie →
+          </span>
+        </Link>
+        <Link href="/merch" className="card group relative overflow-hidden bg-accent p-8 text-accent-ink transition hover:bg-accent-hover sm:p-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em]">Merch</p>
+          <h2 className="headline mt-3 text-5xl sm:text-6xl">Porte les couleurs</h2>
+          <p className="mt-4 max-w-sm opacity-80">
+            Maillots, t-shirts et casquettes AJI TL3AB. Certaines pièces en précommande — premier arrivé, premier servi.
+          </p>
+          <span className="mt-8 inline-block text-sm font-bold uppercase tracking-wide group-hover:underline">
+            Voir la boutique →
+          </span>
+        </Link>
+      </section>
+
+      {/* FAQ */}
+      <section className="border-t border-night-700">
+        <div className="container-page grid gap-10 py-16 sm:py-24 lg:grid-cols-[1fr_2fr]">
+          <div>
+            <p className="eyebrow">FAQ</p>
+            <h2 className="headline mt-3 text-5xl sm:text-7xl">Des questions ?</h2>
+            <p className="mt-4 text-chalk-muted">Ma l9itich jawab ? Écris-nous directement.</p>
+            <a
+              href={whatsappLink("Salam, 3ndi wa7d so2al :")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-ghost mt-6"
+            >
+              Poser une question
+            </a>
+          </div>
+          <div className="divide-y divide-night-700 border-y border-night-700">
+            {FAQ.map((f) => (
+              <details key={f.q} className="group py-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold [&::-webkit-details-marker]:hidden">
+                  {f.q}
+                  <span className="headline text-3xl text-accent transition group-open:rotate-45">+</span>
+                </summary>
+                <p className="mt-3 text-chalk-muted">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
