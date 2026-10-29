@@ -1,4 +1,4 @@
-import { matches, type Match } from "@/data/matches";
+import type { Match } from "@/data/matches";
 
 // Morocco runs on UTC+1 outside Ramadan.
 const MARRAKECH_OFFSET = "+01:00";
@@ -14,21 +14,6 @@ export function spotsLeft(m: Match): number {
 
 export function isFull(m: Match): boolean {
   return spotsLeft(m) === 0;
-}
-
-export function getUpcomingMatches(limit?: number, now: Date = new Date()): Match[] {
-  const upcoming = matches
-    .filter((m) => matchStart(m) > now)
-    .sort((a, b) => matchStart(a).getTime() - matchStart(b).getTime());
-  return limit ? upcoming.slice(0, limit) : upcoming;
-}
-
-/** Played matches that have a result, most recent first. */
-export function getRecentResults(limit?: number, now: Date = new Date()): Match[] {
-  const played = matches
-    .filter((m) => m.result && matchStart(m) <= now)
-    .sort((a, b) => matchStart(b).getTime() - matchStart(a).getTime());
-  return limit ? played.slice(0, limit) : played;
 }
 
 /** "ven. 30 oct." */

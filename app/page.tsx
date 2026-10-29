@@ -1,11 +1,12 @@
 import Link from "next/link";
 import MatchCard from "@/components/MatchCard";
 import ResultCard from "@/components/ResultCard";
-import { getRecentResults, getUpcomingMatches, isFull } from "@/lib/matches";
+import { isFull } from "@/lib/matches";
+import { getRecentResults, getUpcomingMatches } from "@/lib/matches-source";
 import { whatsappLink } from "@/lib/config";
 
-// Re-render hourly so "next matches" stays current.
-export const revalidate = 3600;
+// Re-render every 5 min (MATCHES_REVALIDATE_SECONDS) to pick up sheet edits.
+export const revalidate = 300;
 
 const STEPS = [
   {
@@ -48,9 +49,8 @@ const FAQ = [
   },
 ];
 
-export default function HomePage() {
-  const upcoming = getUpcomingMatches(3);
-  const results = getRecentResults(4);
+export default async function HomePage() {
+  const [upcoming, results] = await Promise.all([getUpcomingMatches(3), getRecentResults(4)]);
 
   return (
     <>

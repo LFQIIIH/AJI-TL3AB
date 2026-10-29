@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getUpcomingMatches } from "@/lib/matches";
+import { getUpcomingMatches } from "@/lib/matches-source";
 import MatchBrowser from "./MatchBrowser";
 
 export const metadata: Metadata = {
@@ -7,11 +7,12 @@ export const metadata: Metadata = {
   description: "Tous les matchs 5v5, 7v7 et 9v9 à venir à Marrakech. Choisis, réserve, joue.",
 };
 
-// Re-render hourly so past matches drop off the list.
-export const revalidate = 3600;
+// Re-render every 5 min (MATCHES_REVALIDATE_SECONDS) to pick up sheet edits
+// and drop matches that have started.
+export const revalidate = 300;
 
-export default function JouerPage() {
-  const matches = getUpcomingMatches();
+export default async function JouerPage() {
+  const matches = await getUpcomingMatches();
 
   return (
     <div className="container-page py-12 sm:py-16">
