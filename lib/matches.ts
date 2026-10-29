@@ -23,6 +23,14 @@ export function getUpcomingMatches(limit?: number, now: Date = new Date()): Matc
   return limit ? upcoming.slice(0, limit) : upcoming;
 }
 
+/** Played matches that have a result, most recent first. */
+export function getRecentResults(limit?: number, now: Date = new Date()): Match[] {
+  const played = matches
+    .filter((m) => m.result && matchStart(m) <= now)
+    .sort((a, b) => matchStart(b).getTime() - matchStart(a).getTime());
+  return limit ? played.slice(0, limit) : played;
+}
+
 /** "ven. 30 oct." */
 export function formatDay(date: string): string {
   return new Intl.DateTimeFormat("fr-FR", {

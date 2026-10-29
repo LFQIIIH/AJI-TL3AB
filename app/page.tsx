@@ -1,6 +1,7 @@
 import Link from "next/link";
 import MatchCard from "@/components/MatchCard";
-import { getUpcomingMatches, isFull } from "@/lib/matches";
+import ResultCard from "@/components/ResultCard";
+import { getRecentResults, getUpcomingMatches, isFull } from "@/lib/matches";
 import { whatsappLink } from "@/lib/config";
 
 // Re-render hourly so "next matches" stays current.
@@ -49,6 +50,7 @@ const FAQ = [
 
 export default function HomePage() {
   const upcoming = getUpcomingMatches(3);
+  const results = getRecentResults(4);
 
   return (
     <>
@@ -136,6 +138,20 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
+      {/* Results history */}
+      {results.length > 0 && (
+        <section id="historique" className="container-page scroll-mt-20 pt-16 sm:pt-24">
+          <p className="eyebrow">Historique</p>
+          <h2 className="headline mt-3 text-5xl sm:text-7xl">Derniers résultats</h2>
+          <p className="mt-4 max-w-xl text-chalk-muted">Chkoun rbe7 ? Les scores des derniers matchs, et le MVP de chaque soirée.</p>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+            {results.map((m) => (
+              <ResultCard key={m.id} match={m} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Kids + Merch teasers */}
       <section className="container-page grid gap-4 py-16 sm:py-24 md:grid-cols-2">
