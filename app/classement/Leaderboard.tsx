@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import PositionArt from "@/components/community/PositionArt";
 import { useRpc } from "@/components/community/useRpc";
 import { AWARD_LABELS, currentMonthRange, currentSeasonRange, monthLabel, type AwardCategory } from "@/lib/community";
 import { positionLabel, type Position } from "@/lib/profile";
@@ -10,6 +11,13 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 type Row = { category: AwardCategory; rank: number; name: string; player_position: Position; value: number; matches: number };
 
 const ORDER: AwardCategory[] = ["buteur", "gardien", "defenseur", "milieu"];
+const CAPTION: Record<AwardCategory, string> = {
+  buteur: "Le plus de buts",
+  gardien: "Élu par les joueurs",
+  defenseur: "Élu par les joueurs",
+  milieu: "Élu par les joueurs",
+};
+
 const UNIT: Record<AwardCategory, [string, string]> = {
   buteur: ["but", "buts"],
   gardien: ["vote", "votes"],
@@ -54,8 +62,15 @@ export default function Leaderboard() {
         {ORDER.map((cat) => {
           const list = rows?.filter((r) => r.category === cat) ?? [];
           return (
-            <section key={cat} className="card p-5 sm:p-6">
-              <h2 className="headline text-3xl">{AWARD_LABELS[cat]}</h2>
+            <section key={cat} className="card overflow-hidden">
+              <div className="flex items-center justify-between gap-3 bg-forest px-5 py-3 text-white sm:px-6">
+                <div>
+                  <h2 className="headline text-3xl">{AWARD_LABELS[cat]}</h2>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-highlight">{CAPTION[cat]}</p>
+                </div>
+                <PositionArt category={cat} className="-my-2 h-28 w-28 shrink-0 sm:h-32 sm:w-32" />
+              </div>
+              <div className="px-5 pb-5 sm:px-6">
               {rows === undefined ? (
                 <div className="mt-4 h-24 animate-pulse rounded-xl bg-canvas-deep" />
               ) : list.length === 0 ? (
@@ -88,6 +103,7 @@ export default function Leaderboard() {
                   ))}
                 </ol>
               )}
+              </div>
             </section>
           );
         })}

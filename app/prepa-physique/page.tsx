@@ -48,7 +48,9 @@ export default function PrepaPhysiquePage() {
             <p className="font-semibold">On s&apos;entraîne directement sur le terrain de foot.</p>
             <p className="mt-1 text-ink-muted">
               En plein air, avec de l&apos;oxygène et de l&apos;espace pour bouger : tu t&apos;entraînes{" "}
-              <strong className="text-primary">merta7</strong>.
+              <strong className="headline inline-block -rotate-2 rounded-lg bg-highlight px-2 pt-1 align-middle text-3xl text-highlight-ink sm:text-4xl">
+                merta7
+              </strong>
             </p>
             <ul className="mt-3 flex flex-wrap gap-2 text-sm font-semibold">
               <li className="rounded-full bg-highlight px-3 py-1 text-highlight-ink">🌳 Plein air</li>
