@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { CITY, INSTAGRAM_HANDLE, INSTAGRAM_URL, whatsappLink } from "@/lib/config";
 import { InstagramIcon, WhatsAppIcon } from "@/components/Icons";
@@ -7,7 +8,8 @@ export default function Footer() {
     <footer className="bg-forest text-white">
       <div className="container-page grid gap-10 py-12 md:grid-cols-3">
         <div>
-          <p className="headline text-4xl">
+          <Image src="/logo-mark.png" alt="" width={379} height={279} className="h-14 w-auto" />
+          <p className="headline mt-3 text-4xl">
             Aji <span className="text-highlight">tl3ab</span>
           </p>
           <p className="mt-3 max-w-xs text-sm text-white/70">

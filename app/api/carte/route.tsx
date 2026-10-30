@@ -32,11 +32,13 @@ export async function GET(request: NextRequest) {
   if (!award) return new Response("Not found", { status: 404 });
 
   const match = (await getMatches().catch(() => [])).find((m) => m.id === matchId);
-  const [anton, inter500, inter700] = await Promise.all([
+  const [anton, inter500, inter700, logo] = await Promise.all([
     fontFile("Anton-Regular.ttf"),
     fontFile("Inter-500.ttf"),
     fontFile("Inter-700.ttf"),
+    readFile(join(process.cwd(), "assets/logo-mark.png")),
   ]);
+  const logoSrc = `data:image/png;base64,${logo.toString("base64")}`;
   const names = award.name.split(" & ");
 
   return new ImageResponse(
@@ -56,7 +58,9 @@ export async function GET(request: NextRequest) {
           fontFamily: "Inter",
         }}
       >
-        <div style={{ display: "flex", fontFamily: "Anton", fontSize: 72, letterSpacing: 2 }}>
+        <div style={{ display: "flex", alignItems: "center", fontFamily: "Anton", fontSize: 72, letterSpacing: 2 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={logoSrc} width={163} height={120} alt="" style={{ marginRight: 28 }} />
           AJI <span style={{ color: C.highlight, marginLeft: 20 }}>TL3AB</span>
         </div>
 

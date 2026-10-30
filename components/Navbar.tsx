@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -32,8 +33,11 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-forest-light bg-forest text-white">
       <nav className="container-page flex h-16 items-center justify-between">
-        <Link href="/" className="headline text-2xl">
-          Aji <span className="text-highlight">tl3ab</span>
+        <Link href="/" className="headline flex items-center gap-2 text-2xl" aria-label="AJI TL3AB, accueil">
+          <Image src="/logo-mark.png" alt="" width={379} height={279} priority className="h-10 w-auto" />
+          <span>
+            Aji <span className="text-highlight">tl3ab</span>
+          </span>
         </Link>
 
         <ul className="hidden items-center gap-8 md:flex">
