@@ -4,7 +4,7 @@ import InfoStrip from "@/components/InfoStrip";
 import ProductCard from "./ProductCard";
 
 export const metadata: Metadata = {
-  title: "Merch",
+  title: "L7wayej",
   description: "Maillots, t-shirts, hoodies et casquettes AJI TL3AB. Commande directe via WhatsApp.",
 };
 

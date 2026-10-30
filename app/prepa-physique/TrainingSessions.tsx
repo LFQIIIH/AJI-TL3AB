@@ -201,7 +201,7 @@ function SessionAction({
   if (!isSupabaseConfigured) {
     return (
       <a
-        href={whatsappLink(`Salam ! Je viens à la prépa physique du ${formatDayLong(date)} à ${formatTime(TRAINING_TIME)}.`)}
+        href={whatsappLink(`Salam ! Je viens au training physique du ${formatDayLong(date)} à ${formatTime(TRAINING_TIME)}.`)}
         target="_blank"
         rel="noopener noreferrer"
         className="btn-primary w-full"

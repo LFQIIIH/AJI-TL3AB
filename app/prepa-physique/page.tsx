@@ -16,8 +16,8 @@ import {
 import TrainingSessions from "./TrainingSessions";
 
 export const metadata: Metadata = {
-  title: "Prépa physique",
-  description: `Prépa physique et renforcement du core avec le coach ${TRAINER_NAME} à Marrakech. ${PRICE_PER_SESSION_MAD} MAD la séance ou ${PRICE_PER_MONTH_MAD} MAD par mois.`,
+  title: "Training physique",
+  description: `Training physique en plein air, sur le terrain de foot, avec le coach ${TRAINER_NAME} à Marrakech. ${PRICE_PER_SESSION_MAD} MAD la séance ou ${PRICE_PER_MONTH_MAD} MAD par mois.`,
 };
 
 const PROGRAM = [
@@ -28,7 +28,7 @@ const PROGRAM = [
 ] as const;
 
 const perSessionWithSub = Math.round(PRICE_PER_MONTH_MAD / SESSIONS_PER_MONTH);
-const subscribeMessage = `Salam ! Je veux m'abonner à la prépa physique avec le coach ${TRAINER_NAME} (${PRICE_PER_MONTH_MAD} MAD / mois).`;
+const subscribeMessage = `Salam ! Je veux m'abonner au training physique avec le coach ${TRAINER_NAME} (${PRICE_PER_MONTH_MAD} MAD / mois).`;
 
 export default function PrepaPhysiquePage() {
   return (
@@ -36,14 +36,26 @@ export default function PrepaPhysiquePage() {
       {/* Hero */}
       <section className="border-b border-line">
         <div className="container-page py-16 sm:py-24">
-          <p className="eyebrow">Prépa physique · Coach {TRAINER_NAME}</p>
+          <p className="eyebrow">Training physique · Coach {TRAINER_NAME}</p>
           <h1 className="headline mt-4 text-6xl sm:text-8xl lg:text-9xl">
-            9wi l&apos;<span className="text-primary">core</span> dyalek.
+            Dima <span className="text-primary">wajed</span>.
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-ink-muted">
             Gainage, cardio et renforcement pour être plus fort sur le terrain. Des séances en groupe, encadrées par un coach,
             trois fois par semaine à Marrakech.
           </p>
+          <div className="mt-6 max-w-2xl rounded-2xl border-2 border-primary bg-surface p-5">
+            <p className="font-semibold">On s&apos;entraîne directement sur le terrain de foot.</p>
+            <p className="mt-1 text-ink-muted">
+              En plein air, avec de l&apos;oxygène et de l&apos;espace pour bouger : tu t&apos;entraînes{" "}
+              <strong className="text-primary">merta7</strong>.
+            </p>
+            <ul className="mt-3 flex flex-wrap gap-2 text-sm font-semibold">
+              <li className="rounded-full bg-highlight px-3 py-1 text-highlight-ink">🌳 Plein air</li>
+              <li className="rounded-full bg-highlight px-3 py-1 text-highlight-ink">💨 De l&apos;oxygène</li>
+              <li className="rounded-full bg-highlight px-3 py-1 text-highlight-ink">⚽ De l&apos;espace</li>
+            </ul>
+          </div>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <a href="#seances" className="btn-primary px-8 py-4 text-base">
               Voir les prochaines séances

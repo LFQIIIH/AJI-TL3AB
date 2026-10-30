@@ -283,7 +283,7 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
       {isSupabaseConfigured && user === null && (
         <p className="mt-4 rounded-xl bg-highlight/30 px-4 py-3 text-sm">
           <Link href="/connexion" className="font-bold text-primary hover:underline">Connecte-toi</Link> pour réserver en un clic,
-          rejoindre la liste d&apos;attente et faire compter tes matchs pour le classement et le tirage au sort du mois.
+          rejoindre la liste d&apos;attente et faire compter tes matchs pour le ranking et le tirage au sort du mois.
         </p>
       )}
 
@@ -352,11 +352,11 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
                     {user ? (
                       <>
                         <Link href="/compte" className="font-bold text-primary hover:underline">Complète ton profil</Link> pour réserver en
-                        un clic et faire compter ce match pour le classement et le tirage au sort.
+                        un clic et faire compter ce match pour le ranking et le tirage au sort.
                       </>
                     ) : (
                       <>
-                        Sans compte, ce match ne compte pas pour le classement ni le tirage au sort du mois.{" "}
+                        Sans compte, ce match ne compte pas pour le ranking ni le tirage au sort du mois.{" "}
                         <Link href="/connexion" className="font-bold text-primary hover:underline">Se connecter</Link>
                       </>
                     )}
@@ -428,7 +428,7 @@ function PlusOne({ checked, onChange, disabled }: { checked: boolean; onChange: 
       <span>
         <span className="font-semibold">+1 pote</span>
         <span className="block text-xs text-ink-muted">
-          {disabled ? "Plus assez de places pour deux." : "Il paie aussi sur place. Il ne compte pas pour le classement."}
+          {disabled ? "Plus assez de places pour deux." : "Il paie aussi sur place. Il ne compte pas pour le ranking."}
         </span>
       </span>
     </label>

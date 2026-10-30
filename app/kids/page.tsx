@@ -3,7 +3,7 @@ import InfoStrip from "@/components/InfoStrip";
 import KidsSignup from "./KidsSignup";
 
 export const metadata: Metadata = {
-  title: "Kids Academy",
+  title: "Académie enfants",
   description:
     "Académie de football pour enfants de 5 à 14 ans à Marrakech. Groupes par âge, coachs diplômés, encadrement sécurisé.",
 };
@@ -47,7 +47,7 @@ export default function KidsPage() {
       {/* Hero */}
       <section className="border-b border-line">
         <div className="container-page py-16 sm:py-24">
-          <p className="eyebrow">Kids Academy · 5–14 ans</p>
+          <p className="eyebrow">Académie enfants · La fierté de demain</p>
           <h1 className="headline mt-4 text-6xl sm:text-8xl lg:text-9xl">
             Sghar f l&apos;3mer,
             <br />

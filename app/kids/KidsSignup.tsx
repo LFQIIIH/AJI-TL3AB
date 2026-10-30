@@ -25,7 +25,7 @@ export default function KidsSignup({ label = "Inscrire mon enfant", className = 
     e.preventDefault();
     if (!valid) return;
     const message = [
-      "Salam AJI TL3AB ! Bghit nsejjel wldi / bnti f Kids Academy 👋",
+      "Salam AJI TL3AB ! Bghit nsejjel wldi / bnti f l'Académie enfants 👋",
       "",
       `👦 Prénom de l'enfant : ${childName.trim()}`,
       `🎂 Âge : ${ageNum} ans`,
@@ -41,7 +41,7 @@ export default function KidsSignup({ label = "Inscrire mon enfant", className = 
       <button type="button" className={className} onClick={() => setOpen(true)}>
         <WhatsAppIcon /> {label}
       </button>
-      <Modal open={open} onClose={() => setOpen(false)} title="Inscription Kids">
+      <Modal open={open} onClose={() => setOpen(false)} title="Inscription enfant">
         <form onSubmit={submit} className="space-y-4">
           <label className="block">
             <span className="mb-2 block text-sm font-semibold">Prénom de l&apos;enfant</span>

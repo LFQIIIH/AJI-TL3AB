@@ -170,7 +170,7 @@ export default async function HomePage() {
               <h2 className="headline mt-3 text-5xl sm:text-7xl">Joue, vote, gagne</h2>
             </div>
             <Link href="/classement" className="text-sm font-bold uppercase tracking-wide text-primary hover:underline">
-              Voir le classement →
+              Voir le ranking →
             </Link>
           </div>
           <TeamOfMonth />
@@ -181,7 +181,7 @@ export default async function HomePage() {
       {/* Kids + Merch teasers */}
       <section className="container-page grid gap-4 py-16 sm:py-24 md:grid-cols-2">
         <Link href="/kids" className="card group relative overflow-hidden p-8 transition hover:border-primary sm:p-10">
-          <p className="eyebrow">Kids Academy</p>
+          <p className="eyebrow">Académie enfants · La fierté de demain</p>
           <h2 className="headline mt-3 text-5xl sm:text-6xl">
             Sghar f l&apos;3mer, <span className="text-primary">kbar</span> f terrain
           </h2>
@@ -193,7 +193,7 @@ export default async function HomePage() {
           </span>
         </Link>
         <Link href="/merch" className="group relative overflow-hidden rounded-2xl bg-forest p-8 text-white transition hover:bg-forest-light sm:p-10">
-          <p className="eyebrow text-highlight">Merch</p>
+          <p className="eyebrow text-highlight">L7wayej</p>
           <h2 className="headline mt-3 text-5xl sm:text-6xl">
             Porte les <span className="text-highlight">couleurs</span>
           </h2>

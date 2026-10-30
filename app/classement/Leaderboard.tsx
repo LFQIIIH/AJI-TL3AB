@@ -25,7 +25,7 @@ export default function Leaderboard() {
   const rows = useRpc<Row>("leaderboard", { p_from: range.from, p_to: range.to, p_limit: 10 });
 
   if (!isSupabaseConfigured) {
-    return <p className="card p-6 text-ink-muted">Le classement arrive bientôt.</p>;
+    return <p className="card p-6 text-ink-muted">Le ranking arrive bientôt.</p>;
   }
 
   return (

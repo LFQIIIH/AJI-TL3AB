@@ -39,7 +39,7 @@ export default function LoginPanel() {
       {isSupabaseConfigured ? (
         <>
           <p className="mt-4 text-ink-muted">
-            Connecte-toi pour créer ton profil joueur : nom, téléphone et poste. Bientôt : classements et tirage au sort
+            Connecte-toi pour créer ton profil joueur : nom, téléphone et poste. Bientôt : ranking et tirage au sort
             mensuel.
           </p>
           <button

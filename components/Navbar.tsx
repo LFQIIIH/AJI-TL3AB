@@ -9,10 +9,10 @@ import { firstName } from "@/lib/profile";
 
 const LINKS = [
   { href: "/jouer", label: "Jouer" },
-  { href: "/classement", label: "Classement" },
-  { href: "/prepa-physique", label: "Prépa" },
-  { href: "/kids", label: "Kids" },
-  { href: "/merch", label: "Merch" },
+  { href: "/classement", label: "Ranking" },
+  { href: "/prepa-physique", label: "Training" },
+  { href: "/kids", label: "Enfants" },
+  { href: "/merch", label: "L7wayej" },
 ];
 
 export default function Navbar() {

@@ -4,14 +4,14 @@ import TeamOfMonth from "@/components/community/TeamOfMonth";
 import Leaderboard from "./Leaderboard";
 
 export const metadata: Metadata = {
-  title: "Classement",
+  title: "Ranking",
   description: "Meilleurs buteurs, gardiens, défenseurs et milieux AJI TL3AB, équipe du mois et tirage au sort mensuel.",
 };
 
 export default function ClassementPage() {
   return (
     <div className="container-page py-12 sm:py-16">
-      <p className="eyebrow">Classement</p>
+      <p className="eyebrow">Ranking</p>
       <h1 className="headline mt-3 text-6xl sm:text-8xl">
         Chkoun <span className="text-primary">l&apos;m3allem</span> ?
       </h1>
