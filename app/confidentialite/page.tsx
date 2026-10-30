@@ -22,6 +22,7 @@ const SECTIONS = [
     title: "Pourquoi",
     body: [
       "Gérer tes réservations et te contacter au sujet de tes matchs.",
+      "Gérer tes inscriptions aux séances de prépa physique. Le nombre d'inscrits par séance est public, jamais les noms.",
       "Plus tard : les classements (buteurs, meilleurs joueurs par poste) et le tirage au sort mensuel.",
     ],
   },
