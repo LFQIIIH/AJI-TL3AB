@@ -38,7 +38,7 @@ export default function PrepaPhysiquePage() {
         <div className="container-page py-16 sm:py-24">
           <p className="eyebrow">Training physique · Coach {TRAINER_NAME}</p>
           <h1 className="headline mt-4 text-6xl sm:text-8xl lg:text-9xl">
-            Dima <span className="text-primary">wajed</span>.
+            Aji <span className="text-primary">tdreb</span>.
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-ink-muted">
             Gainage, cardio et renforcement pour être plus fort sur le terrain. Des séances en groupe, encadrées par un coach,
