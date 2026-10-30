@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { useSessionUser } from "@/lib/supabase/useSession";
+import { firstName } from "@/lib/profile";
 
 const LINKS = [
   { href: "/jouer", label: "Jouer" },
@@ -13,6 +16,14 @@ const LINKS = [
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const user = useSessionUser();
+  const account = isSupabaseConfigured
+    ? user
+      ? { href: "/compte", label: firstName((user.user_metadata?.full_name as string | undefined) ?? "") || "Mon compte" }
+      : user === null
+        ? { href: "/connexion", label: "Connexion" }
+        : null
+    : null;
 
   useEffect(() => setOpen(false), [pathname]);
 
@@ -36,6 +47,19 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
+          {account && (
+            <li>
+              <Link
+                href={account.href}
+                className={`flex items-center gap-2 text-sm font-semibold uppercase tracking-wide transition hover:text-highlight ${
+                  pathname === account.href ? "text-highlight" : "text-white"
+                }`}
+              >
+                <UserIcon />
+                {account.label}
+              </Link>
+            </li>
+          )}
           <li>
             <Link href="/jouer" className="btn-primary px-5 py-2.5">
               Réserve
@@ -69,9 +93,29 @@ export default function Navbar() {
                 </Link>
               </li>
             ))}
+            {account && (
+              <li className="mt-2 border-t border-forest-light pt-4">
+                <Link
+                  href={account.href}
+                  className={`flex items-center gap-3 py-2 text-lg font-semibold ${pathname === account.href ? "text-highlight" : ""}`}
+                >
+                  <UserIcon />
+                  {account.label}
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
       )}
     </header>
+  );
+}
+
+function UserIcon() {
+  return (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21a8 8 0 0 1 16 0" />
+    </svg>
   );
 }

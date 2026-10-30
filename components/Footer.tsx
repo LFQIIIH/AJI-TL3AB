@@ -21,6 +21,7 @@ export default function Footer() {
             <li><Link href="/jouer" className="hover:text-highlight">Jouer</Link></li>
             <li><Link href="/kids" className="hover:text-highlight">Kids Academy</Link></li>
             <li><Link href="/merch" className="hover:text-highlight">Merch</Link></li>
+            <li><Link href="/confidentialite" className="hover:text-highlight">Confidentialité</Link></li>
           </ul>
         </nav>
 
