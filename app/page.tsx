@@ -1,10 +1,12 @@
 import Link from "next/link";
 import InfoStrip from "@/components/InfoStrip";
-import MatchCard from "@/components/MatchCard";
-import { Icon } from "@/components/Icons";
-import RelativeDay from "@/components/RelativeDay";
-import ResultCard from "@/components/ResultCard";
-import { formatDay, formatTime, isFull, spotsLeft } from "@/lib/matches";
+import DrawInfo from "@/components/community/DrawInfo";
+import ResultsGrid from "@/components/community/ResultsGrid";
+import TeamOfMonth from "@/components/community/TeamOfMonth";
+import NextMatchCard from "@/components/home/NextMatchCard";
+import UpcomingCards from "@/components/home/UpcomingCards";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { isFull } from "@/lib/matches";
 import { getRecentResults, getUpcomingMatches } from "@/lib/matches-source";
 import { whatsappLink } from "@/lib/config";
 
@@ -55,7 +57,6 @@ const FAQ = [
 export default async function HomePage() {
   const [allUpcoming, results] = await Promise.all([getUpcomingMatches(), getRecentResults(4)]);
   const upcoming = allUpcoming.slice(0, 3);
-  const nextOpen = allUpcoming.find((m) => !isFull(m));
   const openMatches = allUpcoming.filter((m) => !isFull(m));
   const minPrice = allUpcoming.length > 0 ? Math.min(...allUpcoming.map((m) => m.priceMad)) : null;
   const pitchCount = new Set(allUpcoming.map((m) => m.pitch)).size;
@@ -94,42 +95,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {nextOpen && (
-            <Link
-              href="/jouer"
-              className="group block rounded-2xl bg-forest p-6 text-white shadow-xl shadow-forest/20 transition hover:bg-forest-light"
-            >
-              <p className="eyebrow flex items-center gap-2 text-highlight">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-highlight opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-highlight" />
-                </span>
-                Prochain match
-              </p>
-              <div className="mt-4 flex items-end justify-between gap-3">
-                <div>
-                  <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-white/70">
-                    <span className="capitalize">{formatDay(nextOpen.date)}</span>
-                    <RelativeDay date={nextOpen.date} />
-                  </p>
-                  <p className="headline mt-1 text-6xl">{formatTime(nextOpen.time)}</p>
-                </div>
-                <span className="headline rounded-lg bg-highlight px-3 py-1.5 text-2xl text-highlight-ink">{nextOpen.format}</span>
-              </div>
-              <p className="mt-4 flex items-center gap-2 text-sm">
-                <Icon name="pin" className="h-4 w-4 text-highlight" />
-                <span className="font-semibold">{nextOpen.pitch}</span>
-                {nextOpen.area && <span className="text-white/70">· {nextOpen.area}</span>}
-              </p>
-              <div className="mt-5 flex items-center justify-between gap-3 border-t border-forest-light pt-4">
-                <p className="text-sm">
-                  <span className="font-bold text-highlight">{spotsLeft(nextOpen)}</span>{" "}
-                  {spotsLeft(nextOpen) > 1 ? "places" : "place"} · <span className="font-bold">{nextOpen.priceMad} MAD</span>
-                </p>
-                <span className="text-sm font-bold uppercase tracking-wide text-highlight group-hover:underline">Réserver →</span>
-              </div>
-            </Link>
-          )}
+          <NextMatchCard matches={allUpcoming} />
         </div>
       </section>
 
@@ -175,23 +141,7 @@ export default async function HomePage() {
             </Link>
           </div>
           {upcoming.length > 0 ? (
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
-              {upcoming.map((m) => (
-                <MatchCard
-                  key={m.id}
-                  match={m}
-                  action={
-                    isFull(m) ? (
-                      <span className="btn-ghost cursor-default px-5 py-2.5 opacity-50">Complet</span>
-                    ) : (
-                      <Link href="/jouer" className="btn-primary px-5 py-2.5">
-                        Réserver
-                      </Link>
-                    )
-                  }
-                />
-              ))}
-            </div>
+            <UpcomingCards matches={upcoming} />
           ) : (
             <div className="card mt-10 p-8 text-center">
               <p className="headline text-3xl">Nouveaux matchs très bientôt</p>
@@ -206,12 +156,25 @@ export default async function HomePage() {
         <section id="historique" className="container-page scroll-mt-20 pt-16 sm:pt-24">
           <p className="eyebrow">Historique</p>
           <h2 className="headline mt-3 text-5xl sm:text-7xl">Derniers résultats</h2>
-          <p className="mt-4 max-w-xl text-ink-muted">Chkoun rbe7 ? Les scores des derniers matchs, et le MVP de chaque soirée.</p>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            {results.map((m) => (
-              <ResultCard key={m.id} match={m} />
-            ))}
+          <p className="mt-4 max-w-xl text-ink-muted">Chkoun rbe7 ? Les scores des derniers matchs et les joueurs élus par leurs coéquipiers.</p>
+          <ResultsGrid results={results} />
+        </section>
+      )}
+
+      {/* Community: team of the month + monthly draw */}
+      {isSupabaseConfigured && (
+        <section className="container-page space-y-4 pt-16 sm:pt-24">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <p className="eyebrow">Communauté</p>
+              <h2 className="headline mt-3 text-5xl sm:text-7xl">Joue, vote, gagne</h2>
+            </div>
+            <Link href="/classement" className="text-sm font-bold uppercase tracking-wide text-primary hover:underline">
+              Voir le classement →
+            </Link>
           </div>
+          <TeamOfMonth />
+          <DrawInfo compact />
         </section>
       )}
 

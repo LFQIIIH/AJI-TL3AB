@@ -23,14 +23,17 @@ const SECTIONS = [
     body: [
       "Gérer tes réservations et te contacter au sujet de tes matchs.",
       "Gérer tes inscriptions aux séances de prépa physique. Le nombre d'inscrits par séance est public, jamais les noms.",
-      "Plus tard : les classements (buteurs, meilleurs joueurs par poste) et le tirage au sort mensuel.",
+      "Tes réservations en ligne, ta présence aux matchs, tes buts et les votes des autres joueurs : pour le classement, les prix de match et le tirage au sort mensuel.",
+      "Le code de parrainage : pour savoir quel pote t'a invité, et lui donner un ticket de plus au tirage."
     ],
   },
   {
     title: "Qui peut voir tes données",
     body: [
       "Ton numéro de téléphone et ton e-mail sont privés : seuls toi et l'équipe AJI TL3AB y ont accès. Les autres joueurs ne les voient jamais.",
-      "Sur les classements publics, seuls ton prénom, l'initiale de ton nom (ex : « Yassine B. ») et ton poste apparaîtront.",
+      "Sur le classement, les prix de match, l'équipe du mois et le tirage au sort, seuls ton prénom, l'initiale de ton nom (ex : « Yassine B. ») et ton poste apparaissent.",
+      "Pour voter, les joueurs d'un même match voient les prénoms (+ initiale) et postes des autres joueurs de ce match.",
+      "Les votes sont anonymes : personne ne voit pour qui tu as voté.",
       "On ne vend ni ne partage tes données avec des tiers à des fins commerciales.",
     ],
   },

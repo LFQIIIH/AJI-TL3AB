@@ -9,6 +9,7 @@ import { firstName } from "@/lib/profile";
 
 const LINKS = [
   { href: "/jouer", label: "Jouer" },
+  { href: "/classement", label: "Classement" },
   { href: "/prepa-physique", label: "Prépa" },
   { href: "/kids", label: "Kids" },
   { href: "/merch", label: "Merch" },

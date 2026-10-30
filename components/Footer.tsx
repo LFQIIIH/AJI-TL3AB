@@ -19,6 +19,7 @@ export default function Footer() {
           <p className="eyebrow text-highlight">Navigation</p>
           <ul className="mt-4 space-y-2 text-sm">
             <li><Link href="/jouer" className="hover:text-highlight">Jouer</Link></li>
+            <li><Link href="/classement" className="hover:text-highlight">Classement & tirage</Link></li>
             <li><Link href="/prepa-physique" className="hover:text-highlight">Prépa physique</Link></li>
             <li><Link href="/kids" className="hover:text-highlight">Kids Academy</Link></li>
             <li><Link href="/merch" className="hover:text-highlight">Merch</Link></li>

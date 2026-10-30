@@ -22,7 +22,10 @@ This creates the `profiles` table with the privacy rules: each player can only
 read and edit their own row. You see everyone in **Table Editor → profiles**.
 
 Then do the same with `supabase/migrations/0002_training.sql` (prépa physique
-sign-ups). Run the files **in number order**; each one is safe to run again.
+sign-ups) and `supabase/migrations/0003_community.sql` (online bookings,
+waiting list, votes, leaderboard, monthly draw, referrals). Run the files
+**in number order**; each one is safe to run again. See `docs/ADMIN.md` for
+day-to-day admin.
 You see who signed up for each session in **Table Editor → training_signups**.
 
 ## 3. Create the Google login credentials

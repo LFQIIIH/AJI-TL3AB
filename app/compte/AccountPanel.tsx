@@ -7,6 +7,10 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { useSessionUser } from "@/lib/supabase/useSession";
 import { firstName, formatPhone, normalizePhone, POSITIONS, type Position, type Profile } from "@/lib/profile";
+import { clearStoredReferral, readStoredReferral } from "@/lib/community";
+
+/** Fired after a save so the dashboard reloads (e.g. right after profile creation). */
+export const PROFILE_SAVED_EVENT = "ajitl3ab:profile-saved";
 
 type Status = { kind: "idle" } | { kind: "saving" } | { kind: "saved" } | { kind: "error"; message: string };
 
@@ -18,6 +22,7 @@ export default function AccountPanel() {
   const [phone, setPhone] = useState("");
   const [position, setPosition] = useState<Position | "">("");
   const [consent, setConsent] = useState(false);
+  const [referral, setReferral] = useState("");
   const [status, setStatus] = useState<Status>({ kind: "idle" });
 
   useEffect(() => {
@@ -42,6 +47,7 @@ export default function AccountPanel() {
         setFullName(data?.full_name ?? (user.user_metadata?.full_name as string | undefined) ?? "");
         setPhone(data ? formatPhone(data.phone) : "");
         setPosition(data?.position ?? "");
+        if (!data) setReferral(readStoredReferral());
       });
     return () => {
       cancelled = true;
@@ -64,6 +70,7 @@ export default function AccountPanel() {
       phone: normalizedPhone,
       position,
       consent_at: profile?.consent_at ?? new Date().toISOString(),
+      ...(isNew && referral.trim() ? { referral_input: referral.trim() } : {}),
     };
     const { data, error } = await getSupabaseBrowserClient()
       .from("profiles")
@@ -77,6 +84,8 @@ export default function AccountPanel() {
     setProfile(data);
     setPhone(formatPhone(data.phone));
     setStatus({ kind: "saved" });
+    if (isNew) clearStoredReferral();
+    window.dispatchEvent(new Event(PROFILE_SAVED_EVENT));
   }
 
   async function signOut() {
@@ -86,14 +95,14 @@ export default function AccountPanel() {
 
   if (!user || profile === undefined) {
     return (
-      <div className="card w-full max-w-lg p-8 text-center text-ink-muted" aria-busy="true">
+      <div className="card w-full p-8 text-center text-ink-muted" aria-busy="true">
         {status.kind === "error" ? status.message : "Chargement…"}
       </div>
     );
   }
 
   return (
-    <div className="card w-full max-w-lg p-6 sm:p-8">
+    <div className="card w-full p-6 sm:p-8">
       <p className="eyebrow">Espace joueur</p>
       <h1 className="headline mt-3 text-5xl">
         {isNew ? "Crée ton profil" : `Salam ${firstName(profile?.full_name ?? "")}`}
@@ -151,7 +160,7 @@ export default function AccountPanel() {
 
         <fieldset>
           <legend className="mb-2 block text-sm font-semibold">Poste préféré</legend>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2">
             {POSITIONS.map((p) => (
               <button
                 key={p.value}
@@ -168,6 +177,23 @@ export default function AccountPanel() {
             ))}
           </div>
         </fieldset>
+
+        {isNew && (
+          <label className="block">
+            <span className="mb-2 block text-sm font-semibold">
+              Code d&apos;un pote <span className="font-normal text-ink-muted">(optionnel)</span>
+            </span>
+            <input
+              className="input font-mono uppercase"
+              value={referral}
+              onChange={(e) => setReferral(e.target.value)}
+              placeholder="Ex : K7M2QX"
+              maxLength={12}
+              autoCapitalize="characters"
+            />
+            <span className="mt-2 block text-xs text-ink-muted">Ton pote gagne un ticket pour le tirage au sort quand tu joues.</span>
+          </label>
+        )}
 
         {isNew && (
           <label className="flex items-start gap-3 text-sm">
