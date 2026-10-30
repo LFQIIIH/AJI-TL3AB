@@ -181,15 +181,15 @@ export default async function HomePage() {
       {/* Kids + Merch teasers */}
       <section className="container-page grid gap-4 py-16 sm:py-24 md:grid-cols-2">
         <Link href="/kids" className="card group relative overflow-hidden p-8 transition hover:border-primary sm:p-10">
-          <p className="eyebrow">Académie enfants · La fierté de demain</p>
+          <p className="eyebrow">Enfants · La fierté de demain</p>
           <h2 className="headline mt-3 text-5xl sm:text-6xl">
             Sghar f l&apos;3mer, <span className="text-primary">kbar</span> f terrain
           </h2>
           <p className="mt-4 max-w-sm text-ink-muted">
-            Entraînements encadrés pour les 5–14 ans, par groupes d&apos;âge, avec des coachs diplômés.
+            Matchs et activités encadrés pour les 5–14 ans. Vous réservez, vous les amenez, on s&apos;occupe du reste.
           </p>
           <span className="mt-8 inline-block text-sm font-bold uppercase tracking-wide text-primary group-hover:underline">
-            Découvrir l&apos;académie →
+            Découvrir les activités →
           </span>
         </Link>
         <Link href="/merch" className="group relative overflow-hidden rounded-2xl bg-forest p-8 text-white transition hover:bg-forest-light sm:p-10">

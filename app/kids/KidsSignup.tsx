@@ -13,7 +13,7 @@ type KidsSignupProps = {
 const MIN_AGE = 5;
 const MAX_AGE = 14;
 
-export default function KidsSignup({ label = "Inscrire mon enfant", className = "btn-primary" }: KidsSignupProps) {
+export default function KidsSignup({ label = "Réserver pour mon enfant", className = "btn-primary" }: KidsSignupProps) {
   const [open, setOpen] = useState(false);
   const [childName, setChildName] = useState("");
   const [age, setAge] = useState("");
@@ -25,12 +25,12 @@ export default function KidsSignup({ label = "Inscrire mon enfant", className = 
     e.preventDefault();
     if (!valid) return;
     const message = [
-      "Salam AJI TL3AB ! Bghit nsejjel wldi / bnti f l'Académie enfants 👋",
+      "Salam AJI TL3AB ! Bghit nreservi l wldi / bnti f les activités dyal drari 👋",
       "",
       `👦 Prénom de l'enfant : ${childName.trim()}`,
       `🎂 Âge : ${ageNum} ans`,
       "",
-      "Merci de me donner les prochaines étapes.",
+      "Quelles sont les prochaines dates ?",
     ].join("\n");
     window.open(whatsappLink(message), "_blank", "noopener,noreferrer");
     setOpen(false);
@@ -41,7 +41,7 @@ export default function KidsSignup({ label = "Inscrire mon enfant", className = 
       <button type="button" className={className} onClick={() => setOpen(true)}>
         <WhatsAppIcon /> {label}
       </button>
-      <Modal open={open} onClose={() => setOpen(false)} title="Inscription enfant">
+      <Modal open={open} onClose={() => setOpen(false)} title="Réserver pour mon enfant">
         <form onSubmit={submit} className="space-y-4">
           <label className="block">
             <span className="mb-2 block text-sm font-semibold">Prénom de l&apos;enfant</span>
@@ -73,7 +73,7 @@ export default function KidsSignup({ label = "Inscrire mon enfant", className = 
             Continuer sur WhatsApp
           </button>
           <p className="text-center text-xs text-ink-muted">
-            Première séance d&apos;essai offerte. On vous recontacte pour confirmer le groupe.
+            On vous répond sur WhatsApp avec les prochaines dates, l&apos;heure, le terrain et le prix.
           </p>
         </form>
       </Modal>

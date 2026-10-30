@@ -21,7 +21,7 @@ export default function Footer() {
             <li><Link href="/jouer" className="hover:text-highlight">Jouer</Link></li>
             <li><Link href="/classement" className="hover:text-highlight">Ranking & tirage</Link></li>
             <li><Link href="/prepa-physique" className="hover:text-highlight">Training physique</Link></li>
-            <li><Link href="/kids" className="hover:text-highlight">Académie enfants</Link></li>
+            <li><Link href="/kids" className="hover:text-highlight">Enfants</Link></li>
             <li><Link href="/merch" className="hover:text-highlight">L7wayej</Link></li>
             <li><Link href="/confidentialite" className="hover:text-highlight">Confidentialité</Link></li>
           </ul>
