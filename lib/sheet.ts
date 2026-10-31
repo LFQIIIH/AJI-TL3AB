@@ -1,4 +1,5 @@
 import type { Match, MatchFormat, MatchLevel } from "@/data/matches";
+import { canonicalTeamName, defaultTeams } from "@/lib/teams";
 
 /** Minimal RFC 4180 CSV parser (handles quoted fields, "" escapes, CRLF). */
 export function parseCsv(text: string): string[][] {
@@ -114,12 +115,19 @@ export function sheetToMatches(csv: string): Match[] {
     const totalSpots = parseCount(get(row, "places"));
     if (!date || !time || !pitch || !format || price === null || !totalSpots) continue;
 
-    const scoreLime = parseCount(get(row, "scorelime"));
-    const scoreNoir = parseCount(get(row, "scorenoir"));
+    // score_1 / score_2 (older sheets: score_lime / score_noir).
+    const score1 = parseCount(get(row, "score1") || get(row, "scorelime"));
+    const score2 = parseCount(get(row, "score2") || get(row, "scorenoir"));
     const mvp = get(row, "mvp");
 
+    const id = `${date}-${time}-${normalize(pitch)}`;
+    // Team names from equipe_1 / equipe_2, otherwise two fixed picks per match.
+    const [auto1, auto2] = defaultTeams(id);
+    const team1 = get(row, "equipe1") ? canonicalTeamName(get(row, "equipe1")) : auto1;
+    const team2 = get(row, "equipe2") ? canonicalTeamName(get(row, "equipe2")) : team1 === auto2 ? auto1 : auto2;
+
     matches.push({
-      id: `${date}-${time}-${normalize(pitch)}`,
+      id,
       date,
       time,
       pitch,
@@ -130,10 +138,10 @@ export function sheetToMatches(csv: string): Match[] {
       totalSpots,
       spotsTaken: Math.min(totalSpots, parseCount(get(row, "reservees")) ?? 0),
       result:
-        scoreLime !== null && scoreNoir !== null
+        score1 !== null && score2 !== null
           ? {
-              home: { name: "Lime", score: scoreLime },
-              away: { name: "Noir", score: scoreNoir },
+              home: { name: team1, score: score1 },
+              away: { name: team2, score: score2 },
               ...(mvp ? { mvp } : {}),
             }
           : undefined,

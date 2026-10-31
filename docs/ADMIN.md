@@ -66,3 +66,16 @@ order by e.tickets desc;
 - **training_signups**: who signed up for each prépa physique session.
 - **votes**: raw votes (`voter_id` → `candidate_id`). Votes are anonymous on
   the site; please keep them that way.
+
+## Team names on results
+
+Every played match shows two team names with an emblem (Vikings, Conquérants,
+Fighters, Lions de l'Atlas, Requins, Dragons, Éclairs, Titans). By default
+each match gets two different teams automatically.
+
+To choose them, add two columns to the **Matchs** sheet (anywhere):
+`equipe_1` and `equipe_2`. Type one of the names above (capitals and accents
+don't matter). Any other name works too and gets a shield emblem.
+`score_lime` / `score_noir` are the scores of équipe 1 / équipe 2 (you can
+rename them `score_1` / `score_2` if you prefer). The list of teams lives in
+`lib/teams.ts`.
