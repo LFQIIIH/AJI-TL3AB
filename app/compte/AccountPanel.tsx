@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { useSessionUser } from "@/lib/supabase/useSession";
-import { firstName, formatPhone, normalizePhone, POSITIONS, type Position, type Profile } from "@/lib/profile";
+import { firstName, formatPhone, normalizePhone, POSITIONS, positionLabel, type Position, type Profile } from "@/lib/profile";
 import { clearStoredReferral, readStoredReferral } from "@/lib/community";
 
 /** Fired after a save so the dashboard reloads (e.g. right after profile creation). */
@@ -24,6 +24,8 @@ export default function AccountPanel() {
   const [consent, setConsent] = useState(false);
   const [referral, setReferral] = useState("");
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+  // A complete profile is shown as a short summary; the form opens on demand.
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     if (!isSupabaseConfigured || user === null) router.replace("/connexion");
@@ -84,6 +86,7 @@ export default function AccountPanel() {
     setProfile(data);
     setPhone(formatPhone(data.phone));
     setStatus({ kind: "saved" });
+    setEditing(false);
     if (isNew) clearStoredReferral();
     window.dispatchEvent(new Event(PROFILE_SAVED_EVENT));
   }
@@ -101,16 +104,49 @@ export default function AccountPanel() {
     );
   }
 
+  function cancelEdit() {
+    if (!profile) return;
+    setFullName(profile.full_name);
+    setPhone(formatPhone(profile.phone));
+    setPosition(profile.position);
+    setStatus({ kind: "idle" });
+    setEditing(false);
+  }
+
+  if (profile && !editing) {
+    return (
+      <div className="card w-full p-6 sm:p-8">
+        <p className="eyebrow">Espace joueur</p>
+        <h1 className="headline mt-3 text-5xl">
+          Salam <span className="whitespace-nowrap">{firstName(profile.full_name)} 👋</span>
+        </h1>
+        <p className="mt-3 flex flex-wrap items-center gap-2 text-ink-muted">
+          <span className="rounded-full bg-highlight px-3 py-1 text-sm font-bold text-highlight-ink">⚽ {positionLabel(profile.position)}</span>
+          Ton profil est prêt.
+        </p>
+        {status.kind === "saved" && (
+          <p className="mt-4 rounded-xl bg-highlight/40 px-4 py-3 text-sm font-semibold text-highlight-ink" role="status">
+            ✔ Profil enregistré. Mrehba bik f AJI TL3AB !
+          </p>
+        )}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5 text-sm">
+          <button type="button" onClick={() => setEditing(true)} className="btn-ghost px-4 py-2">
+            Modifier mes infos
+          </button>
+          <button type="button" onClick={signOut} className="font-semibold text-ink-muted hover:text-ink hover:underline">
+            Se déconnecter
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="card w-full p-6 sm:p-8">
       <p className="eyebrow">Espace joueur</p>
-      <h1 className="headline mt-3 text-5xl">
-        {isNew ? "Crée ton profil" : `Salam ${firstName(profile?.full_name ?? "")}`}
-      </h1>
+      <h1 className="headline mt-3 text-5xl">{isNew ? "Crée ton profil" : "Mes infos"}</h1>
       <p className="mt-3 text-ink-muted">
-        {isNew
-          ? "Quelques infos et c'est bon. Ça prend 30 secondes."
-          : "Tes infos joueur. Tu peux les modifier à tout moment."}
+        {isNew ? "Quelques infos et c'est bon. Ça prend 30 secondes." : "Modifie ce que tu veux puis enregistre."}
       </p>
 
       <form onSubmit={save} className="mt-8 space-y-5">
@@ -219,11 +255,6 @@ export default function AccountPanel() {
         </button>
 
         <div aria-live="polite">
-          {status.kind === "saved" && (
-            <p className="rounded-xl bg-highlight/40 px-4 py-3 text-sm font-semibold text-highlight-ink">
-              ✔ Profil enregistré. Mrehba bik f AJI TL3AB !
-            </p>
-          )}
           {status.kind === "error" && (
             <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
               {status.message}
@@ -233,8 +264,14 @@ export default function AccountPanel() {
       </form>
 
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5 text-sm">
-        <span className="text-ink-muted">Connecté avec {user.email}</span>
-        <button type="button" onClick={signOut} className="font-semibold text-primary hover:underline">
+        {isNew ? (
+          <span />
+        ) : (
+          <button type="button" onClick={cancelEdit} className="font-semibold text-primary hover:underline">
+            Annuler
+          </button>
+        )}
+        <button type="button" onClick={signOut} className="font-semibold text-ink-muted hover:text-ink hover:underline">
           Se déconnecter
         </button>
       </div>

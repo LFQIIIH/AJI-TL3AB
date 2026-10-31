@@ -14,8 +14,8 @@ const SECTIONS = [
   {
     title: "Ce qu'on collecte",
     body: [
-      "Quand tu crées ton profil : ton nom complet, ton numéro de téléphone, ton poste préféré et l'adresse e-mail de ton compte Google.",
-      "On ne reçoit jamais ton mot de passe Google.",
+      "Quand tu crées ton profil : ton nom complet, ton numéro de téléphone, ton poste préféré et ton adresse e-mail (celle de ton compte Google ou celle que tu as saisie pour te connecter).",
+      "On ne reçoit jamais ton mot de passe Google, et la connexion par e-mail se fait sans mot de passe.",
     ],
   },
   {

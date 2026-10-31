@@ -86,3 +86,23 @@ Supabase → **Authentication → URL Configuration**:
 - Fill in the legal entity at the top of `app/confidentialite/page.tsx`.
 - Check with a local advisor whether you need to declare the processing of
   personal data to the **CNDP** (law 09-08).
+
+## Login by e-mail (magic link)
+
+The Connexion page also lets players log in with just their e-mail: Supabase
+sends them a one-time link (no password).
+
+Supabase's built-in e-mail sender only delivers to **members of your Supabase
+team** and only a few e-mails per hour. Until you connect your own sender,
+other players see "La connexion par e-mail n'est pas encore disponible.
+Utilise Google en attendant" — nothing breaks.
+
+To open it to everyone (once you have your professional address/domain):
+
+1. Create an account with an e-mail sending service (e.g. Resend, Brevo —
+   both have free plans) and verify your domain there.
+2. Supabase → **Authentication → Emails → SMTP Settings** → enable custom
+   SMTP, paste the host, port, user and password from that service, and set
+   the sender (e.g. `contact@<your domain>`, name `AJI TL3AB`).
+3. Optional: **Authentication → Emails → Templates → Magic Link**, write the
+   e-mail in French.
