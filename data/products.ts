@@ -12,6 +12,17 @@ export type Product = {
 // Catalogue. Team jerseys are drawn by scripts/generate_jerseys.py (one per team
 // in lib/teams.ts); other images are SVG mockups in /public/merch.
 export const products: Product[] = [
+  // Club jerseys (genuine, bought from suppliers). Photo by the AJI TL3AB designer.
+  // TODO: confirm price, sizes, stock and season.
+  {
+    id: "maillot-barcelone-domicile",
+    name: "Maillot FC Barcelone Domicile",
+    priceMad: 450,
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    images: ["/merch/maillot-barcelone-domicile.jpg"],
+    preorder: false,
+    description: "Le maillot domicile du Barça, rayures blaugrana. Disponible en boutique.",
+  },
   {
     id: "maillot-vikings",
     name: "Maillot Vikings",
