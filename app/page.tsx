@@ -50,7 +50,7 @@ const FAQ = [
   },
   {
     q: "Il faut ramener quoi ?",
-    a: "Crampons moulés ou baskets selon le terrain, une bouteille d'eau, et la motivation. Le reste on gère.",
+    a: "Tes chaussures de foot, une bouteille d'eau et la motivation. Pas de chaussures ? Loue une paire pour 20 MAD en réservant ta place (pointures 38 à 45). Le reste, on gère.",
   },
 ];
 

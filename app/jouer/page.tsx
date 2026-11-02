@@ -30,6 +30,7 @@ export default async function JouerPage() {
           { icon: "cash", label: "Paiement", value: "Sur place, espèces ou virement" },
           { icon: "clock", label: "Arrivée", value: "10 min avant le coup d'envoi" },
           { icon: "ball", label: "Fourni", value: "Ballon, chasubles, équipes" },
+          { icon: "store", label: "Pas de chaussures ?", value: "Location 20 MAD, à réserver avec ta place" },
           { icon: "calendar", label: "Annulation", value: "Gratuite jusqu'à 24h avant" },
         ]}
       />

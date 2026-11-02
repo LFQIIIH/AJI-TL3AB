@@ -12,6 +12,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { supabaseClient } from "@/lib/supabase/lazy";
 import { useSessionUser } from "@/lib/supabase/useSession";
 import { useMatchCounts, withOnlineBookings } from "@/lib/useMatchCounts";
+import { SHOE_RENTAL_MAD, SHOE_SIZES } from "@/lib/shoes";
 
 const FORMATS: MatchFormat[] = ["5v5", "7v7", "9v9"];
 const NAME_KEY = "ajitl3ab:playerName";
@@ -36,10 +37,22 @@ type Mine = { bookings: Map<string, number>; waiting: Map<string, string | null>
 type ModalState =
   | { kind: "guest"; match: Match }
   | { kind: "member"; match: Match }
-  | { kind: "booked"; match: Match; guests: number }
+  | { kind: "booked"; match: Match; guests: number; shoes: Shoes }
   | null;
 
+/** Rented pair sizes for the player and the +1 friend: null = no rental, 0 = ticked but no size yet. */
+type Shoes = { me: number | null; friend: number | null };
+const NO_SHOES: Shoes = { me: null, friend: null };
+
+function shoeLines(shoes: Shoes): string[] {
+  return [
+    ...(shoes.me ? [`👟 Location chaussures : pointure ${shoes.me} (+${SHOE_RENTAL_MAD} MAD)`] : []),
+    ...(shoes.friend ? [`👟 Chaussures pour mon pote : pointure ${shoes.friend} (+${SHOE_RENTAL_MAD} MAD)`] : []),
+  ];
+}
+
 const BOOKING_ERRORS: Record<string, string> = {
+  shoes_unavailable: "Cette pointure vient d'être réservée. Choisis-en une autre.",
   full: "Le match vient d'être complet. Inscris-toi sur la liste d'attente.",
   already_booked: "Tu es déjà inscrit à ce match.",
   match_started: "Ce match a déjà commencé.",
@@ -54,6 +67,8 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
   const [modal, setModal] = useState<ModalState>(null);
   const [name, setName] = useState("");
   const [plusOne, setPlusOne] = useState(false);
+  const [shoes, setShoes] = useState<Shoes>(NO_SHOES);
+  const [shoeStock, setShoeStock] = useState<Record<number, number> | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
 
@@ -113,9 +128,20 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
     setArea(null);
   }
 
+  async function loadShoeStock(m: Match) {
+    setShoeStock(null);
+    if (!isSupabaseConfigured) return;
+    try {
+      const { data, error } = await (await supabaseClient()).rpc("match_shoe_availability", { p_match_id: m.id });
+      if (!error) setShoeStock(Object.fromEntries(((data ?? []) as { size: number; pairs_left: number }[]).map((r) => [r.size, r.pairs_left])));
+    } catch {}
+  }
+
   function openBooking(m: Match) {
     setError("");
     setPlusOne(false);
+    setShoes(NO_SHOES);
+    loadShoeStock(m);
     if (isMember) {
       setModal({ kind: "member", match: m });
     } else {
@@ -134,6 +160,12 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
     ];
   }
 
+  /** Rentals actually requested (friend only counts with +1). */
+  const rented: Shoes = { me: shoes.me || null, friend: plusOne ? shoes.friend || null : null };
+  const shoeSizeMissing = shoes.me === 0 || (plusOne && shoes.friend === 0);
+  const total = (m: Match) =>
+    m.priceMad * (plusOne ? 2 : 1) + SHOE_RENTAL_MAD * ((rented.me ? 1 : 0) + (rented.friend ? 1 : 0));
+
   function confirmGuestBooking(e: React.FormEvent) {
     e.preventDefault();
     if (modal?.kind !== "guest") return;
@@ -146,6 +178,9 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
       ...matchLines(modal.match),
       "",
       `Nom : ${player}${plusOne ? " + 1 pote" : ""}`,
+      ...shoeLines(rented),
+      ...(rented.me || rented.friend ? ["(chaussures sous réserve de disponibilité)"] : []),
+      `Total sur place : ${total(modal.match)} MAD`,
     ].join("\n");
     window.open(whatsappLink(message), "_blank", "noopener,noreferrer");
     setModal(null);
@@ -161,13 +196,14 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
       const res = await fetch("/api/reservations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ matchId: modal.match.id, guests }),
+        body: JSON.stringify({ matchId: modal.match.id, guests, shoeSize: rented.me, guestShoeSize: rented.friend }),
       });
       if (!res.ok) {
         const { error: code } = (await res.json().catch(() => ({}))) as { error?: string };
         setError(BOOKING_ERRORS[code ?? ""] ?? "La réservation a échoué. Réessaie dans un instant.");
+        if (code === "shoes_unavailable") loadShoeStock(modal.match);
       } else {
-        setModal({ kind: "booked", match: modal.match, guests });
+        setModal({ kind: "booked", match: modal.match, guests, shoes: rented });
       }
     } catch {
       setError("Pas de connexion. Réessaie dans un instant.");
@@ -344,7 +380,11 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
                   />
                 </label>
                 <PlusOne checked={plusOne} onChange={setPlusOne} disabled={spotsLeft(modal.match) < 2} />
-                <button type="submit" className="btn-primary w-full" disabled={!name.trim()}>
+                <ShoeRental shoes={shoes} onChange={setShoes} plusOne={plusOne} stock={shoeStock} />
+                <p className="text-sm">
+                  Total à payer sur place : <span className="font-bold">{total(modal.match)} MAD</span>
+                </p>
+                <button type="submit" className="btn-primary w-full" disabled={!name.trim() || shoeSizeMissing}>
                   <WhatsAppIcon /> Continuer sur WhatsApp
                 </button>
                 {isSupabaseConfigured ? (
@@ -373,11 +413,12 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
                   Joueur : <span className="font-semibold">{profileName}</span>
                 </p>
                 <PlusOne checked={plusOne} onChange={setPlusOne} disabled={spotsLeft(modal.match) < 2} />
+                <ShoeRental shoes={shoes} onChange={setShoes} plusOne={plusOne} stock={shoeStock} />
                 <p className="text-sm">
                   Total à payer sur place :{" "}
-                  <span className="font-bold">{modal.match.priceMad * (plusOne ? 2 : 1)} MAD</span>
+                  <span className="font-bold">{total(modal.match)} MAD</span>
                 </p>
-                <button type="submit" className="btn-primary w-full" disabled={pending}>
+                <button type="submit" className="btn-primary w-full" disabled={pending || shoeSizeMissing}>
                   {pending ? "Réservation…" : "Confirmer ma réservation"}
                 </button>
                 {error && (
@@ -392,10 +433,15 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
               <div className="space-y-4">
                 <p className="rounded-xl bg-highlight/40 px-4 py-3 text-sm font-semibold text-highlight-ink">
                   ✓ Ta place{modal.guests ? " et celle de ton pote sont réservées" : " est réservée"}. Arrive 10 min avant !
+                  {(modal.shoes.me || modal.shoes.friend) && (
+                    <span className="mt-1 block">
+                      👟 {[modal.shoes.me && `pointure ${modal.shoes.me}`, modal.shoes.friend && `pointure ${modal.shoes.friend} pour ton pote`].filter(Boolean).join(" et ")} : on te l&apos;apporte au terrain.
+                    </span>
+                  )}
                 </p>
                 <a
                   href={whatsappLink(
-                    ["Salam AJI TL3AB ! J'ai réservé en ligne ✅", "", ...matchLines(modal.match), "", `Nom : ${profileName}${modal.guests ? " + 1 pote" : ""}`].join("\n"),
+                    ["Salam AJI TL3AB ! J'ai réservé en ligne ✅", "", ...matchLines(modal.match), "", `Nom : ${profileName}${modal.guests ? " + 1 pote" : ""}`, ...shoeLines(modal.shoes)].join("\n"),
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -412,6 +458,105 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
         )}
       </Modal>
     </>
+  );
+}
+
+function ShoeRental({
+  shoes,
+  onChange,
+  plusOne,
+  stock,
+}: {
+  shoes: Shoes;
+  onChange: (s: Shoes) => void;
+  plusOne: boolean;
+  stock: Record<number, number> | null;
+}) {
+  const on = shoes.me !== null;
+  const left = (size: number) => stock?.[size] ?? 2;
+  return (
+    <div className={`rounded-xl border px-4 py-3 text-sm ${on ? "border-primary bg-highlight/20" : "border-line-strong"}`}>
+      <label className="flex cursor-pointer items-start gap-3">
+        <input
+          type="checkbox"
+          className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
+          checked={on}
+          onChange={(e) => onChange(e.target.checked ? { me: 0, friend: null } : { me: null, friend: null })}
+        />
+        <span className="flex-1">
+          <span className="font-semibold">Pas de crampons ? Loue une paire sur place</span>
+          <span className="block text-xs text-ink-muted">Chaussures de foot turf, pointures 38 à 45. On n&apos;apporte que les paires réservées.</span>
+        </span>
+        <span className="shrink-0 font-bold text-primary">+{SHOE_RENTAL_MAD} MAD</span>
+      </label>
+      {on && (
+        <div className="mt-3 space-y-3 pl-7">
+          <SizePicker
+            label="Ta pointure"
+            value={shoes.me}
+            onPick={(v) => onChange({ ...shoes, me: v })}
+            left={(s) => left(s) - (plusOne && shoes.friend === s ? 1 : 0)}
+          />
+          {plusOne && (
+            <>
+              <label className="flex cursor-pointer items-center gap-2 text-xs font-semibold">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-primary"
+                  checked={shoes.friend !== null}
+                  onChange={(e) => onChange({ ...shoes, friend: e.target.checked ? 0 : null })}
+                />
+                Une paire pour ton pote aussi (+{SHOE_RENTAL_MAD} MAD)
+              </label>
+              {shoes.friend !== null && (
+                <SizePicker
+                  label="Pointure de ton pote"
+                  value={shoes.friend}
+                  onPick={(v) => onChange({ ...shoes, friend: v })}
+                  left={(s) => left(s) - (shoes.me === s ? 1 : 0)}
+                />
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SizePicker({
+  label,
+  value,
+  onPick,
+  left,
+}: {
+  label: string;
+  value: number | null;
+  onPick: (size: number) => void;
+  left: (size: number) => number;
+}) {
+  return (
+    <fieldset>
+      <legend className="mb-1.5 text-xs font-semibold">{label}</legend>
+      <div className="flex flex-wrap gap-1.5">
+        {SHOE_SIZES.map((size) => {
+          const soldOut = left(size) <= 0 && value !== size;
+          return (
+            <button
+              key={size}
+              type="button"
+              disabled={soldOut}
+              onClick={() => onPick(size)}
+              aria-pressed={value === size}
+              title={soldOut ? "Épuisé pour ce match" : undefined}
+              className={`chip min-w-11 px-2.5 py-1 text-xs ${value === size ? "chip-on" : "chip-off"} ${soldOut ? "cursor-not-allowed line-through opacity-40" : ""}`}
+            >
+              {size}
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
   );
 }
 

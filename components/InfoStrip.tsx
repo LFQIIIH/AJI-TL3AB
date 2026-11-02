@@ -5,7 +5,11 @@ export type InfoItem = { icon: IconName; label: string; value: string };
 /** Key facts at a glance: icon + small label + bold value. */
 export default function InfoStrip({ items, className = "" }: { items: InfoItem[]; className?: string }) {
   return (
-    <dl className={`grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line lg:grid-cols-4 ${className}`}>
+    <dl
+      className={`grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line [&>*:last-child:nth-child(odd)]:col-span-2 ${
+        items.length === 5 ? "lg:grid-cols-5 lg:[&>*:last-child:nth-child(odd)]:col-span-1" : "lg:grid-cols-4"
+      } ${className}`}
+    >
       {items.map((item) => (
         <div key={item.label} className="flex items-start gap-3 bg-surface p-4 sm:p-5">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-highlight text-highlight-ink">

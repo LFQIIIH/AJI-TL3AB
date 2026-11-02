@@ -79,3 +79,16 @@ don't matter). Any other name works too and gets a shield emblem.
 `score_lime` / `score_noir` are the scores of équipe 1 / équipe 2 (you can
 rename them `score_1` / `score_2` if you prefer). The list of teams lives in
 `lib/teams.ts`.
+
+## Shoe rental
+
+Players can rent turf shoes (20 MAD, sizes 38–45) when they book on the site.
+Before each match, open **bookings**, filter the `match_id`, and look at
+`shoe_size` (the player) and `guest_shoe_size` (their +1): those are the
+pairs to bring. The site allows 2 pairs per size per match and shows a size
+as "épuisé" when both are taken.
+
+Guests who book on WhatsApp ask for a size in their message ("sous réserve
+de disponibilité"): they're not counted by the site, so check the bookings
+table before confirming. Run `supabase/migrations/0004_shoe_rental.sql` once
+to enable this.

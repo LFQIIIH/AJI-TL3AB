@@ -25,6 +25,8 @@ type Booking = {
   match_date: string;
   match_start: string;
   guests: number;
+  shoe_size: number | null;
+  guest_shoe_size: number | null;
   attended: boolean;
   goals: number;
 };
@@ -53,7 +55,7 @@ export default function AccountDashboard({ matches }: { matches: Match[] }) {
       client.rpc("my_stats"),
       client
         .from("bookings")
-        .select("match_id, match_date, match_start, guests, attended, goals")
+        .select("match_id, match_date, match_start, guests, attended, goals, shoe_size, guest_shoe_size")
         .order("match_start", { ascending: false })
         .limit(60),
       client.from("waitlist").select("match_id, match_date, match_start, promoted_at").is("promoted_at", null),
@@ -258,6 +260,9 @@ function Bookings({
               <span>
                 <span className="font-bold text-primary">✓</span> {matchTitle(byId.get(b.match_id), b)}
                 {b.guests > 0 && <span className="font-semibold"> · +1 pote</span>}
+                {(b.shoe_size || b.guest_shoe_size) && (
+                  <span className="font-semibold"> · 👟 {[b.shoe_size, b.guest_shoe_size].filter(Boolean).join(" + ")}</span>
+                )}
               </span>
               <button type="button" onClick={() => cancel(b)} disabled={busy === b.match_id} className="shrink-0 font-semibold text-ink-muted hover:text-ink hover:underline">
                 {busy === b.match_id ? "…" : "Annuler"}

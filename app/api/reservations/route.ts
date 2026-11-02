@@ -1,12 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getMatches } from "@/lib/matches-source";
 import { matchStart } from "@/lib/matches";
+import { SHOE_SIZES } from "@/lib/shoes";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 const noStore = { "Cache-Control": "private, no-store" };
+
+function validShoeSize(v: unknown): number | null {
+  return typeof v === "number" && Number.isInteger(v) && v >= SHOE_SIZES[0] && v <= SHOE_SIZES[SHOE_SIZES.length - 1] ? v : null;
+}
 
 function fail(status: number, error: string) {
   return NextResponse.json({ error }, { status, headers: noStore });
@@ -30,9 +35,17 @@ export async function POST(request: NextRequest) {
   if ("error" in auth) return auth.error;
   const { supabase } = auth;
 
-  const body = (await request.json().catch(() => null)) as { matchId?: unknown; guests?: unknown } | null;
+  const body = (await request.json().catch(() => null)) as {
+    matchId?: unknown;
+    guests?: unknown;
+    shoeSize?: unknown;
+    guestShoeSize?: unknown;
+  } | null;
   const matchId = typeof body?.matchId === "string" ? body.matchId : "";
   const guests = body?.guests === 1 ? 1 : 0;
+  // Shoe rental (sizes 38–45); stock per size is enforced by the database.
+  const shoeSize = validShoeSize(body?.shoeSize);
+  const guestShoeSize = guests ? validShoeSize(body?.guestShoeSize) : null;
 
   const match = (await getMatches()).find((m) => m.id === matchId);
   if (!match) return fail(404, "match_not_found");
@@ -49,10 +62,13 @@ export async function POST(request: NextRequest) {
     match_date: match.date,
     match_start: start.toISOString(),
     guests,
+    ...(shoeSize ? { shoe_size: shoeSize } : {}),
+    ...(guestShoeSize ? { guest_shoe_size: guestShoeSize } : {}),
   });
   if (error) {
     if (error.code === "23505") return fail(409, "already_booked");
     if (error.code === "23503") return fail(412, "profile_missing");
+    if (error.message.includes("shoes_unavailable")) return fail(409, "shoes_unavailable");
     return fail(400, "booking_failed");
   }
   return NextResponse.json({ ok: true }, { headers: noStore });
