@@ -24,12 +24,12 @@ export default function MerchPage() {
           { icon: "truck", label: "Livraison", value: "Partout à Marrakech" },
           { icon: "cash", label: "Paiement", value: "À la livraison" },
           { icon: "store", label: "Retrait", value: "Au prochain match" },
-          { icon: "gift", label: "Précommande", value: "Livraison mi-décembre" },
+          { icon: "gift", label: "Maillots", value: "En stock, de S à XL" },
         ]}
       />
       <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {products.map((p) => (
-          <ProductCard key={p.id} product={p} />
+        {products.map((p, i) => (
+          <ProductCard key={p.id} product={p} priority={i < 3} />
         ))}
       </div>
     </div>
