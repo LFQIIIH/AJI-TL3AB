@@ -5,7 +5,7 @@ import ProductCard from "./ProductCard";
 
 export const metadata: Metadata = {
   title: "L7wayej",
-  description: "Maillots, t-shirts, hoodies et casquettes AJI TL3AB. Commande directe via WhatsApp.",
+  description: "Maillots des grands clubs en stock, de S à XL. Commande directe via WhatsApp, paiement à la livraison à Marrakech.",
 };
 
 export default function MerchPage() {

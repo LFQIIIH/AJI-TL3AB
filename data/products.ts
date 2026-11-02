@@ -9,20 +9,9 @@ export type Product = {
   description?: string;
 };
 
-// Catalogue. Club jerseys use the designer's photos; other images are SVG mockups
-// in /public/merch.
+// Catalogue: genuine club jerseys bought from suppliers and resold by AJI TL3AB.
+// Images are 800×800 WebP in /public/merch (resize big photos before adding).
 export const products: Product[] = [
-  // Club jerseys: genuine, bought from suppliers and resold by AJI TL3AB.
-  // Images: 800×800 WebP in /public/merch (resize big photos before adding).
-  {
-    id: "maillot-barcelone-domicile",
-    name: "Maillot FC Barcelone Domicile",
-    priceMad: 199,
-    sizes: ["S", "M", "L", "XL"],
-    images: ["/merch/maillot-barcelone-domicile.webp"],
-    preorder: false,
-    description: "Rayures blaugrana bleu et grenat. En stock.",
-  },
   {
     id: "maillot-liverpool-domicile",
     name: "Maillot Liverpool Domicile",
@@ -31,6 +20,51 @@ export const products: Product[] = [
     images: ["/merch/maillot-liverpool-domicile.webp"],
     preorder: false,
     description: "Rouge à motifs graphiques blancs. En stock.",
+  },
+  {
+    id: "maillot-liverpool-domicile-manches-longues",
+    name: "Maillot Liverpool Domicile Manches Longues",
+    priceMad: 199,
+    sizes: ["S", "M", "L", "XL"],
+    images: ["/merch/maillot-liverpool-domicile-manches-longues.webp"],
+    preorder: false,
+    description: "Rouge à motifs graphiques blancs, manches longues. En stock.",
+  },
+  {
+    id: "maillot-manchester-united-domicile",
+    name: "Maillot Manchester United Domicile",
+    priceMad: 199,
+    sizes: ["S", "M", "L", "XL"],
+    images: ["/merch/maillot-manchester-united-domicile.webp"],
+    preorder: false,
+    description: "Rouge, épaules noires. En stock.",
+  },
+  {
+    id: "maillot-manchester-united-bleu",
+    name: "Maillot Manchester United Bleu",
+    priceMad: 199,
+    sizes: ["S", "M", "L", "XL"],
+    images: ["/merch/maillot-manchester-united-bleu.webp"],
+    preorder: false,
+    description: "Bleu roi, col et manches rouge et blanc. En stock.",
+  },
+  {
+    id: "maillot-real-madrid-domicile",
+    name: "Maillot Real Madrid Domicile",
+    priceMad: 199,
+    sizes: ["S", "M", "L", "XL"],
+    images: ["/merch/maillot-real-madrid-domicile.webp"],
+    preorder: false,
+    description: "Blanc, finitions vertes et roses. En stock.",
+  },
+  {
+    id: "maillot-real-madrid-vert",
+    name: "Maillot Real Madrid Vert",
+    priceMad: 199,
+    sizes: ["S", "M", "L", "XL"],
+    images: ["/merch/maillot-real-madrid-vert.webp"],
+    preorder: false,
+    description: "Vert foncé à motifs ton sur ton. En stock.",
   },
   {
     id: "maillot-arsenal-bleu-marine",
@@ -67,32 +101,5 @@ export const products: Product[] = [
     images: ["/merch/maillot-inter-miami-noir.webp"],
     preorder: false,
     description: "Noir avec détails roses, col polo. En stock.",
-  },
-  {
-    id: "tshirt-marrakech",
-    name: "T-shirt Marrakech FC",
-    priceMad: 149,
-    sizes: ["S", "M", "L", "XL"],
-    images: ["/merch/tshirt-marrakech-1.svg"],
-    preorder: false,
-    description: "Coton épais 220g, coupe oversize.",
-  },
-  {
-    id: "hoodie",
-    name: "Hoodie AJI TL3AB",
-    priceMad: 349,
-    sizes: ["S", "M", "L", "XL"],
-    images: ["/merch/hoodie-1.svg"],
-    preorder: false,
-    description: "Molleton brossé, pour les soirées fraîches au bord du terrain.",
-  },
-  {
-    id: "casquette",
-    name: "Casquette AT",
-    priceMad: 129,
-    sizes: ["Taille unique"],
-    images: ["/merch/casquette-1.svg"],
-    preorder: false,
-    description: "Brodée, réglable à l'arrière.",
   },
 ];

@@ -198,7 +198,7 @@ export default async function HomePage() {
             Porte les <span className="text-highlight">couleurs</span>
           </h2>
           <p className="mt-4 max-w-sm opacity-80">
-            Maillots, t-shirts et casquettes AJI TL3AB. Certaines pièces en précommande — premier arrivé, premier servi.
+            Maillots des grands clubs en stock, de S à XL. Commande sur WhatsApp, paiement à la livraison.
           </p>
           <span className="mt-8 inline-block text-sm font-bold uppercase tracking-wide text-highlight group-hover:underline">
             Voir la boutique →
