@@ -7,8 +7,9 @@ import { isFull } from "@/lib/matches";
 import { useMatchCounts, withOnlineBookings } from "@/lib/useMatchCounts";
 
 /** Next matches on the home page, counting online bookings. */
-export default function UpcomingCards({ matches }: { matches: Match[] }) {
-  const { counts } = useMatchCounts(matches.map((m) => m.id));
+/** `countIds`: pass the same ids as NextMatchCard so both share one request. */
+export default function UpcomingCards({ matches, countIds }: { matches: Match[]; countIds: string[] }) {
+  const { counts } = useMatchCounts(countIds);
   return (
     <div className="mt-10 grid gap-4 md:grid-cols-3">
       {matches.map((raw) => {

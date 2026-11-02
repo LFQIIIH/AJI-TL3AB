@@ -3,7 +3,7 @@ import InfoStrip from "@/components/InfoStrip";
 import DrawInfo from "@/components/community/DrawInfo";
 import ResultsGrid from "@/components/community/ResultsGrid";
 import TeamOfMonth from "@/components/community/TeamOfMonth";
-import NextMatchCard from "@/components/home/NextMatchCard";
+import NextMatchCard, { NEXT_MATCH_CANDIDATES } from "@/components/home/NextMatchCard";
 import UpcomingCards from "@/components/home/UpcomingCards";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { isFull } from "@/lib/matches";
@@ -141,7 +141,7 @@ export default async function HomePage() {
             </Link>
           </div>
           {upcoming.length > 0 ? (
-            <UpcomingCards matches={upcoming} />
+            <UpcomingCards matches={upcoming} countIds={allUpcoming.slice(0, NEXT_MATCH_CANDIDATES).map((m) => m.id)} />
           ) : (
             <div className="card mt-10 p-8 text-center">
               <p className="headline text-3xl">Nouveaux matchs très bientôt</p>

@@ -72,7 +72,8 @@ export default function LoginPanel() {
       const { error } = await auth.signInWithPassword({ email: address, password });
       setBusy(null);
       if (error) return setNotice({ kind: "error", text: authMessage(error) });
-      return router.replace("/compte");
+      // Full load so every component (navbar…) picks up the new session.
+      return window.location.assign("/compte");
     }
 
     const { data, error } = await auth.signUp({
@@ -82,7 +83,7 @@ export default function LoginPanel() {
     });
     setBusy(null);
     if (error) return setNotice({ kind: "error", text: authMessage(error) });
-    if (data.session) return router.replace("/compte");
+    if (data.session) return window.location.assign("/compte");
     // With e-mail confirmation on, an existing address comes back with no identities.
     if (data.user && data.user.identities?.length === 0) {
       setMode("login");

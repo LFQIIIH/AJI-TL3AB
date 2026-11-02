@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { supabaseClient } from "@/lib/supabase/lazy";
+import { publicRpc } from "@/lib/supabase/publicApi";
 
 /** Calls a public Supabase function; `undefined` while loading, `null` on error. */
 export function useRpc<T>(fn: string, args: Record<string, unknown>, enabled = true): T[] | null | undefined {
@@ -16,9 +16,8 @@ export function useRpc<T>(fn: string, args: Record<string, unknown>, enabled = t
     }
     let cancelled = false;
     setData(undefined);
-    supabaseClient()
-      .then((c) => c.rpc(fn, JSON.parse(key)))
-      .then(({ data, error }) => !cancelled && setData(error ? null : ((data ?? []) as T[])))
+    publicRpc<T>(fn, JSON.parse(key))
+      .then((rows) => !cancelled && setData(rows))
       .catch(() => !cancelled && setData(null));
     return () => {
       cancelled = true;

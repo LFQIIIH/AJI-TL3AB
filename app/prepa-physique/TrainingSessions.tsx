@@ -6,6 +6,7 @@ import { Icon } from "@/components/Icons";
 import { whatsappLink } from "@/lib/config";
 import { formatDayLong, formatTime } from "@/lib/matches";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { publicRpc } from "@/lib/supabase/publicApi";
 import { useSessionUser } from "@/lib/supabase/useSession";
 import { MIN_PARTICIPANTS, sessionPlace, SESSIONS_SHOWN, type TrainingSession } from "@/lib/training";
 
@@ -36,10 +37,9 @@ export default function TrainingSessions({ sessions: all }: { sessions: Training
 
   const loadCounts = useCallback(async (sessionIds: string[]) => {
     try {
-      const { data, error } = await (await supabase()).rpc("training_session_counts", { p_session_ids: sessionIds });
-      if (error) throw error;
+      const rows = await publicRpc<{ session_id: string; signups: number }>("training_session_counts", { p_session_ids: sessionIds });
       const next: Counts = {};
-      for (const row of (data ?? []) as { session_id: string; signups: number }[]) next[row.session_id] = row.signups;
+      for (const row of rows) next[row.session_id] = row.signups;
       setCounts(next);
       setCountsFailed(false);
     } catch {

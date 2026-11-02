@@ -9,8 +9,10 @@ import { formatDay, formatTime, isFull, spotsLeft } from "@/lib/matches";
 import { useMatchCounts, withOnlineBookings } from "@/lib/useMatchCounts";
 
 /** Hero card: next match that still has room, counting online bookings. */
+export const NEXT_MATCH_CANDIDATES = 10;
+
 export default function NextMatchCard({ matches }: { matches: Match[] }) {
-  const candidates = matches.slice(0, 10);
+  const candidates = matches.slice(0, NEXT_MATCH_CANDIDATES);
   const { counts } = useMatchCounts(candidates.map((m) => m.id));
   const next = useMemo(() => candidates.map((m) => withOnlineBookings(m, counts)).find((m) => !isFull(m)), [candidates, counts]);
   if (!next) return null;

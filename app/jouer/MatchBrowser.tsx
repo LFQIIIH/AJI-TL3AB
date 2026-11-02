@@ -10,6 +10,7 @@ import { whatsappLink } from "@/lib/config";
 import { formatDay, formatDayLong, formatTime, isFull, matchStart, spotsLeft } from "@/lib/matches";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { supabaseClient } from "@/lib/supabase/lazy";
+import { publicRpc } from "@/lib/supabase/publicApi";
 import { useSessionUser } from "@/lib/supabase/useSession";
 import { useMatchCounts, withOnlineBookings } from "@/lib/useMatchCounts";
 import { SHOE_RENTAL_MAD, SHOE_SIZES } from "@/lib/shoes";
@@ -132,8 +133,8 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
     setShoeStock(null);
     if (!isSupabaseConfigured) return;
     try {
-      const { data, error } = await (await supabaseClient()).rpc("match_shoe_availability", { p_match_id: m.id });
-      if (!error) setShoeStock(Object.fromEntries(((data ?? []) as { size: number; pairs_left: number }[]).map((r) => [r.size, r.pairs_left])));
+      const rows = await publicRpc<{ size: number; pairs_left: number }>("match_shoe_availability", { p_match_id: m.id });
+      setShoeStock(Object.fromEntries(rows.map((r) => [r.size, r.pairs_left])));
     } catch {}
   }
 

@@ -10,13 +10,19 @@ import { isSupabaseConfigured } from "./config";
  * `undefined` while loading, `null` when signed out.
  *
  * The Supabase client is imported lazily so pages that only need the navbar
- * don't block first paint on it.
+ * don't block first paint on it — and not at all for visitors without a
+ * Supabase session cookie (they're logged out; a login always ends with a
+ * full page load, which runs this again).
  */
 export function useSessionUser(): User | null | undefined {
   const [user, setUser] = useState<User | null | undefined>(isSupabaseConfigured ? undefined : null);
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
+    if (!/(?:^|;\s*)sb-[^=;]+-auth-token(?:\.\d+)?=/.test(document.cookie)) {
+      setUser(null);
+      return;
+    }
     let unsubscribe: (() => void) | undefined;
     let cancelled = false;
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { currentMonthRange, monthLabel } from "@/lib/community";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { supabaseClient } from "@/lib/supabase/lazy";
+import { publicSelect } from "@/lib/supabase/publicApi";
 import { useRpc } from "./useRpc";
 
 type Winner = { month: string; winner_name: string; entrants: number };
@@ -17,9 +17,8 @@ export default function DrawInfo({ compact = false }: { compact?: boolean }) {
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
-    supabaseClient()
-      .then((c) => c.from("draws").select("month, winner_name, entrants").order("month", { ascending: false }).limit(compact ? 1 : 6))
-      .then(({ data }) => setWinners((data ?? []) as Winner[]))
+    publicSelect<Winner>(`draws?select=month,winner_name,entrants&order=month.desc&limit=${compact ? 1 : 6}`)
+      .then(setWinners)
       .catch(() => setWinners([]));
   }, [compact]);
 
