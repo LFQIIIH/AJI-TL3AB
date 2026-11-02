@@ -92,3 +92,14 @@ Guests who book on WhatsApp ask for a size in their message ("sous réserve
 de disponibilité"): they're not counted by the site, so check the bookings
 table before confirming. Run `supabase/migrations/0004_shoe_rental.sql` once
 to enable this.
+
+## Training sessions (Google Sheet, "Training" tab)
+
+One row per session: `date`, `heure`, `terrain`, `quartier`, `note`
+(optional). Several sessions on the same day are fine. Past sessions drop
+off by themselves; add the next ones every week. To cancel a session,
+delete its row. Don't change the date/time of a session people already
+signed up for: add a new row and delete the old one. If the tab is empty or
+not set up, the site shows the default schedule (mardi, jeudi, samedi
+19:00). Sign-ups per session: Table Editor → **training_signups**
+(`session_id` = date-heure). Requires `0005_training_sessions.sql`.

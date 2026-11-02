@@ -2,16 +2,17 @@ import type { Metadata } from "next";
 import InfoStrip from "@/components/InfoStrip";
 import { Icon, WhatsAppIcon } from "@/components/Icons";
 import { whatsappLink } from "@/lib/config";
-import { formatTime } from "@/lib/matches";
+import { formatDay, formatTime } from "@/lib/matches";
+import { getTrainingSessions } from "@/lib/training-source";
 import {
   MIN_PARTICIPANTS,
   PRICE_PER_MONTH_MAD,
   PRICE_PER_SESSION_MAD,
   SESSIONS_PER_MONTH,
   TRAINER_NAME,
+  sessionPlace,
   TRAINING_DAYS_LABEL,
   TRAINING_PLACE,
-  TRAINING_TIME,
 } from "@/lib/training";
 import TrainingSessions from "./TrainingSessions";
 
@@ -30,7 +31,13 @@ const PROGRAM = [
 const perSessionWithSub = Math.round(PRICE_PER_MONTH_MAD / SESSIONS_PER_MONTH);
 const subscribeMessage = `Salam ! Je veux m'abonner au training physique avec le coach ${TRAINER_NAME} (${PRICE_PER_MONTH_MAD} MAD / mois).`;
 
-export default function PrepaPhysiquePage() {
+// Re-render every 5 min to pick up changes in the sheet's "Training" tab.
+export const revalidate = 300;
+
+export default async function PrepaPhysiquePage() {
+  const sessions = await getTrainingSessions();
+  const next = sessions[0];
+  const places = new Set(sessions.map(sessionPlace));
   return (
     <>
       {/* Hero */}
@@ -70,14 +77,20 @@ export default function PrepaPhysiquePage() {
             className="mt-10"
             items={[
               { icon: "users", label: "Coach", value: TRAINER_NAME },
-              { icon: "calendar", label: "Quand", value: `${TRAINING_DAYS_LABEL[0].toUpperCase()}${TRAINING_DAYS_LABEL.slice(1)} · ${formatTime(TRAINING_TIME)}` },
+              {
+                icon: "calendar",
+                label: next ? "Prochaine séance" : "Quand",
+                value: next
+                  ? `${formatDay(next.date).replace(/^./, (c) => c.toUpperCase())} · ${formatTime(next.time)}`
+                  : `${TRAINING_DAYS_LABEL[0].toUpperCase()}${TRAINING_DAYS_LABEL.slice(1)}`,
+              },
               { icon: "cash", label: "Séance", value: `${PRICE_PER_SESSION_MAD} MAD` },
               { icon: "gift", label: "Abonnement", value: `${PRICE_PER_MONTH_MAD} MAD / mois` },
             ]}
           />
           <p className="mt-4 flex items-center gap-2 text-sm text-ink-muted">
             <Icon name="pin" className="h-4 w-4 text-primary" />
-            {TRAINING_PLACE}
+            {places.size === 1 ? [...places][0] : places.size > 1 ? "Lieu indiqué sur chaque séance" : TRAINING_PLACE}
           </p>
         </div>
       </section>
@@ -99,7 +112,7 @@ export default function PrepaPhysiquePage() {
           </div>
         </div>
         <div className="mt-8">
-          <TrainingSessions />
+          <TrainingSessions sessions={sessions} />
         </div>
       </section>
 

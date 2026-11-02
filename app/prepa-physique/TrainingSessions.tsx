@@ -7,7 +7,7 @@ import { whatsappLink } from "@/lib/config";
 import { formatDayLong, formatTime } from "@/lib/matches";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { useSessionUser } from "@/lib/supabase/useSession";
-import { MIN_PARTICIPANTS, TRAINING_TIME, upcomingSessionDates } from "@/lib/training";
+import { MIN_PARTICIPANTS, sessionPlace, SESSIONS_SHOWN, type TrainingSession } from "@/lib/training";
 
 type Counts = Record<string, number>;
 
@@ -16,10 +16,10 @@ async function supabase() {
   return getSupabaseBrowserClient();
 }
 
-export default function TrainingSessions() {
+export default function TrainingSessions({ sessions: all }: { sessions: TrainingSession[] }) {
   const user = useSessionUser();
-  // Computed after mount so a cached page never lists sessions that already happened.
-  const [dates, setDates] = useState<string[] | null>(null);
+  // Filtered after mount so a cached page never lists sessions that already started.
+  const [sessions, setSessions] = useState<TrainingSession[] | null>(null);
   const [counts, setCounts] = useState<Counts | null>(null);
   const [countsFailed, setCountsFailed] = useState(false);
   const [mine, setMine] = useState<Set<string>>(new Set());
@@ -27,17 +27,19 @@ export default function TrainingSessions() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  useEffect(() => setDates(upcomingSessionDates()), []);
+  useEffect(() => {
+    const now = Date.now();
+    setSessions(all.filter((x) => new Date(x.start).getTime() > now).slice(0, SESSIONS_SHOWN));
+  }, [all]);
+  const ids = sessions?.map((x) => x.id) ?? null;
+  const idsKey = ids?.join("|") ?? "";
 
-  const loadCounts = useCallback(async (ds: string[]) => {
+  const loadCounts = useCallback(async (sessionIds: string[]) => {
     try {
-      const { data, error } = await (await supabase()).rpc("training_counts", {
-        from_date: ds[0],
-        to_date: ds[ds.length - 1],
-      });
+      const { data, error } = await (await supabase()).rpc("training_session_counts", { p_session_ids: sessionIds });
       if (error) throw error;
       const next: Counts = {};
-      for (const row of (data ?? []) as { session_date: string; signups: number }[]) next[row.session_date] = row.signups;
+      for (const row of (data ?? []) as { session_id: string; signups: number }[]) next[row.session_id] = row.signups;
       setCounts(next);
       setCountsFailed(false);
     } catch {
@@ -46,12 +48,12 @@ export default function TrainingSessions() {
   }, []);
 
   useEffect(() => {
-    if (!isSupabaseConfigured || !dates?.length) return;
-    loadCounts(dates);
-  }, [dates, loadCounts]);
+    if (!isSupabaseConfigured || !idsKey) return;
+    loadCounts(idsKey.split("|"));
+  }, [idsKey, loadCounts]);
 
   useEffect(() => {
-    if (!user || !dates?.length) {
+    if (!user || !idsKey) {
       setMine(new Set());
       setHasProfile(null);
       return;
@@ -60,66 +62,81 @@ export default function TrainingSessions() {
     (async () => {
       const client = await supabase();
       const [signups, profile] = await Promise.all([
-        client.from("training_signups").select("session_date").in("session_date", dates),
+        client.from("training_signups").select("session_id").in("session_id", idsKey.split("|")),
         client.from("profiles").select("id").eq("id", user.id).maybeSingle(),
       ]);
       if (cancelled) return;
-      setMine(new Set((signups.data ?? []).map((r: { session_date: string }) => r.session_date)));
+      setMine(new Set((signups.data ?? []).map((r: { session_id: string }) => r.session_id)));
       setHasProfile(Boolean(profile.data));
     })();
     return () => {
       cancelled = true;
     };
-  }, [user, dates]);
+  }, [user, idsKey]);
 
-  async function toggle(date: string) {
+  async function toggle(session: TrainingSession) {
     if (!user || busy) return;
-    setBusy(date);
+    const id = session.id;
+    setBusy(id);
     setError("");
     const client = await supabase();
-    const joined = mine.has(date);
+    const joined = mine.has(id);
     const { error } = joined
-      ? await client.from("training_signups").delete().eq("session_date", date).eq("user_id", user.id)
-      : await client.from("training_signups").insert({ session_date: date });
+      ? await client.from("training_signups").delete().eq("session_id", id).eq("user_id", user.id)
+      : await client.from("training_signups").insert({ session_start: session.start });
     if (error) {
       setError("Ça n'a pas marché. Réessaie dans un instant.");
     } else {
       setMine((prev) => {
         const next = new Set(prev);
-        if (joined) next.delete(date);
-        else next.add(date);
+        if (joined) next.delete(id);
+        else next.add(id);
         return next;
       });
-      setCounts((prev) => (prev ? { ...prev, [date]: Math.max(0, (prev[date] ?? 0) + (joined ? -1 : 1)) } : prev));
+      setCounts((prev) => (prev ? { ...prev, [id]: Math.max(0, (prev[id] ?? 0) + (joined ? -1 : 1)) } : prev));
     }
     setBusy(null);
-    if (dates) loadCounts(dates);
+    if (ids) loadCounts(ids);
   }
 
-  if (!dates) {
+  if (!sessions) {
     return <div className="card h-48 animate-pulse" aria-busy="true" />;
+  }
+  if (sessions.length === 0) {
+    return (
+      <div className="card p-8 text-center">
+        <p className="headline text-3xl">Prochaines séances bientôt</p>
+        <p className="mt-2 text-ink-muted">Les dates arrivent très vite. Suis-nous sur WhatsApp ou Instagram pour être prévenu.</p>
+      </div>
+    );
   }
 
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {dates.map((date) => {
-          const count = counts?.[date] ?? 0;
+        {sessions.map((session) => {
+          const { id, date, time } = session;
+          const count = counts?.[id] ?? 0;
           const showCount = isSupabaseConfigured && counts !== null && !countsFailed;
           const confirmed = showCount && count >= MIN_PARTICIPANTS;
           const missing = Math.max(0, MIN_PARTICIPANTS - count);
-          const joined = mine.has(date);
+          const joined = mine.has(id);
           const pct = Math.min(100, Math.round((count / MIN_PARTICIPANTS) * 100));
 
           return (
-            <article key={date} className={`card flex flex-col p-5 ${confirmed ? "border-2 border-primary" : ""}`}>
+            <article key={id} className={`card flex flex-col p-5 ${confirmed ? "border-2 border-primary" : ""}`}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="flex items-center gap-2 text-sm font-semibold capitalize text-ink-muted">
                     <Icon name="calendar" className="h-4 w-4" />
                     {formatDayLong(date)}
                   </p>
-                  <p className="headline mt-1 text-5xl">{formatTime(TRAINING_TIME)}</p>
+                  <p className="headline mt-1 text-5xl">{formatTime(time)}</p>
+                  <p className="mt-2 flex items-center gap-1.5 text-sm">
+                    <Icon name="pin" className="h-4 w-4 shrink-0 text-primary" />
+                    <span className="font-semibold">{sessionPlace(session)}</span>
+                  </p>
+                  {session.note && <p className="mt-1 text-sm text-ink-muted">{session.note}</p>}
                 </div>
                 {confirmed && (
                   <span className="rounded-full bg-highlight px-3 py-1 text-xs font-bold uppercase tracking-wide text-highlight-ink">
@@ -162,12 +179,12 @@ export default function TrainingSessions() {
 
               <div className="mt-6 border-t border-line pt-4">
                 <SessionAction
-                  date={date}
+                  session={session}
                   user={user}
                   hasProfile={hasProfile}
                   joined={joined}
-                  busy={busy === date}
-                  onToggle={() => toggle(date)}
+                  busy={busy === id}
+                  onToggle={() => toggle(session)}
                 />
               </div>
             </article>
@@ -184,14 +201,14 @@ export default function TrainingSessions() {
 }
 
 function SessionAction({
-  date,
+  session,
   user,
   hasProfile,
   joined,
   busy,
   onToggle,
 }: {
-  date: string;
+  session: TrainingSession;
   user: ReturnType<typeof useSessionUser>;
   hasProfile: boolean | null;
   joined: boolean;
@@ -201,7 +218,9 @@ function SessionAction({
   if (!isSupabaseConfigured) {
     return (
       <a
-        href={whatsappLink(`Salam ! Je viens au training physique du ${formatDayLong(date)} à ${formatTime(TRAINING_TIME)}.`)}
+        href={whatsappLink(
+          `Salam ! Je viens au training physique du ${formatDayLong(session.date)} à ${formatTime(session.time)} (${sessionPlace(session)}).`,
+        )}
         target="_blank"
         rel="noopener noreferrer"
         className="btn-primary w-full"

@@ -10,6 +10,10 @@ export const MATCHES_SHEET_CSV_URL =
   process.env.MATCHES_SHEET_CSV_URL ??
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSZkjrqbPmxFFoESALgq4axdtTQ_pVVE_J7Q1nkgqnVmChWI39CztexYdQDBl0Cu9eZekkB_CnynSbS/pub?gid=753117502&single=true&output=csv";
 
+// Same Google Sheet, "Training" tab published as CSV. Empty = the default
+// schedule in lib/training.ts (mardi, jeudi, samedi).
+export const TRAINING_SHEET_CSV_URL = process.env.TRAINING_SHEET_CSV_URL ?? "";
+
 /** Seconds between refreshes of the match lists on the live site. */
 export const MATCHES_REVALIDATE_SECONDS = 300;
 

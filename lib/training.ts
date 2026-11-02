@@ -45,5 +45,32 @@ export function upcomingSessionDates(count = SESSIONS_SHOWN, now: Date = new Dat
   return dates;
 }
 
+export type TrainingSession = {
+  /** "YYYY-MM-DD-HH:MM" (Marrakech time); matches training_signups.session_id. */
+  id: string;
+  date: string;
+  time: string;
+  /** ISO timestamp of the start. */
+  start: string;
+  pitch: string;
+  area: string;
+  note: string;
+};
+
+/** Morocco runs on UTC+1 outside Ramadan (same rule as matches). */
+export function trainingSession(date: string, time: string, pitch = "", area = "", note = ""): TrainingSession {
+  return { id: `${date}-${time}`, date, time, start: new Date(`${date}T${time}:00+01:00`).toISOString(), pitch, area, note };
+}
+
+/** Fallback when the sheet has no upcoming sessions: the default weekly schedule. */
+export function defaultSessions(count = SESSIONS_SHOWN, now: Date = new Date()): TrainingSession[] {
+  return upcomingSessionDates(count, now).map((d) => trainingSession(d, TRAINING_TIME));
+}
+
+/** "Urban Foot · Guéliz", or the default place text. */
+export function sessionPlace(s: TrainingSession): string {
+  return [s.pitch, s.area].filter(Boolean).join(" · ") || TRAINING_PLACE;
+}
+
 /** Sessions per month at 3/week, used to show the subscription saving. */
 export const SESSIONS_PER_MONTH = Math.round((TRAINING_WEEKDAYS.length * 52) / 12);

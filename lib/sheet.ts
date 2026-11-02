@@ -42,7 +42,7 @@ export function parseCsv(text: string): string[][] {
 }
 
 /** Lowercase, strip accents and non-alphanumerics: "Réservées " → "reservees". */
-function normalize(s: string): string {
+export function normalize(s: string): string {
   return s
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
@@ -51,7 +51,7 @@ function normalize(s: string): string {
 }
 
 /** "07/11/2026", "7/11/2026" or "2026-11-07" → "2026-11-07" */
-function parseDate(raw: string): string | null {
+export function parseDate(raw: string): string | null {
   const s = raw.trim();
   let y: number, m: number, d: number;
   let match = s.match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/);
@@ -68,7 +68,7 @@ function parseDate(raw: string): string | null {
 }
 
 /** "20:00", "20:00:00", "20h", "20h30", "9:30" → "HH:mm" */
-function parseTime(raw: string): string | null {
+export function parseTime(raw: string): string | null {
   const match = raw.trim().toLowerCase().match(/^(\d{1,2})\s*[:h]\s*(\d{2})?(?::\d{2})?$/);
   if (!match) return null;
   const h = Number(match[1]);
