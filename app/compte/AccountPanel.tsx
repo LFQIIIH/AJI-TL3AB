@@ -130,9 +130,14 @@ export default function AccountPanel() {
           </p>
         )}
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5 text-sm">
-          <button type="button" onClick={() => setEditing(true)} className="btn-ghost px-4 py-2">
-            Modifier mes infos
-          </button>
+          <span className="flex flex-wrap items-center gap-3">
+            <button type="button" onClick={() => setEditing(true)} className="btn-ghost px-4 py-2">
+              Modifier mes infos
+            </button>
+            <Link href="/compte/mot-de-passe" className="font-semibold text-primary hover:underline">
+              Mot de passe
+            </Link>
+          </span>
           <button type="button" onClick={signOut} className="font-semibold text-ink-muted hover:text-ink hover:underline">
             Se déconnecter
           </button>

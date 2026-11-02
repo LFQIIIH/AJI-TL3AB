@@ -106,3 +106,20 @@ To open it to everyone (once you have your professional address/domain):
    the sender (e.g. `contact@<your domain>`, name `AJI TL3AB`).
 3. Optional: **Authentication → Emails → Templates → Magic Link**, write the
    e-mail in French.
+
+## Login with e-mail + password
+
+The Connexion page offers Google, then e-mail + password ("J'ai un compte" /
+"Créer un compte"), "Mot de passe oublié ?", and a small "lien de connexion"
+option. Players can set or change a password at `/compte/mot-de-passe`
+(linked from Mon compte).
+
+Recommended Supabase settings (Authentication → Sign In / Providers → Email):
+
+- **Confirm email: OFF** → new players are logged in right after "Créer mon
+  compte", with no e-mail to wait for. (ON also works: they confirm once by
+  e-mail, then log in with their password.)
+- Minimum password length: 6 (the site asks for at least 6).
+
+Reset e-mail in French: Authentication → Emails → Templates → **Reset
+Password** (keep `{{ .ConfirmationURL }}`).
