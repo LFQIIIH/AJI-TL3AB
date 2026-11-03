@@ -25,7 +25,7 @@ export default function ProductCard({ product, priority = false }: { product: Pr
     : undefined;
 
   return (
-    <article className="card flex flex-col overflow-hidden">
+    <article id={product.id} className="card flex scroll-mt-24 flex-col overflow-hidden">
       <div className="relative aspect-square bg-surface">
         <Image
           src={product.images[imageIdx]}
