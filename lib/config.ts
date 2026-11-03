@@ -1,7 +1,7 @@
 // International format, digits only (no "+", spaces or leading 0) — used for wa.me links.
 export const WHATSAPP_NUMBER = "212714610279";
 
-export const INSTAGRAM_HANDLE = "ajitl3ab";
+export const INSTAGRAM_HANDLE = "ajitl3abfoot";
 export const INSTAGRAM_URL = `https://instagram.com/${INSTAGRAM_HANDLE}`;
 
 // Google Sheet "Publier sur le web" → CSV link for the Matchs tab.
