@@ -22,7 +22,7 @@ const SECTIONS = [
     title: "Pourquoi",
     body: [
       "Gérer tes réservations et te contacter au sujet de tes matchs.",
-      "Gérer tes inscriptions aux séances de training physique. Le nombre d'inscrits par séance est public, jamais les noms.",
+      "Gérer tes inscriptions aux séances de training physique et Switch Off. Le nombre d'inscrits par séance est public, jamais les noms.",
       "Tes réservations en ligne, ta présence aux matchs, tes buts et les votes des autres joueurs : pour le ranking, les prix de match et le tirage au sort mensuel.",
       "Le code de parrainage : pour savoir quel pote t'a invité, et lui donner un ticket de plus au tirage."
     ],

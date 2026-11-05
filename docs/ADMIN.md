@@ -103,3 +103,11 @@ signed up for: add a new row and delete the old one. If the tab is empty or
 not set up, the site shows the default schedule (mardi, jeudi, samedi
 19:00). Sign-ups per session: Table Editor → **training_signups**
 (`session_id` = date-heure). Requires `0005_training_sessions.sql`.
+
+## Switch Off (weekend sessions)
+
+Same as Training, in a **"SwitchOff"** tab of the Google Sheet (date, heure,
+terrain, quartier, note). 20 places per session, 75 MAD (lib/switchoff.ts).
+If the tab is empty or not connected, the site shows samedi et dimanche à
+09:00. Who signed up: Table Editor → **switchoff_signups**. Requires
+`0006_switch_off.sql`.

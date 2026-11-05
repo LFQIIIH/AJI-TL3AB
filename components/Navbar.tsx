@@ -12,6 +12,7 @@ const LINKS = [
   { href: "/jouer", label: "Jouer" },
   { href: "/classement", label: "Ranking" },
   { href: "/prepa-physique", label: "Training" },
+  { href: "/switch-off", label: "Switch Off" },
   { href: "/kids", label: "Enfants" },
   { href: "/merch", label: "L7wayej" },
 ];
@@ -33,19 +34,19 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-forest-light bg-forest text-white">
       <nav className="container-page flex h-16 items-center justify-between">
-        <Link href="/" className="headline flex items-center gap-2 text-2xl" aria-label="AJI TL3AB, accueil">
+        <Link href="/" className="headline flex shrink-0 items-center gap-2 whitespace-nowrap text-2xl" aria-label="AJI TL3AB, accueil">
           <Image src="/logo-mark.png" alt="" width={379} height={279} priority className="h-10 w-auto" />
           <span>
             Aji <span className="text-highlight">tl3ab</span>
           </span>
         </Link>
 
-        <ul className="hidden items-center gap-8 md:flex">
+        <ul className="hidden items-center gap-5 lg:flex xl:gap-8">
           {LINKS.map((l) => (
             <li key={l.href}>
               <Link
                 href={l.href}
-                className={`text-sm font-semibold uppercase tracking-wide transition hover:text-highlight ${
+                className={`whitespace-nowrap text-sm font-semibold uppercase tracking-wide transition hover:text-highlight ${
                   pathname === l.href ? "text-highlight" : "text-white"
                 }`}
               >
@@ -57,7 +58,7 @@ export default function Navbar() {
             <li>
               <Link
                 href={account.href}
-                className={`flex items-center gap-2 text-sm font-semibold uppercase tracking-wide transition hover:text-highlight ${
+                className={`flex items-center gap-2 whitespace-nowrap text-sm font-semibold uppercase tracking-wide transition hover:text-highlight ${
                   pathname === account.href ? "text-highlight" : "text-white"
                 }`}
               >
@@ -75,7 +76,7 @@ export default function Navbar() {
 
         <button
           type="button"
-          className="-mr-2 p-2 md:hidden"
+          className="-mr-2 p-2 lg:hidden"
           aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
@@ -87,7 +88,7 @@ export default function Navbar() {
       </nav>
 
       {open && (
-        <div className="border-t border-forest-light md:hidden">
+        <div className="border-t border-forest-light lg:hidden">
           <ul className="container-page flex flex-col py-4">
             {LINKS.map((l) => (
               <li key={l.href}>

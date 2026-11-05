@@ -14,7 +14,7 @@ import {
   TRAINING_DAYS_LABEL,
   TRAINING_PLACE,
 } from "@/lib/training";
-import TrainingSessions from "./TrainingSessions";
+import SessionSignups from "@/components/SessionSignups";
 
 export const metadata: Metadata = {
   title: "Training physique",
@@ -112,7 +112,16 @@ export default async function PrepaPhysiquePage() {
           </div>
         </div>
         <div className="mt-8">
-          <TrainingSessions sessions={sessions} />
+          <SessionSignups
+            sessions={sessions}
+            program={{
+              table: "training_signups",
+              countsRpc: "training_session_counts",
+              mode: "minimum",
+              goal: MIN_PARTICIPANTS,
+              whatsappLabel: "au training physique",
+            }}
+          />
         </div>
       </section>
 

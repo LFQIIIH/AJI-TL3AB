@@ -32,14 +32,19 @@ function localDate(d: Date): string {
  * Next `count` session dates (YYYY-MM-DD), Marrakech time. Today counts until
  * the session start time has passed.
  */
-export function upcomingSessionDates(count = SESSIONS_SHOWN, now: Date = new Date()): string[] {
+export function upcomingSessionDates(
+  count = SESSIONS_SHOWN,
+  now: Date = new Date(),
+  weekdays: readonly number[] = TRAINING_WEEKDAYS,
+  time: string = TRAINING_TIME,
+): string[] {
   const nowTime = new Intl.DateTimeFormat("en-GB", { timeZone: TZ, hour: "2-digit", minute: "2-digit", hour12: false }).format(now);
   const dates: string[] = [];
   for (let i = 0; dates.length < count && i < 31; i++) {
     const date = localDate(new Date(now.getTime() + i * 86_400_000));
     const weekday = new Date(`${date}T12:00:00Z`).getUTCDay();
-    if (!(TRAINING_WEEKDAYS as readonly number[]).includes(weekday)) continue;
-    if (i === 0 && nowTime >= TRAINING_TIME) continue;
+    if (!weekdays.includes(weekday)) continue;
+    if (i === 0 && nowTime >= time) continue;
     dates.push(date);
   }
   return dates;
@@ -63,8 +68,13 @@ export function trainingSession(date: string, time: string, pitch = "", area = "
 }
 
 /** Fallback when the sheet has no upcoming sessions: the default weekly schedule. */
-export function defaultSessions(count = SESSIONS_SHOWN, now: Date = new Date()): TrainingSession[] {
-  return upcomingSessionDates(count, now).map((d) => trainingSession(d, TRAINING_TIME));
+export function defaultSessions(
+  count = SESSIONS_SHOWN,
+  now: Date = new Date(),
+  weekdays: readonly number[] = TRAINING_WEEKDAYS,
+  time: string = TRAINING_TIME,
+): TrainingSession[] {
+  return upcomingSessionDates(count, now, weekdays, time).map((d) => trainingSession(d, time));
 }
 
 /** "Urban Foot · Guéliz", or the default place text. */

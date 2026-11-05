@@ -1,8 +1,9 @@
-import { MATCHES_REVALIDATE_SECONDS, TRAINING_SHEET_CSV_URL } from "@/lib/config";
+import { MATCHES_REVALIDATE_SECONDS, SWITCHOFF_SHEET_CSV_URL, TRAINING_SHEET_CSV_URL } from "@/lib/config";
+import { SWITCHOFF_TIME, SWITCHOFF_WEEKDAYS } from "@/lib/switchoff";
 import { normalize, parseCsv, parseDate, parseTime } from "@/lib/sheet";
 import { defaultSessions, SESSIONS_SHOWN, trainingSession, type TrainingSession } from "@/lib/training";
 
-/** Rows of the "Training" tab: date, heure, terrain, quartier, note. Invalid rows are skipped. */
+/** Rows of a sessions tab ("Training", "SwitchOff"): date, heure, terrain, quartier, note. Invalid rows are skipped. */
 export function sheetToSessions(csv: string): TrainingSession[] {
   const [header, ...rows] = parseCsv(csv);
   if (!header) return [];
@@ -22,14 +23,14 @@ export function sheetToSessions(csv: string): TrainingSession[] {
 }
 
 /**
- * Upcoming training sessions from the sheet, soonest first. Falls back to the
- * default weekly schedule if the sheet isn't set up, can't be read, or has
- * nothing upcoming — the page is never empty.
+ * Upcoming sessions from a sheet tab, soonest first. Falls back to `fallback`
+ * if the tab isn't set up, can't be read, or has nothing upcoming — the page
+ * is never empty.
  */
-export async function getTrainingSessions(now: Date = new Date()): Promise<TrainingSession[]> {
-  if (TRAINING_SHEET_CSV_URL) {
+async function getSheetSessions(url: string, fallback: () => TrainingSession[], now: Date): Promise<TrainingSession[]> {
+  if (url) {
     try {
-      const res = await fetch(TRAINING_SHEET_CSV_URL, { next: { revalidate: MATCHES_REVALIDATE_SECONDS } });
+      const res = await fetch(url, { next: { revalidate: MATCHES_REVALIDATE_SECONDS } });
       if (res.ok) {
         const seen = new Set<string>();
         const upcoming = sheetToSessions(await res.text())
@@ -41,5 +42,19 @@ export async function getTrainingSessions(now: Date = new Date()): Promise<Train
       // fall through to the default schedule
     }
   }
-  return defaultSessions(SESSIONS_SHOWN, now);
+  return fallback();
+}
+
+/** Training sessions ("Training" tab), default mardi/jeudi/samedi 19:00. */
+export function getTrainingSessions(now: Date = new Date()): Promise<TrainingSession[]> {
+  return getSheetSessions(TRAINING_SHEET_CSV_URL, () => defaultSessions(SESSIONS_SHOWN, now), now);
+}
+
+/** Switch Off sessions ("SwitchOff" tab), default samedi/dimanche 09:00. */
+export function getSwitchOffSessions(now: Date = new Date()): Promise<TrainingSession[]> {
+  return getSheetSessions(
+    SWITCHOFF_SHEET_CSV_URL,
+    () => defaultSessions(SESSIONS_SHOWN, now, SWITCHOFF_WEEKDAYS, SWITCHOFF_TIME),
+    now,
+  );
 }

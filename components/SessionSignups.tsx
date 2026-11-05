@@ -8,16 +8,31 @@ import { formatDayLong, formatTime } from "@/lib/matches";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { publicRpc } from "@/lib/supabase/publicApi";
 import { useSessionUser } from "@/lib/supabase/useSession";
-import { MIN_PARTICIPANTS, sessionPlace, SESSIONS_SHOWN, type TrainingSession } from "@/lib/training";
+import { sessionPlace, SESSIONS_SHOWN, type TrainingSession } from "@/lib/training";
 
 type Counts = Record<string, number>;
+
+/**
+ * What a list of sessions signs up for.
+ * - "minimum" (Training): the session runs once `goal` people signed up.
+ * - "capacity" (Switch Off): `goal` places, then the session is full.
+ */
+export type SessionProgram = {
+  table: "training_signups" | "switchoff_signups";
+  countsRpc: "training_session_counts" | "switchoff_session_counts";
+  mode: "minimum" | "capacity";
+  goal: number;
+  /** For the WhatsApp fallback: "au training physique", "à Switch Off". */
+  whatsappLabel: string;
+};
 
 async function supabase() {
   const { getSupabaseBrowserClient } = await import("@/lib/supabase/client");
   return getSupabaseBrowserClient();
 }
 
-export default function TrainingSessions({ sessions: all }: { sessions: TrainingSession[] }) {
+/** Upcoming sessions with live counters and "Je viens" (Training, Switch Off). */
+export default function SessionSignups({ sessions: all, program }: { sessions: TrainingSession[]; program: SessionProgram }) {
   const user = useSessionUser();
   // Filtered after mount so a cached page never lists sessions that already started.
   const [sessions, setSessions] = useState<TrainingSession[] | null>(null);
@@ -37,7 +52,7 @@ export default function TrainingSessions({ sessions: all }: { sessions: Training
 
   const loadCounts = useCallback(async (sessionIds: string[]) => {
     try {
-      const rows = await publicRpc<{ session_id: string; signups: number }>("training_session_counts", { p_session_ids: sessionIds });
+      const rows = await publicRpc<{ session_id: string; signups: number }>(program.countsRpc, { p_session_ids: sessionIds });
       const next: Counts = {};
       for (const row of rows) next[row.session_id] = row.signups;
       setCounts(next);
@@ -45,7 +60,7 @@ export default function TrainingSessions({ sessions: all }: { sessions: Training
     } catch {
       setCountsFailed(true);
     }
-  }, []);
+  }, [program.countsRpc]);
 
   useEffect(() => {
     if (!isSupabaseConfigured || !idsKey) return;
@@ -62,7 +77,7 @@ export default function TrainingSessions({ sessions: all }: { sessions: Training
     (async () => {
       const client = await supabase();
       const [signups, profile] = await Promise.all([
-        client.from("training_signups").select("session_id").in("session_id", idsKey.split("|")),
+        client.from(program.table).select("session_id").in("session_id", idsKey.split("|")),
         client.from("profiles").select("id").eq("id", user.id).maybeSingle(),
       ]);
       if (cancelled) return;
@@ -72,7 +87,7 @@ export default function TrainingSessions({ sessions: all }: { sessions: Training
     return () => {
       cancelled = true;
     };
-  }, [user, idsKey]);
+  }, [user, idsKey, program.table]);
 
   async function toggle(session: TrainingSession) {
     if (!user || busy) return;
@@ -82,10 +97,14 @@ export default function TrainingSessions({ sessions: all }: { sessions: Training
     const client = await supabase();
     const joined = mine.has(id);
     const { error } = joined
-      ? await client.from("training_signups").delete().eq("session_id", id).eq("user_id", user.id)
-      : await client.from("training_signups").insert({ session_start: session.start });
+      ? await client.from(program.table).delete().eq("session_id", id).eq("user_id", user.id)
+      : await client.from(program.table).insert({ session_start: session.start });
     if (error) {
-      setError("Ça n'a pas marché. Réessaie dans un instant.");
+      setError(
+        error.message.includes("session_full")
+          ? "Plus de place pour cette séance, désolé ! Choisis-en une autre."
+          : "Ça n'a pas marché. Réessaie dans un instant.",
+      );
     } else {
       setMine((prev) => {
         const next = new Set(prev);
@@ -118,10 +137,15 @@ export default function TrainingSessions({ sessions: all }: { sessions: Training
           const { id, date, time } = session;
           const count = counts?.[id] ?? 0;
           const showCount = isSupabaseConfigured && counts !== null && !countsFailed;
-          const confirmed = showCount && count >= MIN_PARTICIPANTS;
-          const missing = Math.max(0, MIN_PARTICIPANTS - count);
+          const goal = program.goal;
+          const capacity = program.mode === "capacity";
+          const reached = showCount && count >= goal;
+          // minimum: reaching the goal confirms the session; capacity: it's full
+          const confirmed = !capacity && reached;
+          const full = capacity && reached;
+          const missing = Math.max(0, goal - count);
           const joined = mine.has(id);
-          const pct = Math.min(100, Math.round((count / MIN_PARTICIPANTS) * 100));
+          const pct = Math.min(100, Math.round((count / goal) * 100));
 
           return (
             <article key={id} className={`card flex flex-col p-5 ${confirmed ? "border-2 border-primary" : ""}`}>
@@ -138,9 +162,13 @@ export default function TrainingSessions({ sessions: all }: { sessions: Training
                   </p>
                   {session.note && <p className="mt-1 text-sm text-ink-muted">{session.note}</p>}
                 </div>
-                {confirmed && (
-                  <span className="rounded-full bg-highlight px-3 py-1 text-xs font-bold uppercase tracking-wide text-highlight-ink">
-                    Confirmée
+                {(confirmed || full) && (
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${
+                      full ? "bg-ink text-white" : "bg-highlight text-highlight-ink"
+                    }`}
+                  >
+                    {full ? "Complet" : "Confirmée"}
                   </span>
                 )}
               </div>
@@ -149,7 +177,15 @@ export default function TrainingSessions({ sessions: all }: { sessions: Training
                 <div className="mt-5">
                   <div className="flex items-center justify-between gap-2 text-sm">
                     <span>
-                      {confirmed ? (
+                      {capacity ? (
+                        full ? (
+                          <span className="font-semibold text-ink-muted">Séance complète</span>
+                        ) : (
+                          <>
+                            <span className="font-bold text-primary">{missing}</span> {missing > 1 ? "places restantes" : "place restante"}
+                          </>
+                        )
+                      ) : confirmed ? (
                         <span className="font-semibold text-primary">La séance a lieu ✓</span>
                       ) : (
                         <>
@@ -159,27 +195,31 @@ export default function TrainingSessions({ sessions: all }: { sessions: Training
                     </span>
                     <span className="flex shrink-0 items-center gap-1 text-ink-muted">
                       <Icon name="users" className="h-4 w-4" />
-                      {count}/{MIN_PARTICIPANTS}
+                      {count}/{goal}
                     </span>
                   </div>
                   <div
                     className="mt-2 h-2 overflow-hidden rounded-full bg-line"
                     role="progressbar"
                     aria-valuemin={0}
-                    aria-valuemax={MIN_PARTICIPANTS}
-                    aria-valuenow={Math.min(count, MIN_PARTICIPANTS)}
+                    aria-valuemax={goal}
+                    aria-valuenow={Math.min(count, goal)}
                     aria-label="Inscrits"
                   >
-                    <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+                    <div className={`h-full rounded-full transition-all ${full ? "bg-ink-muted" : "bg-primary"}`} style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               ) : (
-                <p className="mt-5 text-sm text-ink-muted">Minimum {MIN_PARTICIPANTS} inscrits pour lancer la séance.</p>
+                <p className="mt-5 text-sm text-ink-muted">
+                  {capacity ? `${goal} places par séance.` : `Minimum ${goal} inscrits pour lancer la séance.`}
+                </p>
               )}
 
               <div className="mt-6 border-t border-line pt-4">
                 <SessionAction
                   session={session}
+                  program={program}
+                  full={full}
                   user={user}
                   hasProfile={hasProfile}
                   joined={joined}
@@ -202,6 +242,8 @@ export default function TrainingSessions({ sessions: all }: { sessions: Training
 
 function SessionAction({
   session,
+  program,
+  full,
   user,
   hasProfile,
   joined,
@@ -209,6 +251,8 @@ function SessionAction({
   onToggle,
 }: {
   session: TrainingSession;
+  program: SessionProgram;
+  full: boolean;
   user: ReturnType<typeof useSessionUser>;
   hasProfile: boolean | null;
   joined: boolean;
@@ -219,7 +263,7 @@ function SessionAction({
     return (
       <a
         href={whatsappLink(
-          `Salam ! Je viens au training physique du ${formatDayLong(session.date)} à ${formatTime(session.time)} (${sessionPlace(session)}).`,
+          `Salam ! Je viens ${program.whatsappLabel} du ${formatDayLong(session.date)} à ${formatTime(session.time)} (${sessionPlace(session)}).`,
         )}
         target="_blank"
         rel="noopener noreferrer"
@@ -231,6 +275,13 @@ function SessionAction({
   }
   if (user === undefined || (user && hasProfile === null)) {
     return <div className="h-11 animate-pulse rounded-full bg-line" />;
+  }
+  if (full && !joined) {
+    return (
+      <button type="button" disabled className="btn-ghost w-full">
+        Complet
+      </button>
+    );
   }
   if (!user) {
     return (
