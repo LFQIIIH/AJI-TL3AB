@@ -18,7 +18,9 @@ export const TRAINING_SHEET_CSV_URL =
 
 // Same Google Sheet, "SwitchOff" tab published as CSV. Empty or unreadable =
 // samedi et dimanche à 09:00 (lib/switchoff.ts).
-export const SWITCHOFF_SHEET_CSV_URL = process.env.SWITCHOFF_SHEET_CSV_URL ?? "";
+export const SWITCHOFF_SHEET_CSV_URL =
+  process.env.SWITCHOFF_SHEET_CSV_URL ??
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSZkjrqbPmxFFoESALgq4axdtTQ_pVVE_J7Q1nkgqnVmChWI39CztexYdQDBl0Cu9eZekkB_CnynSbS/pub?gid=1214313567&single=true&output=csv";
 
 /** Seconds between refreshes of the match lists on the live site. */
 export const MATCHES_REVALIDATE_SECONDS = 300;
