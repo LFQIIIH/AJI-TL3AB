@@ -9,8 +9,12 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 2678400,
   },
   // Fonts read at runtime by the share-card image route.
+  // Fonts and logo read at runtime by the share-card route and the share images
+  // (/jouer/og.png is re-rendered every 5 min on the server, so it needs them there).
   outputFileTracingIncludes: {
     "/api/carte": ["./assets/fonts/**", "./assets/logo-mark.png"],
+    "/og.png": ["./assets/fonts/**", "./assets/logo-mark.png"],
+    "/*/og.png": ["./assets/fonts/**", "./assets/logo-mark.png", "./public/merch/**"],
   },
   // Let browsers keep product images and the logo for a day (and reuse them
   // up to a week while refreshing in the background). New images get new

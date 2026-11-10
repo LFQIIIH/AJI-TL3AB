@@ -13,8 +13,7 @@
 //   options: --no-external (skip external checks), --map (print the full link map)
 // Exit code 1 if anything internal is broken, orphaned or deeper than 3 clicks.
 
-import { spawn } from "node:child_process";
-import { createServer } from "node:net";
+import { startServer } from "./serve.mjs";
 
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(name);
@@ -26,37 +25,6 @@ const option = (name) => {
 const PROD_HOSTS = new Set(["www.ajitl3ab.com", "ajitl3ab.com"]);
 const MAX_DEPTH = 3;
 const VAGUE = /^(ici|cliquez ici|clique ici|click here|here|en savoir plus|voir plus|lire la suite|plus|lien|link|→)$/i;
-
-// ── Server ───────────────────────────────────────────────────────────────────
-
-function freePort() {
-  return new Promise((resolve) => {
-    const srv = createServer();
-    srv.listen(0, () => {
-      const { port } = srv.address();
-      srv.close(() => resolve(port));
-    });
-  });
-}
-
-async function startServer() {
-  const port = await freePort();
-  const child = spawn("npx", ["next", "start", "-p", String(port)], { stdio: ["ignore", "pipe", "pipe"], detached: true });
-  let log = "";
-  child.stdout.on("data", (d) => (log += d));
-  child.stderr.on("data", (d) => (log += d));
-  const base = `http://localhost:${port}`;
-  for (let i = 0; i < 60; i++) {
-    try {
-      await fetch(base, { redirect: "manual" });
-      return { base, stop: () => process.kill(-child.pid) };
-    } catch {
-      await new Promise((r) => setTimeout(r, 500));
-    }
-  }
-  process.kill(-child.pid);
-  throw new Error(`next start did not come up (did you run "npm run build"?)\n${log}`);
-}
 
 // ── HTML parsing (the site's own markup, so simple patterns are enough) ──────
 
