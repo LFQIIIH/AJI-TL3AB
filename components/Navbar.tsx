@@ -69,7 +69,7 @@ export default function Navbar() {
           )}
           <li>
             <Link href="/jouer" className="btn-primary px-5 py-2.5">
-              Réserve
+              Réserve<span className="sr-only"> un match de foot</span>
             </Link>
           </li>
         </ul>

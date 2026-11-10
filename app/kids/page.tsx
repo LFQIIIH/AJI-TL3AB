@@ -4,6 +4,7 @@ import { Icon, type IconName } from "@/components/Icons";
 import KidsSignup from "./KidsSignup";
 import { pageMetadata } from "@/lib/seo";
 import PageSeo from "@/components/PageSeo";
+import RelatedLinks from "@/components/RelatedLinks";
 
 export const metadata: Metadata = pageMetadata("kids");
 
@@ -165,6 +166,7 @@ export default function KidsPage() {
           <KidsSignup className="btn shrink-0 bg-highlight px-8 py-4 text-base text-highlight-ink hover:bg-highlight/90" />
         </div>
       </section>
+      <RelatedLinks page="kids" title="Et pour les parents ?" className="container-page border-t border-line py-16 sm:py-20" />
     </>
   );
 }

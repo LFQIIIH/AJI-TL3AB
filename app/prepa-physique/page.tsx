@@ -18,6 +18,7 @@ import {
 import SessionSignups from "@/components/SessionSignups";
 import { pageMetadata } from "@/lib/seo";
 import PageSeo from "@/components/PageSeo";
+import RelatedLinks from "@/components/RelatedLinks";
 import { sessionsSchema } from "@/lib/structured-data";
 
 export const metadata: Metadata = pageMetadata("training");
@@ -194,6 +195,7 @@ export default async function PrepaPhysiquePage() {
           Abonné ou pas, inscris-toi à chaque séance avec « Je viens » pour qu&apos;elle compte dans les {MIN_PARTICIPANTS}.
         </p>
       </section>
+      <RelatedLinks page="training" className="container-page border-t border-line py-16 sm:py-20" />
     </>
   );
 }

@@ -3,6 +3,18 @@ import Link from "next/link";
 import { CITY, INSTAGRAM_HANDLE, INSTAGRAM_URL, whatsappLink } from "@/lib/config";
 import { InstagramIcon, WhatsAppIcon } from "@/components/Icons";
 
+// Key pages with descriptive anchor text (the top menu keeps the short labels).
+const FOOTER_LINKS = [
+  { href: "/", label: "Accueil" },
+  { href: "/jouer", label: "Matchs de foot à Marrakech" },
+  { href: "/prepa-physique", label: "Training physique" },
+  { href: "/switch-off", label: "Switch Off, le sport du week-end" },
+  { href: "/kids", label: "Foot pour enfants" },
+  { href: "/merch", label: "Maillots de foot" },
+  { href: "/classement", label: "Classement et tirage du mois" },
+  { href: "/confidentialite", label: "Confidentialité" },
+];
+
 export default function Footer() {
   return (
     <footer className="bg-forest text-white">
@@ -20,13 +32,13 @@ export default function Footer() {
         <nav aria-label="Pages">
           <p className="eyebrow text-highlight">Navigation</p>
           <ul className="mt-4 space-y-2 text-sm">
-            <li><Link href="/jouer" className="hover:text-highlight">Jouer</Link></li>
-            <li><Link href="/classement" className="hover:text-highlight">Ranking & tirage</Link></li>
-            <li><Link href="/prepa-physique" className="hover:text-highlight">Training physique</Link></li>
-            <li><Link href="/switch-off" className="hover:text-highlight">Switch Off (week-end)</Link></li>
-            <li><Link href="/kids" className="hover:text-highlight">Enfants</Link></li>
-            <li><Link href="/merch" className="hover:text-highlight">L7wayej</Link></li>
-            <li><Link href="/confidentialite" className="hover:text-highlight">Confidentialité</Link></li>
+            {FOOTER_LINKS.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className="hover:text-highlight">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
 

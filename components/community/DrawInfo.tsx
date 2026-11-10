@@ -86,7 +86,7 @@ export default function DrawInfo({
         </Link>
         {compact && (
           <Link href="/classement#tirage" className="btn border border-forest-light text-white hover:border-white">
-            Règles
+            Règles du tirage
           </Link>
         )}
       </div>

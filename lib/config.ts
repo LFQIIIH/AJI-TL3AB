@@ -2,7 +2,7 @@
 export const WHATSAPP_NUMBER = "212714610279";
 
 export const INSTAGRAM_HANDLE = "ajitl3abfoot";
-export const INSTAGRAM_URL = `https://instagram.com/${INSTAGRAM_HANDLE}`;
+export const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`;
 
 // Google Sheet "Publier sur le web" → CSV link for the Matchs tab.
 // Set MATCHES_SHEET_CSV_URL="" to use the static list in data/matches.ts instead.

@@ -21,11 +21,11 @@ export default function UpcomingCards({ matches, countIds }: { matches: Match[];
             action={
               isFull(m) ? (
                 <Link href="/jouer" className="btn-ghost px-5 py-2.5">
-                  Complet
+                  Complet<span className="sr-only"> : voir les autres matchs</span>
                 </Link>
               ) : (
                 <Link href="/jouer" className="btn-primary px-5 py-2.5">
-                  Réserver
+                  Réserver<span className="sr-only"> ce match à {m.pitch}</span>
                 </Link>
               )
             }

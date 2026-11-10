@@ -4,6 +4,7 @@ import TeamOfMonth from "@/components/community/TeamOfMonth";
 import Leaderboard from "./Leaderboard";
 import { pageMetadata } from "@/lib/seo";
 import PageSeo from "@/components/PageSeo";
+import RelatedLinks from "@/components/RelatedLinks";
 import { getDrawStatus, getDrawWinners, getMonthLeaderboard, getTeamOfMonth } from "@/lib/community-source";
 
 export const metadata: Metadata = pageMetadata("classement");
@@ -42,6 +43,7 @@ export default async function ClassementPage() {
       <section id="tirage" className="mt-12 scroll-mt-24">
         <DrawInfo initialStatus={drawStatus} initialWinners={winners} headingLevel={2} />
       </section>
+      <RelatedLinks page="classement" title="Monte au classement" className="mt-16 border-t border-line pt-12" />
     </div>
   );
 }

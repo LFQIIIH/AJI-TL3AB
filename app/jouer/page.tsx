@@ -4,6 +4,7 @@ import InfoStrip from "@/components/InfoStrip";
 import MatchBrowser from "./MatchBrowser";
 import { jouerDescription, pageMetadata } from "@/lib/seo";
 import PageSeo from "@/components/PageSeo";
+import RelatedLinks from "@/components/RelatedLinks";
 import { matchesSchema } from "@/lib/structured-data";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -41,6 +42,7 @@ export default async function JouerPage() {
       <div className="mt-10">
         <MatchBrowser matches={matches} />
       </div>
+      <RelatedLinks page="jouer" title="Entre deux matchs" className="mt-16 border-t border-line pt-12" />
     </div>
   );
 }

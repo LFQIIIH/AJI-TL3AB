@@ -4,6 +4,8 @@ import InfoStrip from "@/components/InfoStrip";
 import ProductCard from "./ProductCard";
 import { pageMetadata } from "@/lib/seo";
 import PageSeo from "@/components/PageSeo";
+import Link from "next/link";
+import RelatedLinks from "@/components/RelatedLinks";
 import { productsSchema } from "@/lib/structured-data";
 
 export const metadata: Metadata = pageMetadata("merch");
@@ -17,7 +19,11 @@ export default function MerchPage() {
         Lbes <span className="text-primary">l&apos;couleurs</span>
       </p>
       <p className="mt-4 max-w-xl text-ink-muted">
-        Choisis ta taille et commande sur WhatsApp. Paiement à la livraison sur Marrakech, ou retrait au prochain match.
+        Choisis ta taille et commande sur WhatsApp. Paiement à la livraison sur Marrakech, ou retrait à ton{" "}
+        <Link href="/jouer" className="font-semibold text-primary hover:underline">
+          prochain match à Marrakech
+        </Link>
+        .
       </p>
       <InfoStrip
         className="mt-8"
@@ -33,6 +39,7 @@ export default function MerchPage() {
           <ProductCard key={p.id} product={p} priority={i < 3} />
         ))}
       </div>
+      <RelatedLinks page="merch" className="mt-16 border-t border-line pt-12" />
     </div>
   );
 }

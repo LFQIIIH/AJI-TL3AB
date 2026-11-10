@@ -9,6 +9,7 @@ import { sessionPlace, SESSIONS_SHOWN, TRAINER_NAME, TRAINING_PLACE } from "@/li
 import { getSwitchOffSessions } from "@/lib/training-source";
 import { pageMetadata } from "@/lib/seo";
 import PageSeo from "@/components/PageSeo";
+import RelatedLinks from "@/components/RelatedLinks";
 import { sessionsSchema } from "@/lib/structured-data";
 
 export const metadata: Metadata = pageMetadata("switchOff");
@@ -167,6 +168,7 @@ export default async function SwitchOffPage() {
           </a>
         </div>
       </section>
+      <RelatedLinks page="switchOff" className="container-page border-t border-line py-16 sm:py-20" />
     </>
   );
 }

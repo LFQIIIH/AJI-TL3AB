@@ -13,6 +13,7 @@ import { whatsappLink } from "@/lib/config";
 import { pageMetadata } from "@/lib/seo";
 import { getDrawStatus, getDrawWinners, getTeamOfMonth } from "@/lib/community-source";
 import PageSeo from "@/components/PageSeo";
+import RelatedLinks from "@/components/RelatedLinks";
 import { businessSchema, faqSchema, websiteSchema } from "@/lib/structured-data";
 
 export const metadata: Metadata = pageMetadata("home");
@@ -249,6 +250,7 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+      <RelatedLinks page="home" title="Aussi chez AJI TL3AB" className="container-page border-t border-line py-16 sm:py-20" />
     </>
   );
 }
