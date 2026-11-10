@@ -30,6 +30,8 @@ const nextConfig: NextConfig = {
   // (If the Vercel domain settings already redirect the apex, that runs first.)
   async redirects() {
     return [
+      // The shop lives at /merch; "/boutique" is the natural French word, so send it there.
+      { source: "/boutique", destination: `${SITE_URL}/merch`, statusCode: 301 },
       {
         source: "/:path*",
         has: [{ type: "host", value: SITE_HOST.replace(/^www\./, "") }],
