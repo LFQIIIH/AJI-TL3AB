@@ -20,7 +20,8 @@ export default function Footer() {
     <footer className="bg-forest text-white">
       <div className="container-page grid gap-10 py-12 md:grid-cols-3">
         <div>
-          <Image src="/logo-mark.png" alt="" width={379} height={279} className="h-14 w-auto" />
+          {/* Same source size as the menu logo, so both use one cached file (128px is sharp enough here). */}
+          <Image src="/logo-mark.png" alt="" width={54} height={40} className="h-14 w-auto" />
           <p className="headline mt-3 text-4xl">
             Aji <span className="text-highlight">tl3ab</span>
           </p>
@@ -31,10 +32,10 @@ export default function Footer() {
 
         <nav aria-label="Pages">
           <p className="eyebrow text-highlight">Navigation</p>
-          <ul className="mt-4 space-y-2 text-sm">
+          <ul className="mt-2 text-sm">
             {FOOTER_LINKS.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="hover:text-highlight">
+                <Link href={l.href} className="inline-flex min-h-11 items-center hover:text-highlight">
                   {l.label}
                 </Link>
               </li>
@@ -44,14 +45,14 @@ export default function Footer() {
 
         <div>
           <p className="eyebrow text-highlight">Contact</p>
-          <ul className="mt-4 space-y-3 text-sm">
+          <ul className="mt-2 text-sm">
             <li>
-              <a href={whatsappLink("Salam AJI TL3AB !")} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-highlight">
+              <a href={whatsappLink("Salam AJI TL3AB !")} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 hover:text-highlight">
                 <WhatsAppIcon /> WhatsApp
               </a>
             </li>
             <li>
-              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-highlight">
+              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 hover:text-highlight">
                 <InstagramIcon /> @{INSTAGRAM_HANDLE}
               </a>
             </li>

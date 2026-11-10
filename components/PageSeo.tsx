@@ -28,18 +28,18 @@ export default function PageSeo({ page, schema = [], className = "" }: { page: P
         />
       )}
       {showTrail && (
-        <nav aria-label="Fil d'Ariane" className={`mb-4 text-sm text-ink-muted ${className}`}>
+        <nav aria-label="Fil d'Ariane" className={`-mt-3 mb-1 text-sm text-ink-muted ${className}`}>
           <ol className="flex flex-wrap items-center gap-1.5">
             {trail.map((crumb, i) =>
               i < trail.length - 1 ? (
                 <li key={crumb.url} className="flex items-center gap-1.5">
-                  <Link href={new URL(crumb.url).pathname} className="hover:text-primary hover:underline">
+                  <Link href={new URL(crumb.url).pathname} className="inline-flex min-h-11 items-center hover:text-primary hover:underline">
                     {crumb.name}
                   </Link>
                   <span aria-hidden="true">›</span>
                 </li>
               ) : (
-                <li key={crumb.url} aria-current="page" className="font-semibold text-ink">
+                <li key={crumb.url} aria-current="page" className="flex min-h-11 items-center font-semibold text-ink">
                   {crumb.name}
                 </li>
               ),

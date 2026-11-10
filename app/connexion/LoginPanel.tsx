@@ -175,7 +175,7 @@ export default function LoginPanel() {
                   setMode(value);
                   setNotice(null);
                 }}
-                className={`rounded-full px-3 py-2 text-sm font-bold transition ${
+                className={`min-h-11 rounded-full px-3 py-2 text-sm font-bold transition ${
                   mode === value ? "bg-surface text-ink shadow-sm" : "text-ink-muted hover:text-ink"
                 }`}
               >
@@ -204,7 +204,7 @@ export default function LoginPanel() {
                   Mot de passe
                 </label>
                 {mode === "login" && (
-                  <button type="button" onClick={forgotPassword} disabled={busy !== null} className="text-xs font-semibold text-primary hover:underline">
+                  <button type="button" onClick={forgotPassword} disabled={busy !== null} className="inline-flex min-h-11 items-center text-xs font-semibold text-primary hover:underline">
                     {busy === "reset" ? "Envoi…" : "Mot de passe oublié ?"}
                   </button>
                 )}
@@ -250,7 +250,7 @@ export default function LoginPanel() {
           {mode === "login" && (
             <p className="mt-4 text-center text-xs text-ink-muted">
               Pas envie de mot de passe ?{" "}
-              <button type="button" onClick={sendMagicLink} disabled={busy !== null} className="font-semibold text-primary hover:underline">
+              <button type="button" onClick={sendMagicLink} disabled={busy !== null} className="inline-flex min-h-11 items-center font-semibold text-primary hover:underline">
                 {busy === "link" ? "Envoi…" : "Reçois un lien de connexion par e-mail"}
               </button>
             </p>

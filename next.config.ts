@@ -2,6 +2,12 @@ import type { NextConfig } from "next";
 import { SITE_HOST, SITE_URL } from "./lib/config";
 
 const nextConfig: NextConfig = {
+  images: {
+    // Product photos and the logo: AVIF first, WebP fallback, resized per screen.
+    formats: ["image/avif", "image/webp"],
+    // Optimised images are cached for 31 days (fewer re-optimisations on Vercel).
+    minimumCacheTTL: 2678400,
+  },
   // Fonts read at runtime by the share-card image route.
   outputFileTracingIncludes: {
     "/api/carte": ["./assets/fonts/**", "./assets/logo-mark.png"],

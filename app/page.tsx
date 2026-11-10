@@ -151,7 +151,7 @@ export default async function HomePage() {
               <p className="eyebrow">Prochains matchs</p>
               <h2 className="headline mt-3 text-5xl sm:text-7xl">Ça joue bientôt</h2>
             </div>
-            <Link href="/jouer" className="text-sm font-bold uppercase tracking-wide text-primary hover:underline">
+            <Link href="/jouer" className="inline-flex min-h-11 items-center text-sm font-bold uppercase tracking-wide text-primary hover:underline">
               Voir tous les matchs →
             </Link>
           </div>
@@ -184,7 +184,7 @@ export default async function HomePage() {
               <p className="eyebrow">Communauté</p>
               <h2 className="headline mt-3 text-5xl sm:text-7xl">Joue, vote, gagne</h2>
             </div>
-            <Link href="/classement" className="text-sm font-bold uppercase tracking-wide text-primary hover:underline">
+            <Link href="/classement" className="inline-flex min-h-11 items-center text-sm font-bold uppercase tracking-wide text-primary hover:underline">
               Voir le ranking →
             </Link>
           </div>
@@ -240,7 +240,7 @@ export default async function HomePage() {
           <div className="divide-y divide-line border-y border-line">
             {FAQ.map((f) => (
               <details key={f.q} className="group py-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold [&::-webkit-details-marker]:hidden">
+                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold [&::-webkit-details-marker]:hidden">
                   {f.q}
                   <span className="headline text-3xl text-primary transition group-open:rotate-45">+</span>
                 </summary>

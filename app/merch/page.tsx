@@ -36,7 +36,7 @@ export default function MerchPage() {
       />
       <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((p, i) => (
-          <ProductCard key={p.id} product={p} priority={i < 3} />
+          <ProductCard key={p.id} product={p} priority={i === 0} />
         ))}
       </div>
       <RelatedLinks page="merch" className="mt-16 border-t border-line pt-12" />

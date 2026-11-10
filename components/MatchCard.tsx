@@ -39,7 +39,7 @@ export default function MatchCard({ match, action }: MatchCardProps) {
             href={mapsLink(match)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex shrink-0 items-center gap-1 font-semibold text-primary hover:underline"
+            className="inline-flex min-h-11 shrink-0 items-center gap-1 font-semibold text-primary hover:underline"
           >
             <Icon name="route" className="h-4 w-4" />
             Itinéraire

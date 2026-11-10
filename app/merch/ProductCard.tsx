@@ -6,7 +6,10 @@ import { productImageAlt, type Product } from "@/data/products";
 import { WhatsAppIcon } from "@/components/Icons";
 import { whatsappLink } from "@/lib/config";
 
-/** `priority`: load the image immediately (first row); others load as you scroll. */
+/**
+ * `priority`: the page's LCP image (first card): preloaded, fetchpriority="high",
+ * not lazy. The other cards are lazy-loaded (those already on screen still load at once).
+ */
 export default function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
   const singleSize = product.sizes.length === 1;
   const [size, setSize] = useState<string | null>(singleSize ? product.sizes[0] : null);
@@ -31,11 +34,12 @@ export default function ProductCard({ product, priority = false }: { product: Pr
           src={product.images[imageIdx]}
           alt={productImageAlt(product)}
           fill
-          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          // Displayed width: 1 column on phones, 2 from 640px, 3 (max ~370px) from 1024px.
+          // Next.js serves AVIF/WebP at the matching width (srcset).
+          sizes="(min-width: 1024px) 370px, (min-width: 640px) 50vw, 100vw"
           className="object-cover"
-          // Images are pre-sized 800×800 WebP/SVG files: serve them as-is.
-          unoptimized
           priority={priority && imageIdx === 0}
+          fetchPriority={priority && imageIdx === 0 ? "high" : undefined}
         />
         {product.preorder && (
           <span className="absolute left-3 top-3 rounded-full bg-highlight px-3 py-1 text-xs font-bold uppercase tracking-wide text-highlight-ink">

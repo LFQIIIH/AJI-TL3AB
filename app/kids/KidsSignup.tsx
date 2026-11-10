@@ -50,6 +50,9 @@ export default function KidsSignup({ label = "Réserver pour mon enfant", classN
               value={childName}
               onChange={(e) => setChildName(e.target.value)}
               placeholder="Ex : Adam"
+              autoComplete="off"
+              autoCapitalize="words"
+              enterKeyHint="next"
               required
               autoFocus
               maxLength={60}

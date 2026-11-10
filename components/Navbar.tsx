@@ -34,8 +34,8 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-forest-light bg-forest text-white">
       <nav className="container-page flex h-16 items-center justify-between">
-        <Link href="/" className="headline flex shrink-0 items-center gap-2 whitespace-nowrap text-2xl" aria-label="AJI TL3AB, accueil">
-          <Image src="/logo-mark.png" alt="" width={379} height={279} priority className="h-10 w-auto" />
+        <Link href="/" className="headline flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap text-2xl" aria-label="AJI TL3AB, accueil">
+          <Image src="/logo-mark.png" alt="" width={54} height={40} priority className="h-10 w-auto" />
           <span>
             Aji <span className="text-highlight">tl3ab</span>
           </span>
