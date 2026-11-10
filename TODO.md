@@ -26,13 +26,13 @@ share tags, structured data or links break).
       website, WhatsApp number, description, hours (set to 24h).
 - [x] Review link: https://g.page/r/CcMV2YehOOFoEBI/review (not added to the website, by choice).
 - [ ] Verification: make sure it's confirmed (Google email / profile shows "Verified").
-- [ ] Secondary categories (Edit profile → Business category): Club de sport, Entraîneur personnel,
+- [x] Secondary categories (Edit profile → Business category): Club de sport, Entraîneur personnel,
       École de sport, and Magasin de vêtements de sport if the jerseys should show.
-- [ ] Photos: logo, cover photo (match in action), matches, training, Switch Off, jerseys.
-- [ ] Share the review link in WhatsApp groups after matches + to regulars. No reward in
+- [x] Photos: logo, cover photo (match in action), matches, training, Switch Off, jerseys.
+- [x] (ongoing) Share the review link in WhatsApp groups after matches + to regulars. No reward in
       exchange for reviews (not even a draw ticket). Reply to every review.
-- [ ] Posts: the week's matches / Switch Off weekends, like on Instagram.
-- [ ] Hours: switch from 24h to real hours if Google flags it or people expect night replies;
+- [x] (ongoing) Posts: the week's matches / Switch Off weekends, like on Instagram.
+- [x] Hours: switch from 24h to real hours if Google flags it or people expect night replies;
       add special hours for Eid / days off. (Then tell Claude, to put the same hours in the site's schema.)
 
 ## 4. Backlinks & directories
