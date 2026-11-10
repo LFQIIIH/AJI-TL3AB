@@ -25,6 +25,9 @@ export const SWITCHOFF_SHEET_CSV_URL =
 /** Seconds between refreshes of the match lists on the live site. */
 export const MATCHES_REVALIDATE_SECONDS = 300;
 
+/** Production address (www). Used for canonical URLs, the sitemap and share previews. */
+export const SITE_URL = "https://www.ajitl3ab.com";
+
 export const BRAND_NAME = "AJI TL3AB";
 export const CITY = "Marrakech";
 

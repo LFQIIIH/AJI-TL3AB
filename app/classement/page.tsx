@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import DrawInfo from "@/components/community/DrawInfo";
 import TeamOfMonth from "@/components/community/TeamOfMonth";
 import Leaderboard from "./Leaderboard";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Ranking",
-  description: "Meilleurs buteurs, gardiens, défenseurs et milieux AJI TL3AB, équipe du mois et tirage au sort mensuel.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Classement des joueurs et tirage du mois",
+  description:
+    "Meilleurs buteurs, gardiens, défenseurs et milieux des matchs AJI TL3AB à Marrakech, équipe du mois et tirage au sort mensuel.",
+  path: "/classement",
+});
 
 export default function ClassementPage() {
   return (

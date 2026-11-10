@@ -34,8 +34,10 @@ async function supabase() {
 /** Upcoming sessions with live counters and "Je viens" (Training, Switch Off). */
 export default function SessionSignups({ sessions: all, program }: { sessions: TrainingSession[]; program: SessionProgram }) {
   const user = useSessionUser();
-  // Filtered after mount so a cached page never lists sessions that already started.
-  const [sessions, setSessions] = useState<TrainingSession[] | null>(null);
+  // Server-rendered with the sessions upcoming at build time (so they're in the
+  // HTML), then re-filtered after mount so a cached page never lists sessions
+  // that already started.
+  const [sessions, setSessions] = useState<TrainingSession[]>(() => all.slice(0, SESSIONS_SHOWN));
   const [counts, setCounts] = useState<Counts | null>(null);
   const [countsFailed, setCountsFailed] = useState(false);
   const [mine, setMine] = useState<Set<string>>(new Set());
@@ -47,8 +49,7 @@ export default function SessionSignups({ sessions: all, program }: { sessions: T
     const now = Date.now();
     setSessions(all.filter((x) => new Date(x.start).getTime() > now).slice(0, SESSIONS_SHOWN));
   }, [all]);
-  const ids = sessions?.map((x) => x.id) ?? null;
-  const idsKey = ids?.join("|") ?? "";
+  const idsKey = sessions.map((x) => x.id).join("|");
 
   const loadCounts = useCallback(async (sessionIds: string[]) => {
     try {
@@ -115,12 +116,9 @@ export default function SessionSignups({ sessions: all, program }: { sessions: T
       setCounts((prev) => (prev ? { ...prev, [id]: Math.max(0, (prev[id] ?? 0) + (joined ? -1 : 1)) } : prev));
     }
     setBusy(null);
-    if (ids) loadCounts(ids);
+    if (idsKey) loadCounts(idsKey.split("|"));
   }
 
-  if (!sessions) {
-    return <div className="card h-48 animate-pulse" aria-busy="true" />;
-  }
   if (sessions.length === 0) {
     return (
       <div className="card p-8 text-center">

@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import InfoStrip from "@/components/InfoStrip";
 import { Icon, type IconName } from "@/components/Icons";
 import KidsSignup from "./KidsSignup";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Enfants",
+export const metadata: Metadata = pageMetadata({
+  title: "Foot pour enfants à Marrakech (5–14 ans)",
   description:
-    "Matchs de foot et activités encadrés pour les enfants de 5 à 14 ans à Marrakech. Les parents réservent, on s'occupe du reste : jeu, encadrement et plaisir.",
-};
+    "Matchs de foot et activités encadrés pour les enfants de 5 à 14 ans à Marrakech. Les parents réservent, on s'occupe du jeu et de l'encadrement.",
+  path: "/kids",
+});
 
 const STEPS = [
   { n: "01", title: "Vous réservez", text: "Sur WhatsApp, avec le prénom et l'âge de votre enfant. On vous donne la date, l'heure et le terrain." },

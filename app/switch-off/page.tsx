@@ -5,13 +5,18 @@ import SessionSignups from "@/components/SessionSignups";
 import { whatsappLink } from "@/lib/config";
 import { formatDay, formatTime } from "@/lib/matches";
 import { SWITCHOFF_CAPACITY, SWITCHOFF_PRICE_MAD } from "@/lib/switchoff";
-import { sessionPlace, TRAINER_NAME, TRAINING_PLACE } from "@/lib/training";
+import { sessionPlace, SESSIONS_SHOWN, TRAINER_NAME, TRAINING_PLACE } from "@/lib/training";
 import { getSwitchOffSessions } from "@/lib/training-source";
+import { pageMetadata } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
+import { sessionsJsonLd } from "@/lib/structured-data";
 
-export const metadata: Metadata = {
-  title: "Switch Off",
-  description: `Switch Off : le samedi et le dimanche matin, une pause sport pour les pros débordés. Training, mini-matchs et activités avec le coach ${TRAINER_NAME} à Marrakech. ${SWITCHOFF_PRICE_MAD} MAD la séance.`,
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Switch Off : sport le week-end à Marrakech",
+  description:
+    "Samedi et dimanche à 9h : training, mini-matchs et activités avec un coach à Marrakech. La pause sport des actifs débordés. 75 MAD, 20 places.",
+  path: "/switch-off",
+});
 
 // Re-render every 5 min to pick up changes in the sheet's "SwitchOff" tab.
 export const revalidate = 300;
@@ -36,6 +41,16 @@ export default async function SwitchOffPage() {
 
   return (
     <>
+      {sessions.length > 0 && (
+        <JsonLd
+          data={sessionsJsonLd(sessions.slice(0, SESSIONS_SHOWN), {
+            name: "Switch Off : sport du week-end à Marrakech",
+            description: `Training, mini-matchs et activités avec le coach ${TRAINER_NAME}, le week-end à 9h. ${SWITCHOFF_CAPACITY} places.`,
+            priceMad: SWITCHOFF_PRICE_MAD,
+            path: "/switch-off",
+          })}
+        />
+      )}
       {/* Hero */}
       <section className="border-b border-line">
         <div className="container-page py-16 sm:py-24">

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import InfoStrip from "@/components/InfoStrip";
 import DrawInfo from "@/components/community/DrawInfo";
@@ -9,6 +10,17 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { isFull } from "@/lib/matches";
 import { getRecentResults, getUpcomingMatches } from "@/lib/matches-source";
 import { whatsappLink } from "@/lib/config";
+import { pageMetadata } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
+import { businessJsonLd, faqJsonLd } from "@/lib/structured-data";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Matchs de foot 5v5 & 7v7 à Marrakech · AJI TL3AB",
+  description:
+    "Réserve ta place dans un match de foot 5v5, 7v7 ou 9v9 à Marrakech, seul ou entre amis. Aussi : training physique, Switch Off le week-end et maillots.",
+  path: "/",
+  absoluteTitle: true,
+});
 
 // Re-render every 5 min (MATCHES_REVALIDATE_SECONDS) to pick up sheet edits.
 export const revalidate = 300;
@@ -64,6 +76,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <JsonLd data={[...businessJsonLd(), faqJsonLd(FAQ)]} />
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-line">
         <div

@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { whatsappLink } from "@/lib/config";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Confidentialité",
-  description: "Comment AJI TL3AB protège tes données personnelles (loi 09-08).",
-};
+  description:
+    "Comment AJI TL3AB protège tes données personnelles (loi 09-08).",
+  path: "/confidentialite",
+});
 
 // TODO before launch: fill in the legal entity, address and CNDP declaration number.
 const CONTROLLER = "AJI TL3AB [raison sociale à compléter], Marrakech";

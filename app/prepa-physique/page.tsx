@@ -9,17 +9,23 @@ import {
   PRICE_PER_MONTH_MAD,
   PRICE_PER_SESSION_MAD,
   SESSIONS_PER_MONTH,
+  SESSIONS_SHOWN,
   TRAINER_NAME,
   sessionPlace,
   TRAINING_DAYS_LABEL,
   TRAINING_PLACE,
 } from "@/lib/training";
 import SessionSignups from "@/components/SessionSignups";
+import { pageMetadata } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
+import { sessionsJsonLd } from "@/lib/structured-data";
 
-export const metadata: Metadata = {
-  title: "Training physique",
-  description: `Training physique en plein air, sur le terrain de foot, avec le coach ${TRAINER_NAME} à Marrakech. ${PRICE_PER_SESSION_MAD} MAD la séance ou ${PRICE_PER_MONTH_MAD} MAD par mois.`,
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Training physique en plein air à Marrakech",
+  description:
+    "Training physique en groupe sur un terrain de foot à Marrakech avec le coach Anas Mouatasim : gainage, cardio, renforcement. 50 MAD la séance.",
+  path: "/prepa-physique",
+});
 
 const PROGRAM = [
   { icon: "shield", title: "Gainage & core", text: "Abdos profonds, lombaires, stabilité : la base de chaque frappe et de chaque duel." },
@@ -40,6 +46,16 @@ export default async function PrepaPhysiquePage() {
   const places = new Set(sessions.map(sessionPlace));
   return (
     <>
+      {sessions.length > 0 && (
+        <JsonLd
+          data={sessionsJsonLd(sessions.slice(0, SESSIONS_SHOWN), {
+            name: `Training physique avec le coach ${TRAINER_NAME}`,
+            description: "Séance de training physique en groupe sur un terrain de foot à Marrakech : gainage, cardio, renforcement et mobilité.",
+            priceMad: PRICE_PER_SESSION_MAD,
+            path: "/prepa-physique",
+          })}
+        />
+      )}
       {/* Hero */}
       <section className="border-b border-line">
         <div className="container-page py-16 sm:py-24">
