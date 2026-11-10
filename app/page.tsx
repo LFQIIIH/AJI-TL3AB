@@ -11,6 +11,7 @@ import { isFull } from "@/lib/matches";
 import { getRecentResults, getUpcomingMatches } from "@/lib/matches-source";
 import { whatsappLink } from "@/lib/config";
 import { pageMetadata } from "@/lib/seo";
+import { FAQ } from "@/data/faq";
 import { getDrawStatus, getDrawWinners, getTeamOfMonth } from "@/lib/community-source";
 import PageSeo from "@/components/PageSeo";
 import RelatedLinks from "@/components/RelatedLinks";
@@ -39,28 +40,6 @@ const STEPS = [
   },
 ];
 
-const FAQ = [
-  {
-    q: "Je viens seul, c'est possible ?",
-    a: "Bien sûr. La majorité des joueurs viennent seuls ou à deux. On équilibre les équipes sur place — ghir aji.",
-  },
-  {
-    q: "Comment je paie ?",
-    a: "Sur place, en espèces ou par virement avant le match. Le prix est indiqué sur chaque match, en MAD par joueur.",
-  },
-  {
-    q: "C'est quoi les niveaux ?",
-    a: "Débutant, Intermédiaire, Confirmé ou Tous niveaux. Sois honnête avec toi-même, tout le monde passe un meilleur match.",
-  },
-  {
-    q: "Et si je dois annuler ?",
-    a: "Préviens-nous sur WhatsApp au moins 24h avant pour libérer ta place. Au-delà, la place reste due.",
-  },
-  {
-    q: "Il faut ramener quoi ?",
-    a: "Tes chaussures de foot, une bouteille d'eau et la motivation. Pas de chaussures ? Loue une paire pour 20 MAD en réservant ta place (pointures 38 à 45). Le reste, on gère.",
-  },
-];
 
 export default async function HomePage() {
   const [allUpcoming, results, team, drawStatus, winners] = await Promise.all([
@@ -222,7 +201,7 @@ export default async function HomePage() {
       </section>
 
       {/* FAQ */}
-      <section className="border-t border-line">
+      <section id="faq" className="scroll-mt-20 border-t border-line">
         <div className="container-page grid gap-10 py-16 sm:py-24 lg:grid-cols-[1fr_2fr]">
           <div>
             <p className="eyebrow">FAQ</p>

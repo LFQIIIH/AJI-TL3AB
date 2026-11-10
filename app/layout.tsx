@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppFab from "@/components/WhatsAppFab";
 import { IS_PRODUCTION_SITE, SITE_URL } from "@/lib/config";
-import { fullTitle, OG_IMAGE, PAGES } from "@/lib/seo";
+import { fullTitle, PAGES } from "@/lib/seo";
 import "./globals.css";
 
 const display = Anton({
@@ -20,6 +20,13 @@ const sans = Inter({
   display: "swap",
 });
 
+const google = process.env.GOOGLE_SITE_VERIFICATION?.trim();
+const bing = process.env.BING_SITE_VERIFICATION?.trim();
+const verification: Metadata["verification"] | undefined =
+  IS_PRODUCTION_SITE && (google || bing)
+    ? { ...(google ? { google } : {}), ...(bing ? { other: { "msvalidate.01": bing } } : {}) }
+    : undefined;
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -30,12 +37,15 @@ export const metadata: Metadata = {
     "Réserve ta place dans un match de foot 5v5, 7v7 ou 9v9 à Marrakech. Ghir aji w l3ab.",
   applicationName: "AJI TL3AB",
   // Defaults for pages without their own (pageMetadata() sets these per page).
-  openGraph: { type: "website", locale: "fr_MA", siteName: "AJI TL3AB", images: [OG_IMAGE] },
-  twitter: { card: "summary_large_image", images: [OG_IMAGE.url] },
+  // (images: app/opengraph-image.tsx and the per-page opengraph-image.tsx files)
+  openGraph: { type: "website", locale: "fr_MA", siteName: "AJI TL3AB" },
+  twitter: { card: "summary_large_image" },
   // Preview deployments must never be indexed (production: no robots tag, i.e. index, follow).
   ...(IS_PRODUCTION_SITE ? {} : { robots: { index: false, follow: false } }),
-  // Google Search Console "HTML tag" method: set GOOGLE_SITE_VERIFICATION in Vercel.
-  ...(process.env.GOOGLE_SITE_VERIFICATION ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } } : {}),
+  // Site-ownership meta tags, only when the token is set in Vercel (never hardcoded):
+  // GOOGLE_SITE_VERIFICATION (Search Console "HTML tag") and BING_SITE_VERIFICATION
+  // (Bing Webmaster Tools "meta tag", msvalidate.01). Production deployment only.
+  ...(verification ? { verification } : {}),
 };
 
 export const viewport: Viewport = {

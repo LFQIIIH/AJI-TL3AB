@@ -14,8 +14,6 @@ import { BRAND_NAME, SITE_URL } from "@/lib/config";
 
 export const TITLE_SUFFIX = ` – ${BRAND_NAME}`;
 
-/** Branded share image (public/og-image.png, 1200×630). */
-export const OG_IMAGE = { url: "/og-image.png", width: 1200, height: 630, alt: "AJI TL3AB, matchs de foot à Marrakech" };
 
 export type PageSeoConfig = {
   path: string;
@@ -122,9 +120,10 @@ export function pageMetadata(key: PageKey, overrides: { description?: string } =
       url: canonicalUrl(page.path),
       title,
       description,
-      images: [OG_IMAGE],
+      // og:image (+ width, height, alt, type): from the page's opengraph-image.tsx,
+      // or the site default app/opengraph-image.tsx.
     },
-    twitter: { card: "summary_large_image", title, description, images: [OG_IMAGE.url] },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 

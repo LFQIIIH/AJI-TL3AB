@@ -19,7 +19,7 @@ export const MIN_PARTICIPANTS = 20;
 export const SESSIONS_SHOWN = 6;
 
 const TZ = "Africa/Casablanca";
-const DAY_NAMES = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+export const DAY_NAMES = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 
 export const TRAINING_DAYS_LABEL = TRAINING_WEEKDAYS.map((d) => DAY_NAMES[d].toLowerCase()).join(", ").replace(/, ([^,]*)$/, " et $1");
 
