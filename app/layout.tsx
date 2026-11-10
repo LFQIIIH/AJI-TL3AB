@@ -3,7 +3,7 @@ import { Anton, Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppFab from "@/components/WhatsAppFab";
-import { SITE_URL } from "@/lib/config";
+import { IS_PRODUCTION_SITE, SITE_URL } from "@/lib/config";
 import { OG_IMAGE } from "@/lib/seo";
 import "./globals.css";
 
@@ -32,6 +32,8 @@ export const metadata: Metadata = {
   // Defaults for pages without their own (pageMetadata() sets these per page).
   openGraph: { type: "website", locale: "fr_MA", siteName: "AJI TL3AB", images: [OG_IMAGE] },
   twitter: { card: "summary_large_image", images: [OG_IMAGE.url] },
+  // Preview deployments must never be indexed (production: no robots tag, i.e. index, follow).
+  ...(IS_PRODUCTION_SITE ? {} : { robots: { index: false, follow: false } }),
   // Google Search Console "HTML tag" method: set GOOGLE_SITE_VERIFICATION in Vercel.
   ...(process.env.GOOGLE_SITE_VERIFICATION ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } } : {}),
 };

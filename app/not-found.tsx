@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Page introuvable",
-  robots: { index: false },
+  // No robots tag here: Next.js already sends noindex (and a 404 status) for this page.
 };
 
 export default function NotFound() {

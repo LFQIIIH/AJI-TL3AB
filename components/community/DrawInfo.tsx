@@ -7,17 +7,27 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { publicSelect } from "@/lib/supabase/publicApi";
 import { useRpc } from "./useRpc";
 
-type Winner = { month: string; winner_name: string; entrants: number };
+export type DrawWinner = { month: string; winner_name: string; entrants: number };
 
 /** Monthly draw: rules, this month's pool and past winners. */
-export default function DrawInfo({ compact = false }: { compact?: boolean }) {
+export type DrawStatus = { entrants: number; tickets: number };
+
+export default function DrawInfo({
+  compact = false,
+  initialStatus,
+  initialWinners,
+}: {
+  compact?: boolean;
+  initialStatus?: DrawStatus[];
+  initialWinners?: DrawWinner[];
+}) {
   const { month } = currentMonthRange();
-  const status = useRpc<{ entrants: number; tickets: number }>("draw_status", { p_month: month });
-  const [winners, setWinners] = useState<Winner[] | null>(null);
+  const status = useRpc<DrawStatus>("draw_status", { p_month: month }, true, initialStatus);
+  const [winners, setWinners] = useState<DrawWinner[] | null>(initialWinners ?? null);
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
-    publicSelect<Winner>(`draws?select=month,winner_name,entrants&order=month.desc&limit=${compact ? 1 : 6}`)
+    publicSelect<DrawWinner>(`draws?select=month,winner_name,entrants&order=month.desc&limit=${compact ? 1 : 6}`)
       .then(setWinners)
       .catch(() => setWinners([]));
   }, [compact]);

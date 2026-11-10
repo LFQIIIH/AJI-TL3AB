@@ -3,6 +3,7 @@ import DrawInfo from "@/components/community/DrawInfo";
 import TeamOfMonth from "@/components/community/TeamOfMonth";
 import Leaderboard from "./Leaderboard";
 import { pageMetadata } from "@/lib/seo";
+import { getDrawStatus, getDrawWinners, getMonthLeaderboard, getTeamOfMonth } from "@/lib/community-source";
 
 export const metadata: Metadata = pageMetadata({
   title: "Classement des joueurs et tirage du mois",
@@ -11,7 +12,17 @@ export const metadata: Metadata = pageMetadata({
   path: "/classement",
 });
 
-export default function ClassementPage() {
+// Ranking, team of the month and draw are rendered on the server (refreshed
+// every 5 min) and kept live in the browser.
+export const revalidate = 300;
+
+export default async function ClassementPage() {
+  const [leaderboard, team, drawStatus, winners] = await Promise.all([
+    getMonthLeaderboard(),
+    getTeamOfMonth(),
+    getDrawStatus(),
+    getDrawWinners(6),
+  ]);
   return (
     <div className="container-page py-12 sm:py-16">
       <p className="eyebrow">Ranking</p>
@@ -24,15 +35,15 @@ export default function ClassementPage() {
       </p>
 
       <div className="mt-10">
-        <Leaderboard />
+        <Leaderboard initialMonth={leaderboard} />
       </div>
 
       <div className="mt-12">
-        <TeamOfMonth />
+        <TeamOfMonth initial={team} />
       </div>
 
       <section id="tirage" className="mt-12 scroll-mt-24">
-        <DrawInfo />
+        <DrawInfo initialStatus={drawStatus} initialWinners={winners} />
       </section>
     </div>
   );

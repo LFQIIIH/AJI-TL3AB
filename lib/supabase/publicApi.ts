@@ -29,14 +29,14 @@ async function json<T>(res: Response): Promise<T> {
 }
 
 /** Calls a public SQL function, e.g. publicRpc("draw_status", { p_month: "2026-11-01" }). */
-export function publicRpc<T>(fn: string, args: Record<string, unknown>): Promise<T[]> {
+export function publicRpc<T>(fn: string, args: Record<string, unknown>, init?: RequestInit): Promise<T[]> {
   const body = JSON.stringify(args);
   return shared(`rpc:${fn}:${body}`, () =>
-    fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, { method: "POST", headers, body }).then((r) => json<T[]>(r)),
+    fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, { ...init, method: "POST", headers, body }).then((r) => json<T[]>(r)),
   );
 }
 
 /** Reads a public table with a PostgREST query, e.g. "draws?select=month&order=month.desc&limit=1". */
-export function publicSelect<T>(query: string): Promise<T[]> {
-  return shared(`get:${query}`, () => fetch(`${SUPABASE_URL}/rest/v1/${query}`, { headers }).then((r) => json<T[]>(r)));
+export function publicSelect<T>(query: string, init?: RequestInit): Promise<T[]> {
+  return shared(`get:${query}`, () => fetch(`${SUPABASE_URL}/rest/v1/${query}`, { ...init, headers }).then((r) => json<T[]>(r)));
 }

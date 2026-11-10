@@ -8,7 +8,7 @@ import { AWARD_LABELS, currentMonthRange, currentSeasonRange, monthLabel, type A
 import { positionLabel, type Position } from "@/lib/profile";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 
-type Row = { category: AwardCategory; rank: number; name: string; player_position: Position; value: number; matches: number };
+export type LeaderboardRow = { category: AwardCategory; rank: number; name: string; player_position: Position; value: number; matches: number };
 
 const ORDER: AwardCategory[] = ["buteur", "gardien", "defenseur", "milieu"];
 const CAPTION: Record<AwardCategory, string> = {
@@ -25,12 +25,13 @@ const UNIT: Record<AwardCategory, [string, string]> = {
   milieu: ["vote", "votes"],
 };
 
-export default function Leaderboard() {
+/** `initialMonth`: this month's rows, fetched on the server so the ranking is in the HTML. */
+export default function Leaderboard({ initialMonth }: { initialMonth?: LeaderboardRow[] }) {
   const [period, setPeriod] = useState<"month" | "season">("month");
   const month = currentMonthRange();
   const season = currentSeasonRange();
   const range = period === "month" ? month : season;
-  const rows = useRpc<Row>("leaderboard", { p_from: range.from, p_to: range.to, p_limit: 10 });
+  const rows = useRpc<LeaderboardRow>("leaderboard", { p_from: range.from, p_to: range.to, p_limit: 10 }, true, initialMonth);
 
   if (!isSupabaseConfigured) {
     return <p className="card p-6 text-ink-muted">Le ranking arrive bientôt.</p>;

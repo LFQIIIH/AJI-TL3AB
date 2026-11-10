@@ -11,6 +11,7 @@ import { isFull } from "@/lib/matches";
 import { getRecentResults, getUpcomingMatches } from "@/lib/matches-source";
 import { whatsappLink } from "@/lib/config";
 import { pageMetadata } from "@/lib/seo";
+import { getDrawStatus, getDrawWinners, getTeamOfMonth } from "@/lib/community-source";
 import JsonLd from "@/components/JsonLd";
 import { businessJsonLd, faqJsonLd } from "@/lib/structured-data";
 
@@ -67,7 +68,13 @@ const FAQ = [
 ];
 
 export default async function HomePage() {
-  const [allUpcoming, results] = await Promise.all([getUpcomingMatches(), getRecentResults(4)]);
+  const [allUpcoming, results, team, drawStatus, winners] = await Promise.all([
+    getUpcomingMatches(),
+    getRecentResults(4),
+    getTeamOfMonth(),
+    getDrawStatus(),
+    getDrawWinners(1),
+  ]);
   const upcoming = allUpcoming.slice(0, 3);
   const openMatches = allUpcoming.filter((m) => !isFull(m));
   const minPrice = allUpcoming.length > 0 ? Math.min(...allUpcoming.map((m) => m.priceMad)) : null;
@@ -186,8 +193,8 @@ export default async function HomePage() {
               Voir le ranking →
             </Link>
           </div>
-          <TeamOfMonth />
-          <DrawInfo compact />
+          <TeamOfMonth initial={team} />
+          <DrawInfo compact initialStatus={drawStatus} initialWinners={winners} />
         </section>
       )}
 

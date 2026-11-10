@@ -5,7 +5,7 @@ import { positionLabel, type Position } from "@/lib/profile";
 import PositionArt from "./PositionArt";
 import { useRpc } from "./useRpc";
 
-type Row = { name: string; player_position: Position; votes: number; goals: number };
+export type TeamOfMonthRow = { name: string; player_position: Position; votes: number; goals: number };
 
 const ART_FOR: Record<Position, "buteur" | "gardien" | "defenseur" | "milieu"> = {
   attaquant: "buteur",
@@ -15,9 +15,9 @@ const ART_FOR: Record<Position, "buteur" | "gardien" | "defenseur" | "milieu"> =
 };
 
 /** The 5 most-voted players of the month. Renders nothing until there are votes. */
-export default function TeamOfMonth({ dark = false }: { dark?: boolean }) {
+export default function TeamOfMonth({ dark = false, initial }: { dark?: boolean; initial?: TeamOfMonthRow[] }) {
   const { month } = currentMonthRange();
-  const rows = useRpc<Row>("team_of_month", { p_month: month });
+  const rows = useRpc<TeamOfMonthRow>("team_of_month", { p_month: month }, true, initial);
   if (!rows?.length) return null;
 
   return (

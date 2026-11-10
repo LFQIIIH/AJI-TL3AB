@@ -27,6 +27,16 @@ export const MATCHES_REVALIDATE_SECONDS = 300;
 
 /** Production address (www). Used for canonical URLs, the sitemap and share previews. */
 export const SITE_URL = "https://www.ajitl3ab.com";
+export const SITE_HOST = new URL(SITE_URL).host;
+
+/**
+ * True for the production build. On Vercel, preview deployments have
+ * VERCEL_ENV="preview" and are kept out of search engines (robots.txt +
+ * noindex). Off Vercel (local `next build`), NODE_ENV decides.
+ */
+export const IS_PRODUCTION_SITE = process.env.VERCEL_ENV
+  ? process.env.VERCEL_ENV === "production"
+  : process.env.NODE_ENV === "production";
 
 export const BRAND_NAME = "AJI TL3AB";
 export const CITY = "Marrakech";
