@@ -15,14 +15,24 @@ const ART_FOR: Record<Position, "buteur" | "gardien" | "defenseur" | "milieu"> =
 };
 
 /** The 5 most-voted players of the month. Renders nothing until there are votes. */
-export default function TeamOfMonth({ dark = false, initial }: { dark?: boolean; initial?: TeamOfMonthRow[] }) {
+/** `headingLevel`: 2 when the block is a page section, 3 when it sits under an h2. */
+export default function TeamOfMonth({
+  dark = false,
+  initial,
+  headingLevel = 3,
+}: {
+  dark?: boolean;
+  initial?: TeamOfMonthRow[];
+  headingLevel?: 2 | 3;
+}) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const { month } = currentMonthRange();
   const rows = useRpc<TeamOfMonthRow>("team_of_month", { p_month: month }, true, initial);
   if (!rows?.length) return null;
 
   return (
     <div className={`rounded-2xl p-5 sm:p-6 ${dark ? "bg-forest text-white" : "card"}`}>
-      <p className={`eyebrow ${dark ? "text-highlight" : ""}`}>Équipe du mois · {monthLabel(month)}</p>
+      <Heading className={`eyebrow ${dark ? "text-highlight" : ""}`}>Équipe du mois · {monthLabel(month)}</Heading>
       <ol className="mt-4 grid gap-3 sm:grid-cols-5">
         {rows.map((r, i) => (
           <li key={r.name + i} className="overflow-hidden rounded-xl bg-canvas-deep text-center">

@@ -3,13 +3,9 @@ import InfoStrip from "@/components/InfoStrip";
 import { Icon, type IconName } from "@/components/Icons";
 import KidsSignup from "./KidsSignup";
 import { pageMetadata } from "@/lib/seo";
+import PageSeo from "@/components/PageSeo";
 
-export const metadata: Metadata = pageMetadata({
-  title: "Foot pour enfants à Marrakech (5–14 ans)",
-  description:
-    "Matchs de foot et activités encadrés pour les enfants de 5 à 14 ans à Marrakech. Les parents réservent, on s'occupe du jeu et de l'encadrement.",
-  path: "/kids",
-});
+export const metadata: Metadata = pageMetadata("kids");
 
 const STEPS = [
   { n: "01", title: "Vous réservez", text: "Sur WhatsApp, avec le prénom et l'âge de votre enfant. On vous donne la date, l'heure et le terrain." },
@@ -60,12 +56,13 @@ export default function KidsPage() {
       {/* Hero */}
       <section className="border-b border-line">
         <div className="container-page py-16 sm:py-24">
-          <p className="eyebrow">Enfants · La fierté de demain</p>
-          <h1 className="headline mt-4 text-6xl sm:text-8xl lg:text-9xl">
+          <PageSeo page="kids" />
+          <h1 className="eyebrow">Foot pour enfants de 5 à 14 ans à Marrakech</h1>
+          <p className="headline mt-4 text-6xl sm:text-8xl lg:text-9xl">
             Sghar f l&apos;3mer,
             <br />
             <span className="text-primary">kbar</span> f terrain.
-          </h1>
+          </p>
           <p className="mt-6 max-w-2xl text-lg text-ink-muted">
             Chers parents : on organise des matchs de foot et des activités pour les enfants. Vous réservez, vous les amenez au
             terrain, et on s&apos;occupe du reste. Notre rôle : qu&apos;ils s&apos;amusent, les guider et veiller sur eux du début à

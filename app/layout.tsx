@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppFab from "@/components/WhatsAppFab";
 import { IS_PRODUCTION_SITE, SITE_URL } from "@/lib/config";
-import { OG_IMAGE } from "@/lib/seo";
+import { fullTitle, OG_IMAGE, PAGES } from "@/lib/seo";
 import "./globals.css";
 
 const display = Anton({
@@ -23,8 +23,8 @@ const sans = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "AJI TL3AB — Matchs de foot à Marrakech",
-    template: "%s · AJI TL3AB",
+    default: fullTitle(PAGES.home.title),
+    template: "%s – AJI TL3AB",
   },
   description:
     "Réserve ta place dans un match de foot 5v5, 7v7 ou 9v9 à Marrakech. Ghir aji w l3ab.",

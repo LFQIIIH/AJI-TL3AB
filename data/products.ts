@@ -7,7 +7,28 @@ export type Product = {
   images: string[];
   preorder: boolean;
   description?: string;
+  /** Alt text of the photos. Optional: built from the name + description if empty. */
+  imageAlt?: string;
 };
+
+/** "Rouge à motifs graphiques blancs. En stock." → "rouge à motifs graphiques blancs" */
+function look(p: Product): string {
+  const text = (p.description ?? "").replace(/\s*En stock\.?\s*$/i, "").replace(/\.\s*$/, "").trim();
+  return text ? text.charAt(0).toLowerCase() + text.slice(1) : "";
+}
+
+/** Alt text for a product photo, e.g. "Maillot Liverpool Domicile, rouge à motifs graphiques blancs". */
+export function productImageAlt(p: Product): string {
+  if (p.imageAlt) return p.imageAlt;
+  return look(p) ? `${p.name}, ${look(p)}` : p.name;
+}
+
+/** Description for search engines, from the data, with a fallback. */
+export function productDescription(p: Product): string {
+  const sizes = p.sizes.length ? `Tailles ${p.sizes[0]} à ${p.sizes.at(-1)}.` : "";
+  const base = look(p) ? `${p.name}, ${look(p)}.` : `${p.name}.`;
+  return `${base} ${sizes} ${p.priceMad} MAD, livré à Marrakech, paiement à la livraison.`.replace(/\s+/g, " ").trim();
+}
 
 // Catalogue: genuine club jerseys bought from suppliers and resold by AJI TL3AB.
 // Images are 800×800 WebP in /public/merch (resize big photos before adding).

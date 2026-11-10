@@ -8,15 +8,10 @@ import { SWITCHOFF_CAPACITY, SWITCHOFF_PRICE_MAD } from "@/lib/switchoff";
 import { sessionPlace, SESSIONS_SHOWN, TRAINER_NAME, TRAINING_PLACE } from "@/lib/training";
 import { getSwitchOffSessions } from "@/lib/training-source";
 import { pageMetadata } from "@/lib/seo";
-import JsonLd from "@/components/JsonLd";
-import { sessionsJsonLd } from "@/lib/structured-data";
+import PageSeo from "@/components/PageSeo";
+import { sessionsSchema } from "@/lib/structured-data";
 
-export const metadata: Metadata = pageMetadata({
-  title: "Switch Off : sport le week-end à Marrakech",
-  description:
-    "Samedi et dimanche à 9h : training, mini-matchs et activités avec un coach à Marrakech. La pause sport des actifs débordés. 75 MAD, 20 places.",
-  path: "/switch-off",
-});
+export const metadata: Metadata = pageMetadata("switchOff");
 
 // Re-render every 5 min to pick up changes in the sheet's "SwitchOff" tab.
 export const revalidate = 300;
@@ -41,25 +36,24 @@ export default async function SwitchOffPage() {
 
   return (
     <>
-      {sessions.length > 0 && (
-        <JsonLd
-          data={sessionsJsonLd(sessions.slice(0, SESSIONS_SHOWN), {
-            name: "Switch Off : sport du week-end à Marrakech",
-            description: `Training, mini-matchs et activités avec le coach ${TRAINER_NAME}, le week-end à 9h. ${SWITCHOFF_CAPACITY} places.`,
-            priceMad: SWITCHOFF_PRICE_MAD,
-            path: "/switch-off",
-          })}
-        />
-      )}
       {/* Hero */}
       <section className="border-b border-line">
         <div className="container-page py-16 sm:py-24">
-          <p className="eyebrow">Switch Off · Week-end · Coach {TRAINER_NAME}</p>
-          <h1 className="headline mt-4 text-6xl sm:text-8xl lg:text-9xl">
+          <PageSeo
+            page="switchOff"
+            schema={sessionsSchema(sessions.slice(0, SESSIONS_SHOWN), {
+              name: "Switch Off : sport du week-end à Marrakech",
+              description: `Training, mini-matchs et activités avec le coach ${TRAINER_NAME}, le week-end à 9h. ${SWITCHOFF_CAPACITY} places.`,
+              priceMad: SWITCHOFF_PRICE_MAD,
+              page: "switchOff",
+            })}
+          />
+          <h1 className="eyebrow">Switch Off : sport le week-end à Marrakech · Coach {TRAINER_NAME}</h1>
+          <p className="headline mt-4 text-6xl sm:text-8xl lg:text-9xl">
             Sedd l&apos;PC.
             <br />
             <span className="text-primary">Jiii</span> l&apos;terrain.
-          </h1>
+          </p>
           <p className="mt-6 max-w-2xl text-lg text-ink-muted">
             Ta pause du week-end, loin des écrans, des mails et des réunions. Chaque samedi et dimanche à 9h : training, mini-matchs
             et activités avec le coach {TRAINER_NAME}, sur le terrain et en plein air.

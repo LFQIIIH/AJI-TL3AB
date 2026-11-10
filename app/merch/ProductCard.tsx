@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import type { Product } from "@/data/products";
+import { productImageAlt, type Product } from "@/data/products";
 import { WhatsAppIcon } from "@/components/Icons";
 import { whatsappLink } from "@/lib/config";
 
@@ -29,7 +29,7 @@ export default function ProductCard({ product, priority = false }: { product: Pr
       <div className="relative aspect-square bg-surface">
         <Image
           src={product.images[imageIdx]}
-          alt={product.name}
+          alt={productImageAlt(product)}
           fill
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover"

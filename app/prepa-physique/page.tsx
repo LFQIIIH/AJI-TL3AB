@@ -17,15 +17,10 @@ import {
 } from "@/lib/training";
 import SessionSignups from "@/components/SessionSignups";
 import { pageMetadata } from "@/lib/seo";
-import JsonLd from "@/components/JsonLd";
-import { sessionsJsonLd } from "@/lib/structured-data";
+import PageSeo from "@/components/PageSeo";
+import { sessionsSchema } from "@/lib/structured-data";
 
-export const metadata: Metadata = pageMetadata({
-  title: "Training physique en plein air à Marrakech",
-  description:
-    "Training physique en groupe sur un terrain de foot à Marrakech avec le coach Anas Mouatasim : gainage, cardio, renforcement. 50 MAD la séance.",
-  path: "/prepa-physique",
-});
+export const metadata: Metadata = pageMetadata("training");
 
 const PROGRAM = [
   { icon: "shield", title: "Gainage & core", text: "Abdos profonds, lombaires, stabilité : la base de chaque frappe et de chaque duel." },
@@ -46,23 +41,22 @@ export default async function PrepaPhysiquePage() {
   const places = new Set(sessions.map(sessionPlace));
   return (
     <>
-      {sessions.length > 0 && (
-        <JsonLd
-          data={sessionsJsonLd(sessions.slice(0, SESSIONS_SHOWN), {
-            name: `Training physique avec le coach ${TRAINER_NAME}`,
-            description: "Séance de training physique en groupe sur un terrain de foot à Marrakech : gainage, cardio, renforcement et mobilité.",
-            priceMad: PRICE_PER_SESSION_MAD,
-            path: "/prepa-physique",
-          })}
-        />
-      )}
       {/* Hero */}
       <section className="border-b border-line">
         <div className="container-page py-16 sm:py-24">
-          <p className="eyebrow">Training physique · Coach {TRAINER_NAME}</p>
-          <h1 className="headline mt-4 text-6xl sm:text-8xl lg:text-9xl">
+          <PageSeo
+            page="training"
+            schema={sessionsSchema(sessions.slice(0, SESSIONS_SHOWN), {
+              name: `Training physique avec le coach ${TRAINER_NAME}`,
+              description: "Séance de training physique en groupe sur un terrain de foot à Marrakech : gainage, cardio, renforcement et mobilité.",
+              priceMad: PRICE_PER_SESSION_MAD,
+              page: "training",
+            })}
+          />
+          <h1 className="eyebrow">Training physique à Marrakech · Coach {TRAINER_NAME}</h1>
+          <p className="headline mt-4 text-6xl sm:text-8xl lg:text-9xl">
             Aji <span className="text-primary">tdreb</span>.
-          </h1>
+          </p>
           <p className="mt-6 max-w-2xl text-lg text-ink-muted">
             Gainage, cardio et renforcement pour être plus fort sur le terrain. Des séances en groupe, encadrées par un coach,
             trois fois par semaine à Marrakech.

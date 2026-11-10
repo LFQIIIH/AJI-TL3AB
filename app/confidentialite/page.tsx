@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
 import { whatsappLink } from "@/lib/config";
 import { pageMetadata } from "@/lib/seo";
+import PageSeo from "@/components/PageSeo";
 
-export const metadata: Metadata = pageMetadata({
-  title: "Confidentialité",
-  description:
-    "Comment AJI TL3AB protège tes données personnelles (loi 09-08).",
-  path: "/confidentialite",
-});
+export const metadata: Metadata = pageMetadata("confidentialite");
 
 // TODO before launch: fill in the legal entity, address and CNDP declaration number.
 const CONTROLLER = "AJI TL3AB [raison sociale à compléter], Marrakech";
@@ -62,8 +58,9 @@ const SECTIONS = [
 export default function ConfidentialitePage() {
   return (
     <div className="container-page max-w-3xl py-12 sm:py-16">
+      <PageSeo page="confidentialite" />
       <p className="eyebrow">Données personnelles</p>
-      <h1 className="headline mt-3 text-6xl sm:text-7xl">Confidentialité</h1>
+      <h1 className="headline mt-3 text-6xl sm:text-7xl">Politique de confidentialité</h1>
       <p className="mt-4 text-ink-muted">
         Responsable du traitement : {CONTROLLER}. Dernière mise à jour : {UPDATED}.
       </p>

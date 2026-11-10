@@ -16,11 +16,15 @@ export default function DrawInfo({
   compact = false,
   initialStatus,
   initialWinners,
+  headingLevel = 3,
 }: {
   compact?: boolean;
+  /** 2 when the block is a page section, 3 when it sits under an h2. */
+  headingLevel?: 2 | 3;
   initialStatus?: DrawStatus[];
   initialWinners?: DrawWinner[];
 }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const { month } = currentMonthRange();
   const status = useRpc<DrawStatus>("draw_status", { p_month: month }, true, initialStatus);
   const [winners, setWinners] = useState<DrawWinner[] | null>(initialWinners ?? null);
@@ -38,9 +42,9 @@ export default function DrawInfo({
   return (
     <div className="rounded-2xl bg-forest p-6 text-white sm:p-8">
       <p className="eyebrow text-highlight">Tirage au sort · {monthLabel(month)}</p>
-      <h3 className="headline mt-3 text-4xl sm:text-5xl">
+      <Heading className="headline mt-3 text-4xl sm:text-5xl">
         Un match <span className="text-highlight">gratuit</span> chaque mois
-      </h3>
+      </Heading>
       <p className="mt-3 max-w-xl text-white/70">
         Chaque fin de mois, on tire au sort un joueur parmi ceux qui ont joué au moins un match dans le mois. Le gagnant joue son
         prochain match gratuitement.

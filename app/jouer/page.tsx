@@ -2,16 +2,14 @@ import type { Metadata } from "next";
 import { getUpcomingMatches } from "@/lib/matches-source";
 import InfoStrip from "@/components/InfoStrip";
 import MatchBrowser from "./MatchBrowser";
-import { pageMetadata } from "@/lib/seo";
-import JsonLd from "@/components/JsonLd";
-import { matchesJsonLd } from "@/lib/structured-data";
+import { jouerDescription, pageMetadata } from "@/lib/seo";
+import PageSeo from "@/components/PageSeo";
+import { matchesSchema } from "@/lib/structured-data";
 
-export const metadata: Metadata = pageMetadata({
-  title: "Réserver un match de foot à Marrakech",
-  description:
-    "Tous les matchs de foot à venir à Marrakech : 5v5, 7v7 et 9v9, par jour, quartier et niveau. Réserve ta place en ligne ou sur WhatsApp.",
-  path: "/jouer",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  // Description built from the upcoming matches (count, lowest price, formats).
+  return pageMetadata("jouer", { description: jouerDescription(await getUpcomingMatches()) });
+}
 
 // Re-render every 5 min (MATCHES_REVALIDATE_SECONDS) to pick up sheet edits
 // and drop matches that have started.
@@ -22,11 +20,11 @@ export default async function JouerPage() {
 
   return (
     <div className="container-page py-12 sm:py-16">
-      {matches.length > 0 && <JsonLd data={matchesJsonLd(matches)} />}
-      <p className="eyebrow">Matchs à venir</p>
-      <h1 className="headline mt-3 text-6xl sm:text-8xl">
+      <PageSeo page="jouer" schema={matchesSchema(matches)} />
+      <h1 className="eyebrow">Matchs de foot à venir à Marrakech</h1>
+      <p className="headline mt-3 text-6xl sm:text-8xl">
         Fin <span className="text-primary">bghiti</span> tl3ab ?
-      </h1>
+      </p>
       <p className="mt-4 max-w-xl text-ink-muted">
         Filtre par jour et par format, choisis ton créneau et réserve en 30 secondes via WhatsApp.
       </p>

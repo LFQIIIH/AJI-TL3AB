@@ -12,16 +12,10 @@ import { getRecentResults, getUpcomingMatches } from "@/lib/matches-source";
 import { whatsappLink } from "@/lib/config";
 import { pageMetadata } from "@/lib/seo";
 import { getDrawStatus, getDrawWinners, getTeamOfMonth } from "@/lib/community-source";
-import JsonLd from "@/components/JsonLd";
-import { businessJsonLd, faqJsonLd } from "@/lib/structured-data";
+import PageSeo from "@/components/PageSeo";
+import { businessSchema, faqSchema, websiteSchema } from "@/lib/structured-data";
 
-export const metadata: Metadata = pageMetadata({
-  title: "Matchs de foot 5v5 & 7v7 à Marrakech · AJI TL3AB",
-  description:
-    "Réserve ta place dans un match de foot 5v5, 7v7 ou 9v9 à Marrakech, seul ou entre amis. Aussi : training physique, Switch Off le week-end et maillots.",
-  path: "/",
-  absoluteTitle: true,
-});
+export const metadata: Metadata = pageMetadata("home");
 
 // Re-render every 5 min (MATCHES_REVALIDATE_SECONDS) to pick up sheet edits.
 export const revalidate = 300;
@@ -83,7 +77,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <JsonLd data={[...businessJsonLd(), faqJsonLd(FAQ)]} />
+      <PageSeo page="home" schema={[businessSchema(), websiteSchema(), faqSchema(FAQ)]} />
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-line">
         <div
@@ -97,10 +91,10 @@ export default async function HomePage() {
         />
         <div className="container-page relative grid items-end gap-10 py-16 sm:py-24 lg:grid-cols-[1fr_22rem] lg:py-28">
           <div>
-            <p className="eyebrow">Football · Marrakech</p>
-            <h1 className="headline mt-4 text-[22vw] sm:text-[11rem] lg:text-[8.5rem] xl:text-[9.5rem]">
+            <h1 className="eyebrow">Matchs de foot à Marrakech</h1>
+            <p className="headline mt-4 text-[22vw] sm:text-[11rem] lg:text-[8.5rem] xl:text-[9.5rem]">
               Aji tl3ab<span className="text-primary">.</span>
-            </h1>
+            </p>
             <p className="mt-6 max-w-xl text-lg text-ink-muted sm:text-xl">
               Rejoins des matchs <strong className="text-ink">5v5, 7v7 et 9v9</strong> partout à Marrakech.
               Seul ou avec tes potes, tu réserves ta place, on s&apos;occupe du terrain et des équipes.

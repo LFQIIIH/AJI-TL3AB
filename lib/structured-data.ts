@@ -1,71 +1,131 @@
+import type {
+  BreadcrumbList,
+  Event,
+  FAQPage,
+  GeoCoordinates,
+  ItemList,
+  OpeningHoursSpecification,
+  Organization,
+  Place,
+  PostalAddress,
+  SportsActivityLocation,
+  SportsEvent,
+  Thing,
+  WebSite,
+} from "schema-dts";
 import type { Match } from "@/data/matches";
-import type { Product } from "@/data/products";
-import { BRAND_NAME, INSTAGRAM_HANDLE, WHATSAPP_NUMBER } from "@/lib/config";
+import { productDescription, type Product } from "@/data/products";
+import { BRAND_NAME, INSTAGRAM_URL, WHATSAPP_NUMBER } from "@/lib/config";
 import { isFull, matchStart } from "@/lib/matches";
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, breadcrumbTrail, canonicalUrl, PAGES, type PageKey } from "@/lib/seo";
 import { sessionPlace, type TrainingSession } from "@/lib/training";
 
-const ORG_ID = absoluteUrl("/#organization");
+// schema.org (JSON-LD) builders. Types come from `schema-dts`, so a property
+// that doesn't exist on a schema.org type fails the TypeScript build.
+// Only content visible on the page is marked up.
 
-const organizer = { "@type": "Organization", "@id": ORG_ID, name: BRAND_NAME, url: absoluteUrl("/") };
+/** A node of the page's @graph (no @context: <PageSeo> adds it once). */
+export type SchemaNode = Thing;
 
-function place(name: string, area = "") {
+// ── Business details ─────────────────────────────────────────────────────────
+// Real data only. Anything `undefined` stays out of the markup until filled in.
+const BUSINESS: {
+  streetAddress?: string;
+  postalCode?: string;
+  geo?: GeoCoordinates;
+  openingHours?: OpeningHoursSpecification[];
+} = {
+  streetAddress: undefined, // TODO: street address (as on the Google Business Profile), if there is a fixed one
+  postalCode: undefined, // TODO: postal code, e.g. "40000"
+  geo: undefined, // TODO: { "@type": "GeoCoordinates", latitude: 31.63, longitude: -8.0 } of the main pitch / meeting point
+  openingHours: undefined, // TODO: e.g. [{ "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday", …], opens: "18:00", closes: "23:00" }]
+};
+
+const BUSINESS_ID = absoluteUrl("/#business");
+
+const address: PostalAddress = {
+  "@type": "PostalAddress",
+  ...(BUSINESS.streetAddress ? { streetAddress: BUSINESS.streetAddress } : {}),
+  ...(BUSINESS.postalCode ? { postalCode: BUSINESS.postalCode } : {}),
+  addressLocality: "Marrakech",
+  addressRegion: "Marrakech-Safi",
+  addressCountry: "MA",
+};
+
+/** Who organises the matches and sessions (points to the business node on the home page). */
+const organizer: Organization = { "@type": "Organization", "@id": BUSINESS_ID, name: BRAND_NAME, url: canonicalUrl("/") };
+
+// ── Home ─────────────────────────────────────────────────────────────────────
+
+/** The business. SportsActivityLocation = LocalBusiness subtype for sport activities. */
+export function businessSchema(): SportsActivityLocation {
   return {
-    "@type": "Place",
-    name: [name, area].filter(Boolean).join(", ") || "Marrakech",
-    address: { "@type": "PostalAddress", addressLocality: "Marrakech", addressCountry: "MA" },
+    "@type": "SportsActivityLocation",
+    "@id": BUSINESS_ID,
+    name: BRAND_NAME,
+    description: PAGES.home.description,
+    url: canonicalUrl("/"),
+    logo: absoluteUrl("/logo-mark.png"),
+    image: absoluteUrl("/og-image.png"),
+    telephone: `+${WHATSAPP_NUMBER}`,
+    address,
+    ...(BUSINESS.geo ? { geo: BUSINESS.geo } : {}),
+    ...(BUSINESS.openingHours ? { openingHoursSpecification: BUSINESS.openingHours } : {}),
+    areaServed: { "@type": "City", name: "Marrakech" },
+    sameAs: [INSTAGRAM_URL],
   };
 }
 
-/** Local business + website, for the home page. */
-export function businessJsonLd() {
-  return [
-    {
-      "@context": "https://schema.org",
-      "@type": "SportsActivityLocation",
-      "@id": ORG_ID,
-      name: BRAND_NAME,
-      description: "Matchs de foot 5v5, 7v7 et 9v9 à Marrakech, training physique, Switch Off le week-end, activités enfants et maillots.",
-      url: absoluteUrl("/"),
-      logo: absoluteUrl("/icon.png"),
-      image: absoluteUrl("/og-image.png"),
-      telephone: `+${WHATSAPP_NUMBER}`,
-      address: { "@type": "PostalAddress", addressLocality: "Marrakech", addressCountry: "MA" },
-      areaServed: { "@type": "City", name: "Marrakech" },
-      sameAs: [`https://www.instagram.com/${INSTAGRAM_HANDLE}/`],
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      name: BRAND_NAME,
-      url: absoluteUrl("/"),
-      inLanguage: "fr",
-      publisher: { "@id": ORG_ID },
-    },
-  ];
+export function websiteSchema(): WebSite {
+  return {
+    "@type": "WebSite",
+    "@id": absoluteUrl("/#website"),
+    name: BRAND_NAME,
+    url: canonicalUrl("/"),
+    inLanguage: "fr",
+    publisher: { "@id": BUSINESS_ID },
+  };
 }
 
-export function faqJsonLd(faq: { q: string; a: string }[]) {
+/** Only for a FAQ that is visible on the page. */
+export function faqSchema(faq: { q: string; a: string }[]): FAQPage {
   return {
-    "@context": "https://schema.org",
     "@type": "FAQPage",
     mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
   };
 }
 
-export function productsJsonLd(products: Product[]) {
+// ── Inner pages ──────────────────────────────────────────────────────────────
+
+export function breadcrumbSchema(key: PageKey): BreadcrumbList {
   return {
-    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbTrail(key).map((crumb, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: crumb.name,
+      item: crumb.url,
+    })),
+  };
+}
+
+/** Shop: the jerseys listed on /merch, each a Product with its Offer. */
+export function productsSchema(products: Product[]): ItemList {
+  return {
     "@type": "ItemList",
+    name: "Maillots de foot",
+    numberOfItems: products.length,
     itemListElement: products.map((p, i) => ({
       "@type": "ListItem",
       position: i + 1,
       item: {
         "@type": "Product",
+        "@id": absoluteUrl(`/merch#${p.id}`),
         name: p.name,
-        ...(p.description ? { description: p.description } : {}),
+        description: productDescription(p),
         image: p.images.map((src) => absoluteUrl(src)),
         sku: p.id,
+        url: absoluteUrl(`/merch#${p.id}`),
         offers: {
           "@type": "Offer",
           url: absoluteUrl(`/merch#${p.id}`),
@@ -73,29 +133,33 @@ export function productsJsonLd(products: Product[]) {
           priceCurrency: "MAD",
           availability: p.preorder ? "https://schema.org/PreOrder" : "https://schema.org/InStock",
           itemCondition: "https://schema.org/NewCondition",
-          seller: { "@id": ORG_ID },
+          seller: { "@id": BUSINESS_ID },
         },
       },
     })),
   };
 }
 
-export function matchesJsonLd(matches: Match[]) {
+function place(name: string): Place {
+  return { "@type": "Place", name, address };
+}
+
+/** /jouer: one SportsEvent per upcoming match listed on the page. */
+export function matchesSchema(matches: Match[]): SportsEvent[] {
   return matches.map((m) => ({
-    "@context": "https://schema.org",
     "@type": "SportsEvent",
-    name: `Match de foot ${m.format} · ${m.pitch}`,
-    description: `Match ${m.format} (${m.level}) à ${m.pitch}, Marrakech. Viens seul ou entre amis, on fait les équipes.`,
+    name: `Match de foot ${m.format} à ${m.pitch}`,
+    description: `Match ${m.format} (${m.level}) à ${[m.pitch, m.area].filter(Boolean).join(", ")}, Marrakech. Viens seul ou entre amis, on fait les équipes.`,
     sport: "Football",
     startDate: matchStart(m).toISOString(),
     eventStatus: "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-    location: place(m.pitch, m.area),
+    location: place([m.pitch, m.area].filter(Boolean).join(", ")),
     image: absoluteUrl("/og-image.png"),
     organizer,
     offers: {
       "@type": "Offer",
-      url: absoluteUrl("/jouer"),
+      url: canonicalUrl(PAGES.jouer.path),
       price: m.priceMad,
       priceCurrency: "MAD",
       availability: isFull(m) ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
@@ -103,9 +167,12 @@ export function matchesJsonLd(matches: Match[]) {
   }));
 }
 
-export function sessionsJsonLd(sessions: TrainingSession[], { name, description, priceMad, path }: { name: string; description: string; priceMad: number; path: string }) {
+/** /prepa-physique and /switch-off: one Event per session listed on the page. */
+export function sessionsSchema(
+  sessions: TrainingSession[],
+  { name, description, priceMad, page }: { name: string; description: string; priceMad: number; page: PageKey },
+): Event[] {
   return sessions.map((s) => ({
-    "@context": "https://schema.org",
     "@type": "Event",
     name,
     description,
@@ -115,6 +182,12 @@ export function sessionsJsonLd(sessions: TrainingSession[], { name, description,
     location: place(sessionPlace(s)),
     image: absoluteUrl("/og-image.png"),
     organizer,
-    offers: { "@type": "Offer", url: absoluteUrl(path), price: priceMad, priceCurrency: "MAD", availability: "https://schema.org/InStock" },
+    offers: {
+      "@type": "Offer",
+      url: canonicalUrl(PAGES[page].path),
+      price: priceMad,
+      priceCurrency: "MAD",
+      availability: "https://schema.org/InStock",
+    },
   }));
 }
