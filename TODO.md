@@ -5,20 +5,20 @@ Manual tasks left after the SEO work. Before any code change goes live:
 share tags, structured data or links break).
 
 ## 1. Google Search Console
-- [ ] Verify the site: Search Console → Add property → **Domain** → `ajitl3ab.com`.
+- [x] Verify the site: Search Console → Add property → **Domain** → `ajitl3ab.com`.
       Copy the `google-site-verification=…` code → Namecheap → Domain List → Manage →
       **Advanced DNS** → Add New Record → **TXT**, Host `@`, Value = the code → save → Verify.
       (Fallback: URL-prefix property + HTML tag → Vercel env var `GOOGLE_SITE_VERIFICATION` → redeploy.)
-- [ ] Sitemaps → submit `https://www.ajitl3ab.com/sitemap.xml` (expect "Success", 8 pages).
-- [ ] URL Inspection → **Test live URL** → **Request indexing** for:
+- [x] Sitemaps → submit `https://www.ajitl3ab.com/sitemap.xml` (expect "Success", 8 pages).
+- [x] URL Inspection → **Test live URL** → **Request indexing** for:
       `/`, `/jouer`, `/merch`, `/switch-off`, `/prepa-physique`, `/kids`, `/classement`
       (check: page available, screenshot shows content, user-declared canonical = same URL).
-- [ ] After 3–7 days: **Page indexing** (8 pages indexed; `/connexion`, `/compte`, `/r/…`,
+- [ ] Around 13–17 Nov 2026 (3–7 days after submitting): **Page indexing** (8 pages indexed; `/connexion`, `/compte`, `/r/…`,
       `/boutique` excluded is normal) and **Enhancements** (warnings OK, no red errors).
-- [ ] After ~28 days: **Core Web Vitals** and **HTTPS** reports; **Performance** for search queries.
+- [ ] Around 8 Dec 2026 (~28 days): **Core Web Vitals** and **HTTPS** reports; **Performance** for search queries.
 
 ## 2. Bing Webmaster Tools
-- [ ] https://www.bing.com/webmasters → **Import from Google Search Console**
+- [x] https://www.bing.com/webmasters → **Import from Google Search Console**
       (or meta tag → Vercel env var `BING_SITE_VERIFICATION` → redeploy). Submit the sitemap.
 
 ## 3. Google Business Profile
