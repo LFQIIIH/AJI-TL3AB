@@ -1,14 +1,11 @@
-import { OG_CONTENT_TYPE, OG_SIZE, renderOgImage } from "@/lib/og-image";
+import { renderOgImage } from "@/lib/og-image";
 import { formatDay, formatTime } from "@/lib/matches";
 import { getUpcomingMatches } from "@/lib/matches-source";
 
 // Built from the upcoming matches (next match, count, price), refreshed with the page.
 export const revalidate = 300;
-export const alt = "Matchs de foot à venir à Marrakech avec AJI TL3AB";
-export const size = OG_SIZE;
-export const contentType = OG_CONTENT_TYPE;
 
-export default async function Image() {
+export async function GET() {
   const matches = await getUpcomingMatches().catch(() => []);
   const next = matches[0];
   if (!next) {

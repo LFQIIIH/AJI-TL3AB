@@ -1,12 +1,11 @@
-import { OG_CONTENT_TYPE, OG_SIZE, renderOgImage, scheduleLabel } from "@/lib/og-image";
+import { renderOgImage, scheduleLabel } from "@/lib/og-image";
 import { SWITCHOFF_CAPACITY, SWITCHOFF_PRICE_MAD, SWITCHOFF_TIME, SWITCHOFF_WEEKDAYS } from "@/lib/switchoff";
 import { TRAINER_NAME } from "@/lib/training";
 
-export const alt = "Switch Off : sport le week-end à Marrakech avec AJI TL3AB";
-export const size = OG_SIZE;
-export const contentType = OG_CONTENT_TYPE;
+// Built once at deploy time (the content only changes with the code).
+export const dynamic = "force-static";
 
-export default function Image() {
+export function GET() {
   return renderOgImage({
     eyebrow: `Switch Off · Week-end · Coach ${TRAINER_NAME.split(" ")[0]}`,
     title: "Sedd l'PC. *Jiii* l'terrain.",

@@ -22,17 +22,21 @@ export type PageSeoConfig = {
   description: string;
   /** Label of this page in the breadcrumb trail (inner pages only). */
   breadcrumb?: string;
+  /** Alt text of the page's share image (served at <path>/og.png by app/…/og.png/route.tsx). */
+  imageAlt: string;
 };
 
 export const PAGES = {
   home: {
     path: "/",
+    imageAlt: "AJI TL3AB : matchs de foot 5v5, 7v7 et 9v9 à Marrakech",
     title: "Matchs de foot 5v5, 7v7 et 9v9 à Marrakech",
     description:
       "Joue au foot à Marrakech sans rien organiser : réserve ta place dans un match 5v5, 7v7 ou 9v9, seul ou entre amis. Terrain, ballon et équipes fournis.",
   },
   jouer: {
     path: "/jouer",
+    imageAlt: "Matchs de foot à venir à Marrakech avec AJI TL3AB",
     title: "Réserver un match de foot à Marrakech en ligne",
     // Fallback; the live description is built from the upcoming matches (jouerDescription).
     description:
@@ -41,6 +45,7 @@ export const PAGES = {
   },
   merch: {
     path: "/merch",
+    imageAlt: "Maillots de foot des grands clubs à 199 MAD, livrés à Marrakech",
     title: "Maillots de clubs de foot à Marrakech · 199 MAD",
     description:
       "Maillots Real Madrid, Liverpool, Manchester United, Juventus, Bayern, Arsenal et Inter Miami, de S à XL. Livrés partout à Marrakech, paiement à la livraison.",
@@ -48,6 +53,7 @@ export const PAGES = {
   },
   switchOff: {
     path: "/switch-off",
+    imageAlt: "Switch Off : sport le week-end à Marrakech avec AJI TL3AB",
     title: "Switch Off : sport le week-end à Marrakech",
     description:
       "Le week-end à 9h, déconnecte des écrans : training, mini-matchs et défis avec un coach, quel que soit ton niveau. 75 MAD la matinée, 20 places seulement.",
@@ -55,6 +61,7 @@ export const PAGES = {
   },
   training: {
     path: "/prepa-physique",
+    imageAlt: "Training physique en plein air à Marrakech avec AJI TL3AB",
     title: "Training physique en plein air à Marrakech",
     description:
       "Gainage, cardio foot et renforcement en groupe avec le coach Anas Mouatasim, trois soirs par semaine à Marrakech. 50 MAD la séance ou 200 MAD par mois.",
@@ -62,6 +69,7 @@ export const PAGES = {
   },
   kids: {
     path: "/kids",
+    imageAlt: "Foot pour enfants de 5 à 14 ans à Marrakech avec AJI TL3AB",
     title: "Foot pour enfants de 5 à 14 ans à Marrakech",
     description:
       "Matchs, jeux et défis encadrés pour les enfants de 5 à 14 ans à Marrakech, par tranche d'âge. Vous réservez sur WhatsApp, on s'occupe du jeu et du reste.",
@@ -69,6 +77,7 @@ export const PAGES = {
   },
   classement: {
     path: "/classement",
+    imageAlt: "Classement des joueurs AJI TL3AB et tirage au sort du mois",
     title: "Classement des joueurs de foot à Marrakech",
     description:
       "Meilleurs buteurs, gardiens, défenseurs et milieux des matchs AJI TL3AB à Marrakech, l'équipe du mois et le tirage au sort qui offre un match gratuit.",
@@ -76,6 +85,7 @@ export const PAGES = {
   },
   confidentialite: {
     path: "/confidentialite",
+    imageAlt: "Politique de confidentialité d'AJI TL3AB",
     title: "Confidentialité et protection des données",
     description:
       "Quelles données AJI TL3AB collecte quand tu réserves un match, pourquoi, qui les voit, où elles sont stockées, combien de temps, et comment exercer tes droits.",
@@ -100,6 +110,21 @@ export function breadcrumbTrail(key: PageKey): { name: string; url: string }[] {
   return page.breadcrumb ? [home, { name: page.breadcrumb, url: canonicalUrl(page.path) }] : [home];
 }
 
+/** Share image of a page: /og.png, /jouer/og.png… (1200×630 PNG). */
+export function ogImageUrl(path: string): string {
+  return path === "/" ? "/og.png" : `${path}/og.png`;
+}
+
+// Key order matters: Next.js prints the tags in this order, and Facebook needs
+// og:image first, then its width/height/type/alt.
+const ogImage = (page: PageSeoConfig) => ({
+  url: ogImageUrl(page.path),
+  width: 1200,
+  height: 630,
+  type: "image/png",
+  alt: page.imageAlt,
+});
+
 /**
  * Next.js metadata for a page in PAGES: title, description, canonical and the
  * Open Graph / Twitter tags. `description` overrides the static one for pages
@@ -120,10 +145,9 @@ export function pageMetadata(key: PageKey, overrides: { description?: string } =
       url: canonicalUrl(page.path),
       title,
       description,
-      // og:image (+ width, height, alt, type): from the page's opengraph-image.tsx,
-      // or the site default app/opengraph-image.tsx.
+      images: [ogImage(page)],
     },
-    twitter: { card: "summary_large_image", title, description },
+    twitter: { card: "summary_large_image", title, description, images: [{ url: ogImage(page).url, alt: page.imageAlt }] },
   };
 }
 

@@ -37,9 +37,13 @@ export const metadata: Metadata = {
     "Réserve ta place dans un match de foot 5v5, 7v7 ou 9v9 à Marrakech. Ghir aji w l3ab.",
   applicationName: "AJI TL3AB",
   // Defaults for pages without their own (pageMetadata() sets these per page).
-  // (images: app/opengraph-image.tsx and the per-page opengraph-image.tsx files)
-  openGraph: { type: "website", locale: "fr_MA", siteName: "AJI TL3AB" },
-  twitter: { card: "summary_large_image" },
+  openGraph: {
+    type: "website",
+    locale: "fr_MA",
+    siteName: "AJI TL3AB",
+    images: [{ url: "/og.png", width: 1200, height: 630, type: "image/png", alt: PAGES.home.imageAlt }],
+  },
+  twitter: { card: "summary_large_image", images: [{ url: "/og.png", alt: PAGES.home.imageAlt }] },
   // Preview deployments must never be indexed (production: no robots tag, i.e. index, follow).
   ...(IS_PRODUCTION_SITE ? {} : { robots: { index: false, follow: false } }),
   // Site-ownership meta tags, only when the token is set in Vercel (never hardcoded):

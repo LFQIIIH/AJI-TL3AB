@@ -1,11 +1,10 @@
 import { products } from "@/data/products";
-import { OG_CONTENT_TYPE, OG_SIZE, renderOgImage } from "@/lib/og-image";
+import { renderOgImage } from "@/lib/og-image";
 
-export const alt = "Maillots de foot des grands clubs à 199 MAD, livrés à Marrakech";
-export const size = OG_SIZE;
-export const contentType = OG_CONTENT_TYPE;
+// Built once at deploy time (the content only changes with the code).
+export const dynamic = "force-static";
 
-export default function Image() {
+export function GET() {
   const price = Math.min(...products.map((p) => p.priceMad));
   return renderOgImage({
     eyebrow: "Maillots de foot · Marrakech",
