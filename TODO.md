@@ -37,7 +37,7 @@ share tags, structured data or links break).
 
 ## 4. Backlinks & directories
 - [x] Website link in the Instagram bio.
-- [ ] Website link in the WhatsApp Business profile (Settings → Business tools → Profile → Website).
+- [x] Website link in the WhatsApp Business profile (Settings → Business tools → Profile → Website).
 - [ ] List the business in Moroccan directories (e.g. Kerix, Telecontact) and on a Facebook page.
 - [ ] Ask partner pitches to link to the site.
 - [ ] Get mentioned in Marrakech sport / expat / tourist groups and guides.
