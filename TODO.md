@@ -36,7 +36,8 @@ share tags, structured data or links break).
       add special hours for Eid / days off. (Then tell Claude, to put the same hours in the site's schema.)
 
 ## 4. Backlinks & directories
-- [ ] Website link in the Instagram bio and the WhatsApp Business profile.
+- [x] Website link in the Instagram bio.
+- [ ] Website link in the WhatsApp Business profile (Settings → Business tools → Profile → Website).
 - [ ] List the business in Moroccan directories (e.g. Kerix, Telecontact) and on a Facebook page.
 - [ ] Ask partner pitches to link to the site.
 - [ ] Get mentioned in Marrakech sport / expat / tourist groups and guides.
