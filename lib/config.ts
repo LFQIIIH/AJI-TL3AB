@@ -22,6 +22,13 @@ export const SWITCHOFF_SHEET_CSV_URL =
   process.env.SWITCHOFF_SHEET_CSV_URL ??
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSZkjrqbPmxFFoESALgq4axdtTQ_pVVE_J7Q1nkgqnVmChWI39CztexYdQDBl0Cu9eZekkB_CnynSbS/pub?gid=1214313567&single=true&output=csv";
 
+/**
+ * Where matches come from: "supabase" (the admin area, /admin) or "sheet"
+ * (the Google Sheet, default). Set MATCHES_SOURCE=supabase in Vercel once the
+ * sheet has been imported in /admin.
+ */
+export const MATCHES_SOURCE: "supabase" | "sheet" = process.env.MATCHES_SOURCE === "supabase" ? "supabase" : "sheet";
+
 /** Seconds between refreshes of the match lists on the live site. */
 export const MATCHES_REVALIDATE_SECONDS = 300;
 

@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/config";
 // Built once at build time from the real routes in app/: every page.tsx is
 // listed, except
 // - pages marked noindex (`robots: { index: false }`: account, login, referral, 404),
-// - API / auth routes (route.ts, not pages) and private folders (_x),
+// - API / auth routes (route.ts, not pages), private folders (_x) and the staff area (admin/),
 // - dynamic routes ([param]) — the only one today is /r/[code] (referral
 //   links, noindex). A future indexable dynamic route must list its URLs here.
 // No <lastmod>: the pages have no reliable "last changed" date (match and
@@ -25,7 +25,7 @@ function findRoutes(dir: string, segments: string[]): string[] {
   }
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const name = entry.name;
-    if (!entry.isDirectory() || name.startsWith("_") || name.startsWith("[") || name.startsWith("@") || name === "api") continue;
+    if (!entry.isDirectory() || name.startsWith("_") || name.startsWith("[") || name.startsWith("@") || name === "api" || name === "admin") continue;
     // Route groups "(name)" don't add a URL segment.
     const next = name.startsWith("(") && name.endsWith(")") ? segments : [...segments, name];
     routes.push(...findRoutes(path.join(dir, name), next));

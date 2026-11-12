@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getMatches } from "@/lib/matches-source";
 import AccountDashboard from "./AccountDashboard";
 import AccountPanel from "./AccountPanel";
+import StaffLink from "./StaffLink";
 
 export const metadata: Metadata = {
   title: "Mon compte",
@@ -19,6 +20,7 @@ export default async function ComptePage() {
         <AccountDashboard matches={matches} />
       </div>
       <div className="lg:sticky lg:top-24 lg:order-2">
+        <StaffLink />
         <AccountPanel />
       </div>
     </div>

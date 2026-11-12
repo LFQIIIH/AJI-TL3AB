@@ -1,11 +1,43 @@
 import type { Match } from "@/data/matches";
 
-// Morocco runs on UTC+1 outside Ramadan.
+// Morocco runs on UTC+1 outside Ramadan (UTC+0 during Ramadan).
 const MARRAKECH_OFFSET = "+01:00";
 const TZ = "Africa/Casablanca";
 
 export function matchStart(m: Match): Date {
-  return new Date(`${m.date}T${m.time}:00${MARRAKECH_OFFSET}`);
+  return m.startsAt ? new Date(m.startsAt) : new Date(`${m.date}T${m.time}:00${MARRAKECH_OFFSET}`);
+}
+
+const partsFormat = new Intl.DateTimeFormat("en-CA", {
+  timeZone: TZ,
+  hourCycle: "h23",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+/** Marrakech local date ("2026-11-20") and time ("20:00") of an instant. */
+export function marrakechParts(instant: Date | string): { date: string; time: string } {
+  const p = Object.fromEntries(partsFormat.formatToParts(new Date(instant)).map((x) => [x.type, x.value]));
+  return { date: `${p.year}-${p.month}-${p.day}`, time: `${p.hour}:${p.minute}` };
+}
+
+/** Marrakech local date + time → the exact instant (follows the Ramadan time change). */
+export function marrakechToDate(date: string, time: string): Date {
+  const [y, mo, d] = date.split("-").map(Number);
+  const [h, mi] = time.split(":").map(Number);
+  const wall = Date.UTC(y, mo - 1, d, h, mi);
+  const offsetAt = (t: number) => {
+    const { date: ld, time: lt } = marrakechParts(new Date(t));
+    const [ly, lmo, lday] = ld.split("-").map(Number);
+    const [lh, lmi] = lt.split(":").map(Number);
+    return Date.UTC(ly, lmo - 1, lday, lh, lmi) - t;
+  };
+  let t = wall - offsetAt(wall);
+  t = wall - offsetAt(t);
+  return new Date(t);
 }
 
 export function spotsLeft(m: Match): number {
@@ -25,6 +57,7 @@ export function isAlmostFull(m: Match): boolean {
 }
 
 export function mapsLink(m: Match): string {
+  if (m.mapsUrl) return m.mapsUrl;
   const query = [m.pitch, m.area, "Marrakech"].filter(Boolean).join(", ");
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }

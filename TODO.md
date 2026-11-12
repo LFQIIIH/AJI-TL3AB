@@ -4,6 +4,13 @@ Manual tasks left after the SEO work. Before any code change goes live:
 `npm run build && npm run seo:check` (fails if titles, headings, alt text,
 share tags, structured data or links break).
 
+## 0. Espace admin (Step 0) — voir docs/ADMIN-SETUP.md
+- [ ] Run `supabase/migrations/0007_matches_admin.sql` in Supabase (SQL Editor).
+- [ ] Make yourself admin (SQL in docs/ADMIN-SETUP.md), open /admin.
+- [ ] /admin → « Importer le Google Sheet » (once).
+- [ ] Vercel env var `MATCHES_SOURCE=supabase` → Redeploy.
+- [ ] Terrains: add address + Google Maps link for each pitch.
+
 ## 1. Google Search Console
 - [x] Verify the site: Search Console → Add property → **Domain** → `ajitl3ab.com`.
       Copy the `google-site-verification=…` code → Namecheap → Domain List → Manage →

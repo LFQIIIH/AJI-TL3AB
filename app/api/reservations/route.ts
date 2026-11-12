@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { MATCHES_SOURCE } from "@/lib/config";
 import { getMatches } from "@/lib/matches-source";
 import { matchStart } from "@/lib/matches";
 import { SHOE_SIZES } from "@/lib/shoes";
@@ -27,8 +28,10 @@ async function signedInClient() {
 
 /**
  * Book the signed-in player (+ optional friend) on a match.
- * Capacity = spots in the Google Sheet ("reservees" there are WhatsApp/guest
- * bookings) + online bookings in Supabase.
+ * Database matches (MATCHES_SOURCE=supabase): the database checks the match is
+ * published, not started and not full (atomically) and sets the real date.
+ * Sheet matches: capacity = spots in the Google Sheet ("reservees" there are
+ * WhatsApp/guest bookings) + online bookings in Supabase.
  */
 export async function POST(request: NextRequest) {
   const auth = await signedInClient();
@@ -52,10 +55,13 @@ export async function POST(request: NextRequest) {
   const start = matchStart(match);
   if (start <= new Date()) return fail(410, "match_started");
 
-  const { data: counts, error: countsError } = await supabase.rpc("match_booking_counts", { p_match_ids: [matchId] });
-  if (countsError) return fail(502, "counts_unavailable");
-  const online = (counts as { booked: number }[] | null)?.[0]?.booked ?? 0;
-  if (match.spotsTaken + online + 1 + guests > match.totalSpots) return fail(409, "full");
+  // Sheet matches only: the database can't see the sheet's numbers.
+  if (MATCHES_SOURCE === "sheet") {
+    const { data: counts, error: countsError } = await supabase.rpc("match_booking_counts", { p_match_ids: [matchId] });
+    if (countsError) return fail(502, "counts_unavailable");
+    const online = (counts as { booked: number }[] | null)?.[0]?.booked ?? 0;
+    if (match.spotsTaken + online + 1 + guests > match.totalSpots) return fail(409, "full");
+  }
 
   const { error } = await supabase.from("bookings").insert({
     match_id: matchId,
@@ -69,6 +75,8 @@ export async function POST(request: NextRequest) {
     if (error.code === "23505") return fail(409, "already_booked");
     if (error.code === "23503") return fail(412, "profile_missing");
     if (error.message.includes("shoes_unavailable")) return fail(409, "shoes_unavailable");
+    if (error.message.includes("match_full")) return fail(409, "full");
+    if (error.message.includes("match_started") || error.message.includes("match_unavailable")) return fail(410, "match_started");
     return fail(400, "booking_failed");
   }
   return NextResponse.json({ ok: true }, { headers: noStore });

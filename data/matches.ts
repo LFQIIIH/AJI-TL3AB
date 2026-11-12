@@ -1,5 +1,6 @@
 export type MatchFormat = "5v5" | "7v7" | "9v9";
 export type MatchLevel = "Débutant" | "Intermédiaire" | "Confirmé" | "Tous niveaux";
+export type MatchCategory = "mixte" | "hommes" | "femmes" | "enfants";
 
 export type Match = {
   id: string;
@@ -16,6 +17,12 @@ export type Match = {
   spotsTaken: number;
   /** Filled in once the match has been played. */
   result?: MatchResult;
+  // From the database (Supabase) only:
+  /** Exact kick-off (ISO). More precise than date + time across the Ramadan time change. */
+  startsAt?: string;
+  address?: string;
+  mapsUrl?: string;
+  category?: MatchCategory;
 };
 
 export type MatchResult = {
