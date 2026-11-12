@@ -1,5 +1,11 @@
 # AJI TL3AB — admin guide
 
+> **New: the admin area at /admin** (see `docs/ADMIN-SETUP.md`). Once
+> `MATCHES_SOURCE=supabase` is set in Vercel, matches, places taken outside the
+> site, attendance, goals and scores are all managed there, not in the Google
+> Sheet or the Table Editor. This guide describes the older Google Sheet way
+> and still applies until you switch.
+
 Day-to-day tasks in **Supabase → Table Editor** (no code). Matches themselves
 are still managed in the Google Sheet.
 
