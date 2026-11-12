@@ -1,5 +1,6 @@
 "use client";
 
+import { formatMorocco } from "@/lib/morocco-time";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Match } from "@/data/matches";
@@ -153,7 +154,7 @@ function StatsRow({ stats }: { stats: MyStats }) {
 }
 
 function matchTitle(m: Match | undefined, b: { match_date: string; match_start: string }) {
-  const time = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Africa/Casablanca" }).format(new Date(b.match_start));
+  const time = formatMorocco(b.match_start, { hour: "2-digit", minute: "2-digit" });
   return (
     <>
       <span className="capitalize">{formatDayLong(b.match_date)}</span> · {m ? formatTime(m.time) : time.replace(":", "h")}
@@ -186,7 +187,7 @@ function BallotCard({ ballot, match, onDone }: { ballot: Ballot; match: Match | 
 
   return (
     <section className="rounded-2xl border-2 border-primary bg-surface p-5 sm:p-6">
-      <p className="eyebrow">À toi de voter · jusqu&apos;au {new Intl.DateTimeFormat("fr-FR", { weekday: "long", hour: "2-digit", minute: "2-digit", timeZone: "Africa/Casablanca" }).format(closes)}</p>
+      <p className="eyebrow">À toi de voter · jusqu&apos;au {formatMorocco(closes, { weekday: "long", hour: "2-digit", minute: "2-digit" })}</p>
       <h2 className="headline mt-2 text-3xl">Qui a brillé ?</h2>
       <p className="mt-1 text-sm text-ink-muted">{matchTitle(match, ballot.booking)}</p>
       <div className="mt-5 space-y-5">

@@ -1,44 +1,17 @@
 import type { Match } from "@/data/matches";
+import { formatMoroccoDate, moroccoParts, moroccoToDate, moroccoToday } from "@/lib/morocco-time";
 
-// Morocco runs on UTC+1 outside Ramadan (UTC+0 during Ramadan).
-const MARRAKECH_OFFSET = "+01:00";
-const TZ = "Africa/Casablanca";
+// Morocco time (UTC+0 since 2026-09-20, UTC+1 before): see lib/morocco-time.ts.
 
 export function matchStart(m: Match): Date {
-  return m.startsAt ? new Date(m.startsAt) : new Date(`${m.date}T${m.time}:00${MARRAKECH_OFFSET}`);
+  return m.startsAt ? new Date(m.startsAt) : moroccoToDate(m.date, m.time);
 }
-
-const partsFormat = new Intl.DateTimeFormat("en-CA", {
-  timeZone: TZ,
-  hourCycle: "h23",
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-  hour: "2-digit",
-  minute: "2-digit",
-});
 
 /** Marrakech local date ("2026-11-20") and time ("20:00") of an instant. */
-export function marrakechParts(instant: Date | string): { date: string; time: string } {
-  const p = Object.fromEntries(partsFormat.formatToParts(new Date(instant)).map((x) => [x.type, x.value]));
-  return { date: `${p.year}-${p.month}-${p.day}`, time: `${p.hour}:${p.minute}` };
-}
+export const marrakechParts = moroccoParts;
 
-/** Marrakech local date + time → the exact instant (follows the Ramadan time change). */
-export function marrakechToDate(date: string, time: string): Date {
-  const [y, mo, d] = date.split("-").map(Number);
-  const [h, mi] = time.split(":").map(Number);
-  const wall = Date.UTC(y, mo - 1, d, h, mi);
-  const offsetAt = (t: number) => {
-    const { date: ld, time: lt } = marrakechParts(new Date(t));
-    const [ly, lmo, lday] = ld.split("-").map(Number);
-    const [lh, lmi] = lt.split(":").map(Number);
-    return Date.UTC(ly, lmo - 1, lday, lh, lmi) - t;
-  };
-  let t = wall - offsetAt(wall);
-  t = wall - offsetAt(t);
-  return new Date(t);
-}
+/** Marrakech local date + time → the exact instant. */
+export const marrakechToDate = moroccoToDate;
 
 export function spotsLeft(m: Match): number {
   return Math.max(0, m.totalSpots - m.spotsTaken);
@@ -63,9 +36,7 @@ export function mapsLink(m: Match): string {
 }
 
 /** Today's date in Marrakech as YYYY-MM-DD. */
-function marrakechToday(now: Date): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(now);
-}
+const marrakechToday = (now: Date) => moroccoToday(now);
 
 /** "Aujourd'hui", "Demain" or null. */
 export function relativeDayLabel(date: string, now: Date = new Date()): string | null {
@@ -78,22 +49,12 @@ export function relativeDayLabel(date: string, now: Date = new Date()): string |
 
 /** "ven. 30 oct." */
 export function formatDay(date: string): string {
-  return new Intl.DateTimeFormat("fr-FR", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    timeZone: TZ,
-  }).format(new Date(`${date}T12:00:00${MARRAKECH_OFFSET}`));
+  return formatMoroccoDate(date, { weekday: "short", day: "numeric", month: "short" });
 }
 
 /** "vendredi 30 octobre" */
 export function formatDayLong(date: string): string {
-  return new Intl.DateTimeFormat("fr-FR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    timeZone: TZ,
-  }).format(new Date(`${date}T12:00:00${MARRAKECH_OFFSET}`));
+  return formatMoroccoDate(date, { weekday: "long", day: "numeric", month: "long" });
 }
 
 /** "20:00" → "20h00" */

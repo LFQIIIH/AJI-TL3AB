@@ -1,4 +1,5 @@
 // Physical training ("Prépa physique") — single source of truth for the page and sign-ups.
+import { moroccoParts, moroccoToDate, moroccoToday } from "@/lib/morocco-time";
 
 export const TRAINER_NAME = "Anas Mouatasim";
 
@@ -18,14 +19,13 @@ export const MIN_PARTICIPANTS = 20;
 /** How many upcoming sessions are open for sign-up. */
 export const SESSIONS_SHOWN = 6;
 
-const TZ = "Africa/Casablanca";
 export const DAY_NAMES = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
 
 export const TRAINING_DAYS_LABEL = TRAINING_WEEKDAYS.map((d) => DAY_NAMES[d].toLowerCase()).join(", ").replace(/, ([^,]*)$/, " et $1");
 
 /** "YYYY-MM-DD" for a Date, in Marrakech local time. */
 function localDate(d: Date): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(d);
+  return moroccoToday(d);
 }
 
 /**
@@ -38,7 +38,7 @@ export function upcomingSessionDates(
   weekdays: readonly number[] = TRAINING_WEEKDAYS,
   time: string = TRAINING_TIME,
 ): string[] {
-  const nowTime = new Intl.DateTimeFormat("en-GB", { timeZone: TZ, hour: "2-digit", minute: "2-digit", hour12: false }).format(now);
+  const nowTime = moroccoParts(now).time;
   const dates: string[] = [];
   for (let i = 0; dates.length < count && i < 31; i++) {
     const date = localDate(new Date(now.getTime() + i * 86_400_000));
@@ -62,9 +62,9 @@ export type TrainingSession = {
   note: string;
 };
 
-/** Morocco runs on UTC+1 outside Ramadan (same rule as matches). */
+/** `start` = exact instant in Morocco time (see lib/morocco-time.ts); the database derives the same id from it. */
 export function trainingSession(date: string, time: string, pitch = "", area = "", note = ""): TrainingSession {
-  return { id: `${date}-${time}`, date, time, start: new Date(`${date}T${time}:00+01:00`).toISOString(), pitch, area, note };
+  return { id: `${date}-${time}`, date, time, start: moroccoToDate(date, time).toISOString(), pitch, area, note };
 }
 
 /** Fallback when the sheet has no upcoming sessions: the default weekly schedule. */

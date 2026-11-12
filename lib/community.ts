@@ -1,4 +1,5 @@
 // Shared client helpers for bookings, votes, leaderboard, draw and badges.
+import { moroccoToday } from "@/lib/morocco-time";
 
 export type VoteCategory = "gardien" | "defenseur" | "milieu";
 export type AwardCategory = VoteCategory | "buteur";
@@ -44,10 +45,8 @@ export function awardValueLabel(a: { category: AwardCategory; value: number }): 
 
 // ── Periods ──
 
-const TZ = "Africa/Casablanca";
-
 function todayParts(now = new Date()) {
-  const [y, m] = new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(now).split("-").map(Number);
+  const [y, m] = moroccoToday(now).split("-").map(Number);
   return { y, m };
 }
 

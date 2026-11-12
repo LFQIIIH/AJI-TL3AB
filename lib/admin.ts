@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { formatMorocco } from "@/lib/morocco-time";
 import type { MatchCategory, MatchFormat, MatchLevel } from "@/data/matches";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
@@ -79,12 +80,7 @@ export function dbMessage(error: { message?: string; code?: string } | null): st
   return "Erreur : " + (m || "inconnue");
 }
 
-const TZ = "Africa/Casablanca";
-
 /** "jeu. 20 nov. · 20:00" (Marrakech time). */
 export function formatAdminDate(iso: string): string {
-  const d = new Date(iso);
-  const day = new Intl.DateTimeFormat("fr-FR", { weekday: "short", day: "numeric", month: "short", timeZone: TZ }).format(d);
-  const time = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: TZ }).format(d);
-  return `${day} · ${time}`;
+  return `${formatMorocco(iso, { weekday: "short", day: "numeric", month: "short" })} · ${formatMorocco(iso, { hour: "2-digit", minute: "2-digit" })}`;
 }
