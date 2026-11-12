@@ -212,21 +212,30 @@ export async function importSheet() {
   }
   if (!sheet.length) back("/admin", "erreur", "Le Google Sheet ne contient aucun match.");
 
-  // Pitches by name (keeps existing ones, adds the area if missing).
-  const names = [...new Map(sheet.map((m) => [m.pitch, m.area])).entries()];
-  const { error: pitchError } = await supabase
-    .from("pitches")
-    .upsert(names.map(([name, area]) => ({ name, area })), { onConflict: "name", ignoreDuplicates: true });
-  if (pitchError) back("/admin", "erreur", dbMessage(pitchError));
-  const { data: pitches, error: readError } = await supabase.from("pitches").select("id, name");
-  if (readError || !pitches) back("/admin", "erreur", dbMessage(readError));
-  const pitchId = new Map(pitches.map((p) => [p.name, p.id]));
+  // Pitches by name, ignoring case and spaces ("Zahi Foot" = "zahi foot"):
+  // the first spelling is kept, existing pitches are reused.
+  const key = (name: string) => name.trim().toLowerCase().replace(/\s+/g, " ");
+  const { data: existing, error: existingError } = await supabase.from("pitches").select("id, name");
+  if (existingError || !existing) back("/admin", "erreur", dbMessage(existingError));
+  const pitchId = new Map(existing.map((p) => [key(p.name), p.id as string]));
+  const missing = new Map<string, { name: string; area: string }>();
+  for (const m of sheet) if (!pitchId.has(key(m.pitch)) && !missing.has(key(m.pitch))) missing.set(key(m.pitch), { name: m.pitch.trim(), area: m.area });
+  if (missing.size) {
+    const { data: added, error: pitchError } = await supabase.from("pitches").insert([...missing.values()]).select("id, name");
+    if (pitchError || !added) back("/admin", "erreur", dbMessage(pitchError));
+    for (const p of added) pitchId.set(key(p.name), p.id);
+  }
 
   // Matches keep the sheet's ids so bookings, votes and stats stay linked.
-  const rows = sheet.map((m) => ({
+  // Two sheet rows with the same id (same date, time and pitch) are the same
+  // match for the site: the last row wins.
+  const byId = new Map<string, (typeof sheet)[number]>();
+  for (const m of sheet) byId.set(m.id, m);
+  const duplicates = sheet.length - byId.size;
+  const rows = [...byId.values()].map((m) => ({
     id: m.id,
     starts_at: matchStart(m).toISOString(),
-    pitch_id: pitchId.get(m.pitch)!,
+    pitch_id: pitchId.get(key(m.pitch))!,
     format: m.format,
     level: m.level,
     price_mad: m.priceMad,
@@ -242,7 +251,14 @@ export async function importSheet() {
   const { error } = await supabase.from("matches").upsert(rows, { onConflict: "id" });
   if (error) back("/admin", "erreur", dbMessage(error));
   refreshSite();
-  back("/admin", "ok", `${rows.length} matchs importés (${names.length} terrains). Tu peux passer MATCHES_SOURCE=supabase dans Vercel.`);
+  back(
+    "/admin",
+    "ok",
+    `${rows.length} matchs importés` +
+      (missing.size ? `, ${missing.size} terrains ajoutés` : "") +
+      (duplicates ? `, ${duplicates} doublons du Sheet ignorés (même date, heure et terrain)` : "") +
+      ". Tu peux passer MATCHES_SOURCE=supabase dans Vercel.",
+  );
 }
 
 export async function signOutAdmin() {
