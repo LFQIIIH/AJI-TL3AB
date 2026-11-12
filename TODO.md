@@ -5,10 +5,10 @@ Manual tasks left after the SEO work. Before any code change goes live:
 share tags, structured data or links break).
 
 ## 0. Espace admin (Step 0) — voir docs/ADMIN-SETUP.md
-- [ ] Run `supabase/migrations/0007_matches_admin.sql` in Supabase (SQL Editor).
-- [ ] Make yourself admin (SQL in docs/ADMIN-SETUP.md), open /admin.
-- [ ] /admin → « Importer le Google Sheet » (once).
-- [ ] Vercel env var `MATCHES_SOURCE=supabase` → Redeploy.
+- [x] Run `supabase/migrations/0007_matches_admin.sql` in Supabase (SQL Editor).
+- [x] Make yourself admin (SQL in docs/ADMIN-SETUP.md), open /admin.
+- [x] /admin → « Importer le Google Sheet » (once). 16 matchs, 8 terrains.
+- [x] Vercel env var `MATCHES_SOURCE=supabase` → Redeploy. Site reads the database.
 - [ ] Terrains: add address + Google Maps link for each pitch.
 
 ## 1. Google Search Console
