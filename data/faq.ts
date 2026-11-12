@@ -6,7 +6,7 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Comment je paie ?",
-    a: "Sur place, en espèces ou par virement avant le match. Le prix est indiqué sur chaque match, en MAD par joueur.",
+    a: "Avec ton portefeuille AJI TL3AB : tu le recharges sur WhatsApp, par virement ou en cash au terrain, puis chaque match se réserve en un clic. Le prix est indiqué sur chaque match, en MAD par joueur.",
   },
   {
     q: "C'est quoi les niveaux ?",
@@ -14,7 +14,7 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Et si je dois annuler ?",
-    a: "Préviens-nous sur WhatsApp au moins 24h avant pour libérer ta place. Au-delà, la place reste due.",
+    a: "Annule depuis le site : remboursé à 100 % sur ton portefeuille jusqu'à 24 h avant le match, à 50 % après. Si on annule un match, tout le monde est remboursé à 100 %.",
   },
   {
     q: "Il faut ramener quoi ?",

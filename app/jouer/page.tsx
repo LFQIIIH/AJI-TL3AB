@@ -32,11 +32,11 @@ export default async function JouerPage() {
       <InfoStrip
         className="mt-8"
         items={[
-          { icon: "cash", label: "Paiement", value: "Sur place, espèces ou virement" },
+          { icon: "cash", label: "Paiement", value: "Portefeuille prépayé (WhatsApp, virement, cash)" },
           { icon: "clock", label: "Arrivée", value: "10 min avant le coup d'envoi" },
           { icon: "ball", label: "Fourni", value: "Ballon, chasubles, équipes" },
           { icon: "store", label: "Pas de chaussures ?", value: "Location 20 MAD, à réserver avec ta place" },
-          { icon: "calendar", label: "Annulation", value: "Gratuite jusqu'à 24h avant" },
+          { icon: "calendar", label: "Annulation", value: "Remboursée à 100 % jusqu'à 24 h avant" },
         ]}
       />
       <div className="mt-10">

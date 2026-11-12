@@ -6,7 +6,24 @@ import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { useSessionUser } from "@/lib/supabase/useSession";
-import { firstName, formatPhone, normalizePhone, POSITIONS, positionLabel, type Position, type Profile } from "@/lib/profile";
+import {
+  BIRTH_DATE_MAX,
+  BIRTH_DATE_MIN,
+  FEET,
+  firstName,
+  formatPhone,
+  isProfileComplete,
+  LEVELS,
+  levelLabel,
+  normalizePhone,
+  POSITIONS,
+  positionLabel,
+  PROFILE_COLUMNS,
+  type Foot,
+  type Level,
+  type Position,
+  type Profile,
+} from "@/lib/profile";
 import { clearStoredReferral, readStoredReferral } from "@/lib/community";
 
 /** Fired after a save so the dashboard reloads (e.g. right after profile creation). */
@@ -21,6 +38,9 @@ export default function AccountPanel() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [position, setPosition] = useState<Position | "">("");
+  const [birthDate, setBirthDate] = useState("");
+  const [level, setLevel] = useState<Level | "">("");
+  const [foot, setFoot] = useState<Foot | "">("");
   const [consent, setConsent] = useState(false);
   const [referral, setReferral] = useState("");
   const [status, setStatus] = useState<Status>({ kind: "idle" });
@@ -36,7 +56,7 @@ export default function AccountPanel() {
     let cancelled = false;
     getSupabaseBrowserClient()
       .from("profiles")
-      .select("id, full_name, phone, position, consent_at")
+      .select(PROFILE_COLUMNS)
       .eq("id", user.id)
       .maybeSingle<Profile>()
       .then(({ data, error }) => {
@@ -49,6 +69,11 @@ export default function AccountPanel() {
         setFullName(data?.full_name ?? (user.user_metadata?.full_name as string | undefined) ?? "");
         setPhone(data ? formatPhone(data.phone) : "");
         setPosition(data?.position ?? "");
+        setBirthDate(data?.birth_date ?? "");
+        setLevel(data?.level ?? "");
+        setFoot(data?.preferred_foot ?? "");
+        // Older profiles: ask for the fields booking now needs.
+        if (data && !isProfileComplete(data)) setEditing(true);
         if (!data) setReferral(readStoredReferral());
       });
     return () => {
@@ -60,7 +85,14 @@ export default function AccountPanel() {
   const normalizedPhone = normalizePhone(phone);
   const phoneInvalid = phone.trim() !== "" && normalizedPhone === null;
   const canSave =
-    fullName.trim().length >= 2 && normalizedPhone !== null && position !== "" && (!isNew || consent) && status.kind !== "saving";
+    fullName.trim().length >= 2 &&
+    normalizedPhone !== null &&
+    position !== "" &&
+    birthDate >= BIRTH_DATE_MIN &&
+    birthDate <= BIRTH_DATE_MAX &&
+    level !== "" &&
+    (!isNew || consent) &&
+    status.kind !== "saving";
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -71,13 +103,16 @@ export default function AccountPanel() {
       full_name: fullName.trim().replace(/\s+/g, " "),
       phone: normalizedPhone,
       position,
+      birth_date: birthDate,
+      level,
+      preferred_foot: foot || null,
       consent_at: profile?.consent_at ?? new Date().toISOString(),
       ...(isNew && referral.trim() ? { referral_input: referral.trim() } : {}),
     };
     const { data, error } = await getSupabaseBrowserClient()
       .from("profiles")
       .upsert(row)
-      .select("id, full_name, phone, position, consent_at")
+      .select(PROFILE_COLUMNS)
       .single<Profile>();
     if (error) {
       setStatus({ kind: "error", message: "L'enregistrement a échoué. Vérifie tes infos et réessaie." });
@@ -109,6 +144,9 @@ export default function AccountPanel() {
     setFullName(profile.full_name);
     setPhone(formatPhone(profile.phone));
     setPosition(profile.position);
+    setBirthDate(profile.birth_date ?? "");
+    setLevel(profile.level ?? "");
+    setFoot(profile.preferred_foot ?? "");
     setStatus({ kind: "idle" });
     setEditing(false);
   }
@@ -122,6 +160,7 @@ export default function AccountPanel() {
         </h1>
         <p className="mt-3 flex flex-wrap items-center gap-2 text-ink-muted">
           <span className="rounded-full bg-highlight px-3 py-1 text-sm font-bold text-highlight-ink">⚽ {positionLabel(profile.position)}</span>
+          {profile.level && <span className="rounded-full bg-canvas-deep px-3 py-1 text-sm font-semibold text-ink">{levelLabel(profile.level)}</span>}
           Ton profil est prêt.
         </p>
         {status.kind === "saved" && (
@@ -153,6 +192,11 @@ export default function AccountPanel() {
       <p className="mt-3 text-ink-muted">
         {isNew ? "Quelques infos et c'est bon. Ça prend 30 secondes." : "Modifie ce que tu veux puis enregistre."}
       </p>
+      {profile && !isProfileComplete(profile) && (
+        <p className="mt-4 rounded-xl bg-highlight/40 px-4 py-3 text-sm font-semibold text-highlight-ink" role="status">
+          Nouveau : ajoute ta date de naissance et ton niveau pour pouvoir réserver. On s&apos;en sert pour équilibrer les matchs.
+        </p>
+      )}
 
       <form onSubmit={save} className="mt-8 space-y-5">
         <label className="block">
@@ -214,6 +258,68 @@ export default function AccountPanel() {
                 className={`chip ${position === p.value ? "chip-on" : "chip-off"}`}
               >
                 {p.label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+
+        <label className="block">
+          <span className="mb-2 block text-sm font-semibold">Date de naissance</span>
+          <input
+            className="input"
+            type="date"
+            value={birthDate}
+            min={BIRTH_DATE_MIN}
+            max={BIRTH_DATE_MAX}
+            onChange={(e) => {
+              setBirthDate(e.target.value);
+              setStatus({ kind: "idle" });
+            }}
+            autoComplete="bday"
+            required
+          />
+          <span className="mt-2 flex items-center gap-1.5 text-xs text-ink-muted">
+            <LockIcon /> Privé. Sert à faire des matchs entre joueurs du même âge.
+          </span>
+        </label>
+
+        <fieldset>
+          <legend className="mb-2 block text-sm font-semibold">Ton niveau</legend>
+          <div className="grid grid-cols-3 gap-2">
+            {LEVELS.map((l) => (
+              <button
+                key={l.value}
+                type="button"
+                onClick={() => {
+                  setLevel(l.value);
+                  setStatus({ kind: "idle" });
+                }}
+                aria-pressed={level === l.value}
+                className={`chip px-2 ${level === l.value ? "chip-on" : "chip-off"}`}
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend className="mb-2 block text-sm font-semibold">
+            Pied préféré <span className="font-normal text-ink-muted">(optionnel)</span>
+          </legend>
+          <div className="grid grid-cols-3 gap-2">
+            {FEET.map((f) => (
+              <button
+                key={f.value}
+                type="button"
+                onClick={() => {
+                  setFoot(foot === f.value ? "" : f.value);
+                  setStatus({ kind: "idle" });
+                }}
+                aria-pressed={foot === f.value}
+                className={`chip px-2 ${foot === f.value ? "chip-on" : "chip-off"}`}
+              >
+                {f.label}
               </button>
             ))}
           </div>

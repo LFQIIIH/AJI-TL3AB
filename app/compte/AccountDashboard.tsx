@@ -1,5 +1,7 @@
 "use client";
 
+import { FULL_REFUND_HOURS } from "@/lib/rules";
+import { WALLET_CHANGED_EVENT } from "./WalletCard";
 import { formatMorocco } from "@/lib/morocco-time";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -234,9 +236,21 @@ function Bookings({
   const [busy, setBusy] = useState<string | null>(null);
 
   async function cancel(b: Booking) {
-    if (!window.confirm("Annuler cette réservation ?")) return;
     setBusy(b.match_id);
+    const client = await supabaseClient();
+    const { data } = await client.rpc("cancellation_refund", { p_match_id: b.match_id });
+    const r = (data as { paid: number | null; refund: number; full_refund: boolean }[] | null)?.[0];
+    const refundLine = r?.paid
+      ? r.full_refund
+        ? `\n\nTu seras remboursé de ${r.refund} MAD (100 %) sur ton portefeuille.`
+        : `\n\nMoins de ${FULL_REFUND_HOURS} h avant le match : tu seras remboursé de ${r.refund} MAD sur ${r.paid} MAD (50 %).`
+      : "";
+    if (!window.confirm(`Annuler cette réservation ?${refundLine}`)) {
+      setBusy(null);
+      return;
+    }
     await fetch(`/api/reservations?matchId=${encodeURIComponent(b.match_id)}`, { method: "DELETE" }).catch(() => null);
+    window.dispatchEvent(new Event(WALLET_CHANGED_EVENT));
     setBusy(null);
     onChange();
   }

@@ -83,6 +83,14 @@ export const PAGES = {
       "Meilleurs buteurs, gardiens, défenseurs et milieux des matchs AJI TL3AB à Marrakech, l'équipe du mois et le tirage au sort qui offre un match gratuit.",
     breadcrumb: "Classement",
   },
+  regles: {
+    path: "/regles",
+    imageAlt: "Règlement des matchs AJI TL3AB : réservation, annulation, fair-play",
+    title: "Règlement des matchs de foot à Marrakech",
+    description:
+      "Réservation et paiement par portefeuille, annulation remboursée à 100 % jusqu'à 24 h avant, ponctualité et fair-play : les règles des matchs AJI TL3AB.",
+    breadcrumb: "Règlement",
+  },
   confidentialite: {
     path: "/confidentialite",
     imageAlt: "Politique de confidentialité d'AJI TL3AB",

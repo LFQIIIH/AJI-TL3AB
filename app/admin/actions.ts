@@ -266,3 +266,33 @@ export async function signOutAdmin() {
   await supabase.auth.signOut();
   redirect("/");
 }
+
+// ── Players & wallets (admin) ──
+
+export async function walletAdd(f: FormData) {
+  const { supabase } = await requireStaff({ adminOnly: true });
+  const userId = str(f, "user_id");
+  const path = `/admin/joueurs?joueur=${encodeURIComponent(userId)}&q=${encodeURIComponent(str(f, "q"))}`;
+  const amount = int(f, "amount");
+  const sign = str(f, "kind") === "correction" ? -1 : 1;
+  if (!(amount > 0 && amount <= 100000)) back(path, "erreur", "Montant invalide.");
+  const { data, error } = await supabase.rpc("admin_wallet_add", {
+    p_user: userId,
+    p_amount: sign * amount,
+    p_method: sign > 0 ? str(f, "method") : "autre",
+    p_note: str(f, "note"),
+  });
+  if (error) back(path, "erreur", dbMessage(error));
+  revalidatePath("/compte");
+  back(path, "ok", `${sign > 0 ? "Recharge" : "Correction"} de ${amount} MAD enregistrée. Nouveau solde : ${data} MAD.`);
+}
+
+export async function setTrusted(f: FormData) {
+  const { supabase } = await requireStaff({ adminOnly: true });
+  const userId = str(f, "user_id");
+  const path = `/admin/joueurs?joueur=${encodeURIComponent(userId)}&q=${encodeURIComponent(str(f, "q"))}`;
+  const trusted = str(f, "trusted") === "1";
+  const { error } = await supabase.rpc("admin_set_trusted", { p_user: userId, p_trusted: trusted });
+  if (error) back(path, "erreur", dbMessage(error));
+  back(path, "ok", trusted ? "Joueur de confiance : il peut réserver et payer sur place." : "Joueur de confiance retiré.");
+}

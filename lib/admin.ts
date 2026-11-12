@@ -73,6 +73,7 @@ export function dbMessage(error: { message?: string; code?: string } | null): st
   if (m.includes("last_admin")) return "Impossible : il doit rester au moins un admin.";
   if (m.includes("user_not_found")) return "Aucun compte avec cet e-mail. La personne doit d'abord créer son compte sur le site.";
   if (m.includes("not_played_yet")) return "Le score se saisit après le coup d'envoi.";
+  if (m.includes("invalid_amount")) return "Montant invalide.";
   if (m.includes("no_booking")) return "Réservation introuvable.";
   if (m.includes("duplicate key") || error?.code === "23505") return "Existe déjà (nom en double ?).";
   if (m.includes("violates check constraint")) return "Valeur invalide : vérifie les champs.";

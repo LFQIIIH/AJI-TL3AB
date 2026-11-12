@@ -22,3 +22,17 @@
    Il ne voit que ses matchs : liste des joueurs avec numéros, présence, buts, score.
 
 Retour arrière : supprimer la variable `MATCHES_SOURCE` dans Vercel → Redeploy → le site relit le Google Sheet.
+
+## Portefeuille (Phase 1)
+
+- **Recharger un joueur** : /admin → Joueurs → cherche le nom ou le téléphone → clique sur le joueur →
+  Montant + Moyen (cash, virement, WhatsApp) → Enregistrer. Le solde est crédité tout de suite.
+- **Corriger une erreur** : même formulaire, Type « Correction (−) ».
+- **Joueur de confiance** : sur la fiche du joueur, « Marquer de confiance ». Il peut réserver même sans solde
+  (son solde devient négatif = ce qu'il te doit). En haut de la liste : le total à encaisser.
+- **Annulations** (automatique) : jusqu'à 24 h avant le match, le joueur récupère 100 % sur son portefeuille ;
+  après, 50 %. Si tu annules un match (bouton « Annuler le match »), tout le monde est remboursé à 100 %.
+- **Liste d'attente** (automatique) : quand une place se libère, le premier joueur en attente qui a assez de solde
+  (ou qui est de confiance) est inscrit et débité.
+- **Règlement** : texte dans `lib/rules.ts`, page /regles. Accepté une fois avant la première réservation.
+- Les joueurs sans compte peuvent toujours réserver par WhatsApp : ajoute-les dans « Places prises hors site ».

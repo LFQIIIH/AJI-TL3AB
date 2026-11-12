@@ -1,7 +1,4 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { MATCHES_SOURCE } from "@/lib/config";
-import { getMatches } from "@/lib/matches-source";
-import { matchStart } from "@/lib/matches";
 import { SHOE_SIZES } from "@/lib/shoes";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
@@ -27,11 +24,10 @@ async function signedInClient() {
 }
 
 /**
- * Book the signed-in player (+ optional friend) on a match.
- * Database matches (MATCHES_SOURCE=supabase): the database checks the match is
- * published, not started and not full (atomically) and sets the real date.
- * Sheet matches: capacity = spots in the Google Sheet ("reservees" there are
- * WhatsApp/guest bookings) + online bookings in Supabase.
+ * Book the signed-in player (+ optional friend, shoe rental) on a match and
+ * pay from their wallet. Everything is checked by the database in one go
+ * (public.book_match): complete profile, accepted rules, balance, published
+ * and not started, places left, shoe stock.
  */
 export async function POST(request: NextRequest) {
   const auth = await signedInClient();
@@ -45,41 +41,36 @@ export async function POST(request: NextRequest) {
     guestShoeSize?: unknown;
   } | null;
   const matchId = typeof body?.matchId === "string" ? body.matchId : "";
+  if (!matchId) return fail(404, "match_not_found");
   const guests = body?.guests === 1 ? 1 : 0;
   // Shoe rental (sizes 38–45); stock per size is enforced by the database.
   const shoeSize = validShoeSize(body?.shoeSize);
   const guestShoeSize = guests ? validShoeSize(body?.guestShoeSize) : null;
 
-  const match = (await getMatches()).find((m) => m.id === matchId);
-  if (!match) return fail(404, "match_not_found");
-  const start = matchStart(match);
-  if (start <= new Date()) return fail(410, "match_started");
-
-  // Sheet matches only: the database can't see the sheet's numbers.
-  if (MATCHES_SOURCE === "sheet") {
-    const { data: counts, error: countsError } = await supabase.rpc("match_booking_counts", { p_match_ids: [matchId] });
-    if (countsError) return fail(502, "counts_unavailable");
-    const online = (counts as { booked: number }[] | null)?.[0]?.booked ?? 0;
-    if (match.spotsTaken + online + 1 + guests > match.totalSpots) return fail(409, "full");
-  }
-
-  const { error } = await supabase.from("bookings").insert({
-    match_id: matchId,
-    match_date: match.date,
-    match_start: start.toISOString(),
-    guests,
-    ...(shoeSize ? { shoe_size: shoeSize } : {}),
-    ...(guestShoeSize ? { guest_shoe_size: guestShoeSize } : {}),
+  const { data: paid, error } = await supabase.rpc("book_match", {
+    p_match_id: matchId,
+    p_guests: guests,
+    p_shoe_size: shoeSize,
+    p_guest_shoe_size: guestShoeSize,
   });
   if (error) {
+    const m = error.message;
     if (error.code === "23505") return fail(409, "already_booked");
-    if (error.code === "23503") return fail(412, "profile_missing");
-    if (error.message.includes("shoes_unavailable")) return fail(409, "shoes_unavailable");
-    if (error.message.includes("match_full")) return fail(409, "full");
-    if (error.message.includes("match_started") || error.message.includes("match_unavailable")) return fail(410, "match_started");
+    for (const [code, status] of [
+      ["insufficient_balance", 402],
+      ["profile_missing", 412],
+      ["profile_incomplete", 412],
+      ["rules_not_accepted", 412],
+      ["shoes_unavailable", 409],
+      ["match_full", 409],
+      ["match_started", 410],
+      ["match_unavailable", 410],
+    ] as const) {
+      if (m.includes(code)) return fail(status, code === "match_full" ? "full" : code === "match_unavailable" ? "match_started" : code);
+    }
     return fail(400, "booking_failed");
   }
-  return NextResponse.json({ ok: true }, { headers: noStore });
+  return NextResponse.json({ ok: true, paid: paid as number }, { headers: noStore });
 }
 
 /** Cancel the signed-in player's booking; freed spots go to the waiting list. */

@@ -3,6 +3,7 @@ import { getMatches } from "@/lib/matches-source";
 import AccountDashboard from "./AccountDashboard";
 import AccountPanel from "./AccountPanel";
 import StaffLink from "./StaffLink";
+import WalletCard from "./WalletCard";
 
 export const metadata: Metadata = {
   title: "Mon compte",
@@ -21,6 +22,7 @@ export default async function ComptePage() {
       </div>
       <div className="lg:sticky lg:top-24 lg:order-2">
         <StaffLink />
+        <WalletCard />
         <AccountPanel />
       </div>
     </div>

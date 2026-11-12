@@ -12,6 +12,7 @@ const FOOTER_LINKS = [
   { href: "/kids", label: "Foot pour enfants" },
   { href: "/merch", label: "Maillots de foot" },
   { href: "/classement", label: "Classement et tirage du mois" },
+  { href: "/regles", label: "Règlement" },
   { href: "/confidentialite", label: "Confidentialité" },
 ];
 

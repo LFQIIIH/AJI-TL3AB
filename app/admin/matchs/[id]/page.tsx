@@ -16,6 +16,7 @@ type RosterRow = {
   guest_shoe_size: number | null;
   attended: boolean | null;
   goals: number | null;
+  paid_mad: number | null;
 };
 
 const POSITION: Record<string, string> = { gardien: "Gardien", defenseur: "Défenseur", milieu: "Milieu", attaquant: "Attaquant" };
@@ -105,6 +106,7 @@ export default async function AdminMatchPage({
                       {p.player_position ? POSITION[p.player_position] : ""}
                       {p.shoe_size ? ` · chaussures ${p.shoe_size}` : ""}
                       {p.guest_shoe_size ? ` · pote ${p.guest_shoe_size}` : ""}
+                      {p.paid_mad !== null ? ` · payé ${p.paid_mad} MAD` : " · paie sur place"}
                     </p>
                   </div>
                   {p.phone && (

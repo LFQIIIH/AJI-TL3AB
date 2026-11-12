@@ -14,6 +14,8 @@ import { publicRpc } from "@/lib/supabase/publicApi";
 import { useSessionUser } from "@/lib/supabase/useSession";
 import { useMatchCounts, withOnlineBookings } from "@/lib/useMatchCounts";
 import { SHOE_RENTAL_MAD, SHOE_SIZES } from "@/lib/shoes";
+import { isProfileComplete } from "@/lib/profile";
+import { FULL_REFUND_HOURS, RULES_VERSION } from "@/lib/rules";
 
 const FORMATS: MatchFormat[] = ["5v5", "7v7", "9v9"];
 const NAME_KEY = "ajitl3ab:playerName";
@@ -38,7 +40,7 @@ type Mine = { bookings: Map<string, number>; waiting: Map<string, string | null>
 type ModalState =
   | { kind: "guest"; match: Match }
   | { kind: "member"; match: Match }
-  | { kind: "booked"; match: Match; guests: number; shoes: Shoes }
+  | { kind: "booked"; match: Match; guests: number; shoes: Shoes; paid: number }
   | null;
 
 /** Rented pair sizes for the player and the +1 friend: null = no rental, 0 = ticked but no size yet. */
@@ -58,6 +60,9 @@ const BOOKING_ERRORS: Record<string, string> = {
   already_booked: "Tu es déjà inscrit à ce match.",
   match_started: "Ce match a déjà commencé.",
   profile_missing: "Complète ton profil avant de réserver.",
+  profile_incomplete: "Ajoute ta date de naissance et ton niveau dans Mon compte avant de réserver.",
+  rules_not_accepted: "Accepte le règlement pour réserver.",
+  insufficient_balance: "Solde insuffisant. Recharge ton portefeuille dans Mon compte.",
   not_signed_in: "Ta session a expiré. Reconnecte-toi.",
 };
 
@@ -75,6 +80,10 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
 
   const user = useSessionUser();
   const [profileName, setProfileName] = useState<string | null | undefined>(undefined);
+  const [profileComplete, setProfileComplete] = useState(false);
+  const [rulesOk, setRulesOk] = useState(false);
+  const [acceptRules, setAcceptRules] = useState(false);
+  const [wallet, setWallet] = useState<{ balance: number; trusted: boolean } | null>(null);
   const [mine, setMine] = useState<Mine>({ bookings: new Map(), waiting: new Map() });
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -89,12 +98,17 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
       return;
     }
     const client = await supabaseClient();
-    const [profile, bookings, waiting] = await Promise.all([
-      client.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+    const [profile, bookings, waiting, walletRes] = await Promise.all([
+      client.from("profiles").select("full_name, birth_date, level, rules_version").eq("id", user.id).maybeSingle(),
       client.from("bookings").select("match_id, guests").in("match_id", ids),
       client.from("waitlist").select("match_id, promoted_at").in("match_id", ids),
+      client.rpc("my_wallet"),
     ]);
-    setProfileName((profile.data as { full_name: string } | null)?.full_name ?? null);
+    const p = profile.data as { full_name: string; birth_date: string | null; level: string | null; rules_version: number | null } | null;
+    setProfileName(p?.full_name ?? null);
+    setProfileComplete(isProfileComplete(p as never));
+    setRulesOk((p?.rules_version ?? 0) >= RULES_VERSION);
+    setWallet(((walletRes.data as { balance: number; trusted: boolean }[] | null) ?? [])[0] ?? null);
     setMine({
       bookings: new Map(((bookings.data ?? []) as { match_id: string; guests: number }[]).map((b) => [b.match_id, b.guests])),
       waiting: new Map(((waiting.data ?? []) as { match_id: string; promoted_at: string | null }[]).map((w) => [w.match_id, w.promoted_at])),
@@ -142,6 +156,7 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
     setError("");
     setPlusOne(false);
     setShoes(NO_SHOES);
+    setAcceptRules(false);
     loadShoeStock(m);
     if (isMember) {
       setModal({ kind: "member", match: m });
@@ -194,6 +209,12 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
     setError("");
     const guests = plusOne ? 1 : 0;
     try {
+      if (!rulesOk) {
+        const client = await supabaseClient();
+        const { error: rulesError } = await client.rpc("accept_rules");
+        if (rulesError) throw rulesError;
+        setRulesOk(true);
+      }
       const res = await fetch("/api/reservations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -204,7 +225,9 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
         setError(BOOKING_ERRORS[code ?? ""] ?? "La réservation a échoué. Réessaie dans un instant.");
         if (code === "shoes_unavailable") loadShoeStock(modal.match);
       } else {
-        setModal({ kind: "booked", match: modal.match, guests, shoes: rented });
+        const { paid } = (await res.json().catch(() => ({ paid: total(modal.match) }))) as { paid: number };
+        setModal({ kind: "booked", match: modal.match, guests, shoes: rented, paid });
+        window.dispatchEvent(new Event("ajitl3ab:wallet-changed"));
       }
     } catch {
       setError("Pas de connexion. Réessaie dans un instant.");
@@ -215,9 +238,21 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
   }
 
   async function cancelBooking(m: Match) {
-    if (!window.confirm(`Annuler ta réservation du ${formatDayLong(m.date)} à ${formatTime(m.time)} ?`)) return;
     setBusyId(m.id);
+    const client = await supabaseClient();
+    const { data } = await client.rpc("cancellation_refund", { p_match_id: m.id });
+    const r = (data as { paid: number | null; refund: number; full_refund: boolean }[] | null)?.[0];
+    const refundLine = r?.paid
+      ? r.full_refund
+        ? `\n\nTu seras remboursé de ${r.refund} MAD (100 %) sur ton portefeuille.`
+        : `\n\nMoins de ${FULL_REFUND_HOURS} h avant le match : tu seras remboursé de ${r.refund} MAD sur ${r.paid} MAD (50 %).`
+      : "";
+    if (!window.confirm(`Annuler ta réservation du ${formatDayLong(m.date)} à ${formatTime(m.time)} ?${refundLine}`)) {
+      setBusyId(null);
+      return;
+    }
     await fetch(`/api/reservations?matchId=${encodeURIComponent(m.id)}`, { method: "DELETE" }).catch(() => null);
+    window.dispatchEvent(new Event("ajitl3ab:wallet-changed"));
     await Promise.all([reloadCounts(), loadMine()]);
     setBusyId(null);
   }
@@ -408,32 +443,82 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
               </form>
             )}
 
-            {modal.kind === "member" && (
-              <form onSubmit={confirmMemberBooking} className="space-y-4">
-                <p className="rounded-xl bg-canvas-deep px-4 py-3 text-sm">
-                  Joueur : <span className="font-semibold">{profileName}</span>
-                </p>
-                <PlusOne checked={plusOne} onChange={setPlusOne} disabled={spotsLeft(modal.match) < 2} />
-                <ShoeRental shoes={shoes} onChange={setShoes} plusOne={plusOne} stock={shoeStock} />
-                <p className="text-sm">
-                  Total à payer sur place :{" "}
-                  <span className="font-bold">{total(modal.match)} MAD</span>
-                </p>
-                <button type="submit" className="btn-primary w-full" disabled={pending || shoeSizeMissing}>
-                  {pending ? "Réservation…" : "Confirmer ma réservation"}
-                </button>
-                {error && (
-                  <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-                    {error}
+            {modal.kind === "member" && (() => {
+              const cost = total(modal.match);
+              const balance = wallet?.balance ?? 0;
+              const short = !wallet?.trusted && balance < cost;
+              const blocked = !profileComplete || short || (!rulesOk && !acceptRules);
+              return (
+                <form onSubmit={confirmMemberBooking} className="space-y-4">
+                  <p className="rounded-xl bg-canvas-deep px-4 py-3 text-sm">
+                    Joueur : <span className="font-semibold">{profileName}</span>
                   </p>
-                )}
-              </form>
-            )}
+                  {!profileComplete ? (
+                    <p className="rounded-xl bg-highlight/40 px-4 py-3 text-sm font-semibold text-highlight-ink">
+                      Ajoute ta date de naissance et ton niveau pour réserver.{" "}
+                      <Link href="/compte" className="underline">Compléter mon profil</Link>
+                    </p>
+                  ) : (
+                    <>
+                      <PlusOne checked={plusOne} onChange={setPlusOne} disabled={spotsLeft(modal.match) < 2} />
+                      <ShoeRental shoes={shoes} onChange={setShoes} plusOne={plusOne} stock={shoeStock} />
+                      <div className="rounded-xl border border-line-strong px-4 py-3 text-sm">
+                        <p className="flex justify-between gap-3">
+                          <span>Total</span> <span className="font-bold">{cost} MAD</span>
+                        </p>
+                        <p className="mt-1 flex justify-between gap-3 text-ink-muted">
+                          <span>Ton portefeuille</span>
+                          <span className={balance < 0 ? "font-semibold text-red-700" : ""}>{balance} MAD</span>
+                        </p>
+                        {wallet?.trusted && balance < cost && (
+                          <p className="mt-2 text-xs text-ink-muted">Joueur de confiance : tu complètes sur place.</p>
+                        )}
+                      </div>
+                      {short && (
+                        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+                          Solde insuffisant : il manque {cost - balance} MAD.{" "}
+                          <Link href="/compte" className="font-bold underline">Recharger mon portefeuille</Link>
+                        </p>
+                      )}
+                      {!rulesOk && (
+                        <label className="flex items-start gap-3 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={acceptRules}
+                            onChange={(e) => setAcceptRules(e.target.checked)}
+                            className="mt-0.5 h-5 w-5 shrink-0 accent-primary"
+                          />
+                          <span className="text-ink-muted">
+                            J&apos;ai lu et j&apos;accepte le{" "}
+                            <Link href="/regles" target="_blank" className="font-semibold text-primary hover:underline">
+                              règlement
+                            </Link>{" "}
+                            (ponctualité, fair-play, annulations).
+                          </span>
+                        </label>
+                      )}
+                      <button type="submit" className="btn-primary w-full" disabled={pending || shoeSizeMissing || blocked}>
+                        {pending ? "Réservation…" : `Payer ${cost} MAD et réserver`}
+                      </button>
+                      <p className="text-center text-xs text-ink-muted">
+                        Annulation : remboursé à 100 % jusqu&apos;à {FULL_REFUND_HOURS} h avant, 50 % après.
+                      </p>
+                    </>
+                  )}
+                  {error && (
+                    <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+                      {error}
+                    </p>
+                  )}
+                </form>
+              );
+            })()}
 
             {modal.kind === "booked" && (
               <div className="space-y-4">
                 <p className="rounded-xl bg-highlight/40 px-4 py-3 text-sm font-semibold text-highlight-ink">
                   ✓ Ta place{modal.guests ? " et celle de ton pote sont réservées" : " est réservée"}. Arrive 10 min avant !
+                  {modal.paid > 0 && <span className="mt-1 block">💳 {modal.paid} MAD payés avec ton portefeuille.</span>}
                   {(modal.shoes.me || modal.shoes.friend) && (
                     <span className="mt-1 block">
                       👟 {[modal.shoes.me && `pointure ${modal.shoes.me}`, modal.shoes.friend && `pointure ${modal.shoes.friend} pour ton pote`].filter(Boolean).join(" et ")} : on te l&apos;apporte au terrain.
@@ -574,7 +659,7 @@ function PlusOne({ checked, onChange, disabled }: { checked: boolean; onChange: 
       <span>
         <span className="font-semibold">+1 pote</span>
         <span className="block text-xs text-ink-muted">
-          {disabled ? "Plus assez de places pour deux." : "Il paie aussi sur place. Il ne compte pas pour le ranking."}
+          {disabled ? "Plus assez de places pour deux." : "Même prix pour lui, réservé avec toi. Il ne compte pas pour le ranking."}
         </span>
       </span>
     </label>

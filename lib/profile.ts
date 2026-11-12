@@ -7,13 +7,45 @@ export const POSITIONS = [
 
 export type Position = (typeof POSITIONS)[number]["value"];
 
+export const LEVELS = [
+  { value: "debutant", label: "Débutant" },
+  { value: "intermediaire", label: "Intermédiaire" },
+  { value: "confirme", label: "Confirmé" },
+] as const;
+export type Level = (typeof LEVELS)[number]["value"];
+
+export const FEET = [
+  { value: "droit", label: "Droit" },
+  { value: "gauche", label: "Gauche" },
+  { value: "les_deux", label: "Les deux" },
+] as const;
+export type Foot = (typeof FEET)[number]["value"];
+
 export type Profile = {
   id: string;
   full_name: string;
   phone: string;
   position: Position;
   consent_at: string;
+  birth_date: string | null;
+  level: Level | null;
+  preferred_foot: Foot | null;
+  rules_version: number | null;
 };
+
+/** Columns read for a Profile. */
+export const PROFILE_COLUMNS = "id, full_name, phone, position, consent_at, birth_date, level, preferred_foot, rules_version";
+
+/** Booking needs these on top of name / phone / position. */
+export const isProfileComplete = (p: Pick<Profile, "birth_date" | "level"> | null | undefined) => Boolean(p?.birth_date && p?.level);
+
+export function levelLabel(l: Level | null | undefined): string {
+  return LEVELS.find((x) => x.value === l)?.label ?? "";
+}
+
+/** Birth dates accepted by the database (players aged ~4 to ~86). */
+export const BIRTH_DATE_MIN = "1940-01-01";
+export const BIRTH_DATE_MAX = "2022-12-31";
 
 export function positionLabel(p: Position): string {
   return POSITIONS.find((x) => x.value === p)?.label ?? p;

@@ -31,7 +31,7 @@ const STEPS = [
   {
     n: "02",
     title: "Réserve",
-    text: "Un clic, ton prénom, et on confirme ta place sur WhatsApp. Bla compte, bla app.",
+    text: "Avec ton compte, c'est un clic : ta place est payée avec ton portefeuille et confirmée tout de suite. Sinon, on réserve pour toi sur WhatsApp.",
   },
   {
     n: "03",
