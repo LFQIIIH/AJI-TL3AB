@@ -43,6 +43,14 @@ export const PAGES = {
       "Tous les matchs de foot à venir à Marrakech en 5v5, 7v7 et 9v9, par jour, quartier et niveau. Viens seul ou entre amis : ta place est réservée en 30 secondes.",
     breadcrumb: "Jouer",
   },
+  historique: {
+    path: "/jouer/historique",
+    imageAlt: "Résultats des derniers matchs de foot AJI TL3AB à Marrakech",
+    title: "Résultats des matchs de foot à Marrakech",
+    description:
+      "Scores, équipes et joueurs élus des derniers matchs de foot AJI TL3AB à Marrakech. Filtre par format ou quartier et retrouve les matchs d'un joueur.",
+    breadcrumb: "Historique",
+  },
   merch: {
     path: "/merch",
     imageAlt: "Maillots de foot des grands clubs à 199 MAD, livrés à Marrakech",

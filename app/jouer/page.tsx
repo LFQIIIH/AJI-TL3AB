@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getUpcomingMatches } from "@/lib/matches-source";
+import { getNextPublication, getUpcomingMatches } from "@/lib/matches-source";
+import JouerTabs from "@/components/JouerTabs";
 import InfoStrip from "@/components/InfoStrip";
 import MatchBrowser from "./MatchBrowser";
 import { jouerDescription, pageMetadata } from "@/lib/seo";
@@ -17,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const revalidate = 300;
 
 export default async function JouerPage() {
-  const matches = await getUpcomingMatches();
+  const [matches, nextPublication] = await Promise.all([getUpcomingMatches(), getNextPublication()]);
 
   return (
     <div className="container-page py-12 sm:py-16">
@@ -27,8 +28,9 @@ export default async function JouerPage() {
         Fin <span className="text-primary">bghiti</span> tl3ab ?
       </p>
       <p className="mt-4 max-w-xl text-ink-muted">
-        Filtre par jour et par format, choisis ton créneau et réserve en 30 secondes via WhatsApp.
+        Filtre par jour, format et quartier, choisis ton créneau et réserve en 30 secondes.
       </p>
+      <JouerTabs current="/jouer" className="mt-6" />
       <InfoStrip
         className="mt-8"
         items={[
@@ -40,7 +42,7 @@ export default async function JouerPage() {
         ]}
       />
       <div className="mt-10">
-        <MatchBrowser matches={matches} />
+        <MatchBrowser matches={matches} nextPublication={nextPublication} />
       </div>
       <RelatedLinks page="jouer" title="Entre deux matchs" className="mt-16 border-t border-line pt-12" />
     </div>

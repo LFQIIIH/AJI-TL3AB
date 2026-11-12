@@ -1,7 +1,7 @@
 import type { Match } from "@/data/matches";
 import { Icon } from "@/components/Icons";
 import RelativeDay from "@/components/RelativeDay";
-import { formatDay, formatTime, isAlmostFull, isFull, mapsLink, spotsLeft } from "@/lib/matches";
+import { CATEGORY_LABEL, formatDay, formatTime, isAlmostFull, isFull, mapsLink, spotsLeft } from "@/lib/matches";
 
 type MatchCardProps = {
   match: Match;
@@ -50,6 +50,11 @@ export default function MatchCard({ match, action }: MatchCardProps) {
           <span>
             <span className="text-ink-muted">Niveau :</span> <span className="font-semibold">{match.level}</span>
           </span>
+          {match.category && match.category !== "mixte" && (
+            <span className="ml-auto rounded-full bg-forest px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-highlight">
+              {CATEGORY_LABEL[match.category]}
+            </span>
+          )}
         </li>
       </ul>
 

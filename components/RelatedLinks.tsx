@@ -25,6 +25,7 @@ const RELATED: Partial<Record<PageKey, Target[]>> = {
   kids: [TARGETS.parents, TARGETS.switchOff, TARGETS.training],
   classement: [TARGETS.jouer, TARGETS.training, TARGETS.merch],
   regles: [TARGETS.jouer, TARGETS.classement],
+  historique: [TARGETS.jouer, TARGETS.classement, TARGETS.training],
 };
 
 export default function RelatedLinks({ page, title = "À découvrir aussi", className = "" }: { page: PageKey; title?: string; className?: string }) {

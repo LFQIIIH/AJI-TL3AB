@@ -13,6 +13,8 @@ export const marrakechParts = moroccoParts;
 /** Marrakech local date + time → the exact instant. */
 export const marrakechToDate = moroccoToDate;
 
+export const CATEGORY_LABEL: Record<string, string> = { mixte: "Mixte", hommes: "Hommes", femmes: "Femmes", enfants: "Enfants" };
+
 export function spotsLeft(m: Match): number {
   return Math.max(0, m.totalSpots - m.spotsTaken);
 }

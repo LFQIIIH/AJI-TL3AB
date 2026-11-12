@@ -39,8 +39,15 @@ function matchFromForm(f: FormData) {
   if (!(extra >= 0 && extra <= total)) return "Places hors site : entre 0 et le total.";
   const pitchId = str(f, "pitch_id");
   if (!pitchId) return "Choisis un terrain.";
+  const publishDate = str(f, "publish_date");
+  const publishTime = str(f, "publish_time") || "00:00";
+  if (publishDate && (!/^\d{4}-\d{2}-\d{2}$/.test(publishDate) || !/^\d{2}:\d{2}$/.test(publishTime))) return "Date de publication invalide.";
+  const startsAt = marrakechToDate(date, time);
+  const publishAt = publishDate ? marrakechToDate(publishDate, publishTime) : null;
+  if (publishAt && publishAt >= startsAt) return "La publication doit être avant le match.";
   return {
-    starts_at: marrakechToDate(date, time).toISOString(),
+    starts_at: startsAt.toISOString(),
+    publish_at: publishAt ? publishAt.toISOString() : null,
     pitch_id: pitchId,
     format,
     level,
@@ -98,6 +105,7 @@ export async function duplicateMatch(f: FormData) {
       status: m.status === "cancelled" ? "published" : m.status,
       captain_id: m.captain_id,
       notes: m.notes,
+      publish_at: m.publish_at ? new Date(new Date(m.publish_at).getTime() + days * 86400000).toISOString() : null,
     })
     .select("id")
     .single();

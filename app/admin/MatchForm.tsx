@@ -28,6 +28,7 @@ export default function MatchForm({
   submitLabel: string;
 }) {
   const when = match ? marrakechParts(match.starts_at) : { date: "", time: "20:00" };
+  const pub = match?.publish_at ? marrakechParts(match.publish_at) : { date: "", time: "" };
   const usable = pitches.filter((p) => p.active || p.id === match?.pitch_id);
   return (
     <form action={action} className="card grid gap-5 p-6 sm:grid-cols-2">
@@ -91,6 +92,12 @@ export default function MatchForm({
             </option>
           ))}
         </select>
+      </Field>
+      <Field label="Publier le (optionnel)" hint="Vide = visible tout de suite. Sinon le match reste caché (et non réservable) jusqu'à cette date ; /jouer affiche un compte à rebours.">
+        <input className="input" type="date" name="publish_date" defaultValue={pub.date} />
+      </Field>
+      <Field label="Publier à (heure)">
+        <input className="input" type="time" name="publish_time" step={300} defaultValue={pub.time} />
       </Field>
       <Field label="Capitaine" hint={staff.length ? undefined : "Ajoute des capitaines dans l'onglet Équipe."}>
         <select className="input" name="captain_id" defaultValue={match?.captain_id ?? ""}>

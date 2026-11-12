@@ -39,6 +39,7 @@ export type AdminMatch = {
   away_score: number | null;
   mvp_name: string | null;
   notes: string | null;
+  publish_at: string | null;
   pitches: { name: string; area: string } | null;
 };
 

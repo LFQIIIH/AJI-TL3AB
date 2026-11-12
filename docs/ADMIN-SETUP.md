@@ -36,3 +36,12 @@ Retour arrière : supprimer la variable `MATCHES_SOURCE` dans Vercel → Redeplo
   (ou qui est de confiance) est inscrit et débité.
 - **Règlement** : texte dans `lib/rules.ts`, page /regles. Accepté une fois avant la première réservation.
 - Les joueurs sans compte peuvent toujours réserver par WhatsApp : ajoute-les dans « Places prises hors site ».
+
+## Publication programmée (Phase 2)
+
+- Dans le formulaire du match : « Publier le » + « Publier à ». Vide = visible tout de suite.
+- Avant cette date, le match est caché sur le site et ne peut pas être réservé ; /jouer affiche
+  « Nouveaux matchs publiés dans … » avec un compte à rebours, et la liste se met à jour toute seule à l'heure dite.
+- Astuce : crée tous les matchs de la semaine avec la même date de publication (ex. samedi 23:59),
+  comme ça tout le monde a la même chance de réserver.
+- Catégorie (Mixte / Hommes / Femmes / Enfants) : un filtre apparaît sur /jouer dès qu'il y a plusieurs catégories.

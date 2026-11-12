@@ -1,64 +1,14 @@
-import { matches as staticMatches, type Match, type MatchCategory, type MatchFormat, type MatchLevel } from "@/data/matches";
+import { matches as staticMatches, type Match } from "@/data/matches";
 import { MATCHES_REVALIDATE_SECONDS, MATCHES_SHEET_CSV_URL, MATCHES_SOURCE } from "@/lib/config";
-import { marrakechParts, matchStart } from "@/lib/matches";
+import { matchStart } from "@/lib/matches";
+import { rowToMatch, type PublicMatchRow } from "@/lib/match-row";
+
+export { rowToMatch };
 import { sheetToMatches } from "@/lib/sheet";
 import { publicRpc } from "@/lib/supabase/publicApi";
 
 /** Cache tag of the match list; the admin area revalidates it after each change. */
 export const MATCHES_TAG = "matches";
-
-type PublicMatchRow = {
-  id: string;
-  starts_at: string;
-  pitch: string;
-  area: string;
-  address: string;
-  maps_url: string | null;
-  format: MatchFormat;
-  level: MatchLevel;
-  category: MatchCategory;
-  price_mad: number;
-  total_spots: number;
-  extra_spots: number;
-  booked: number;
-  waiting: number;
-  home_name: string | null;
-  away_name: string | null;
-  home_score: number | null;
-  away_score: number | null;
-  mvp_name: string | null;
-};
-
-/** A row of public_matches() → the Match shape the pages already use. */
-export function rowToMatch(r: PublicMatchRow): Match {
-  const { date, time } = marrakechParts(r.starts_at);
-  const played = r.home_score !== null && r.away_score !== null;
-  return {
-    id: r.id,
-    date,
-    time,
-    startsAt: r.starts_at,
-    pitch: r.pitch,
-    area: r.area,
-    address: r.address || undefined,
-    mapsUrl: r.maps_url ?? undefined,
-    format: r.format,
-    level: r.level,
-    category: r.category,
-    priceMad: r.price_mad,
-    totalSpots: r.total_spots,
-    // Same meaning as the sheet's "réservées": places taken outside the site.
-    // Online bookings are added on top (useMatchCounts / booking API).
-    spotsTaken: Math.min(r.total_spots, r.extra_spots),
-    result: played
-      ? {
-          home: { name: r.home_name ?? "Équipe 1", score: r.home_score! },
-          away: { name: r.away_name ?? "Équipe 2", score: r.away_score! },
-          ...(r.mvp_name ? { mvp: r.mvp_name } : {}),
-        }
-      : undefined,
-  };
-}
 
 async function getDatabaseMatches(): Promise<Match[]> {
   const rows = await publicRpc<PublicMatchRow>(
@@ -109,4 +59,32 @@ export async function getRecentResults(limit?: number, now: Date = new Date()): 
     .filter((m) => m.result && matchStart(m) <= now)
     .sort((a, b) => matchStart(b).getTime() - matchStart(a).getTime());
   return limit ? played.slice(0, limit) : played;
+}
+
+/** Next scheduled publication of matches (ISO), or null: for the countdown on /jouer. */
+export async function getNextPublication(): Promise<string | null> {
+  if (MATCHES_SOURCE !== "supabase") return null;
+  try {
+    const value = (await publicRpc<string | null>("next_publication", {}, {
+      next: { revalidate: MATCHES_REVALIDATE_SECONDS, tags: [MATCHES_TAG] },
+    })) as unknown;
+    return typeof value === "string" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Short names ("Yassine B.") of the players at each played match, for the history search. */
+export async function getMatchPlayers(matchIds: string[]): Promise<Record<string, string[]>> {
+  if (MATCHES_SOURCE !== "supabase" || !matchIds.length) return {};
+  try {
+    const rows = await publicRpc<{ match_id: string; player: string }>("public_match_players", { p_match_ids: matchIds }, {
+      next: { revalidate: MATCHES_REVALIDATE_SECONDS, tags: [MATCHES_TAG] },
+    });
+    const out: Record<string, string[]> = {};
+    for (const r of rows) (out[r.match_id] ??= []).push(r.player);
+    return out;
+  } catch {
+    return {};
+  }
 }

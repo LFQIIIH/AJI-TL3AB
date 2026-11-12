@@ -57,7 +57,11 @@ export default async function AdminMatchesPage({ searchParams }: { searchParams:
               {taken}/{m.total_spots}
             </span>
             {(c?.waiting ?? 0) > 0 && <span className="text-ink-muted">+{c?.waiting} en attente</span>}
-            <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${badge.className}`}>{badge.label}</span>
+            {m.status === "published" && m.publish_at && new Date(m.publish_at).getTime() > now ? (
+              <span className="rounded-full bg-canvas-deep px-2.5 py-1 text-xs font-bold text-ink-muted">Visible le {formatAdminDate(m.publish_at)}</span>
+            ) : (
+              <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${badge.className}`}>{badge.label}</span>
+            )}
           </span>
         </Link>
       </li>

@@ -7,7 +7,9 @@ import MatchCard from "@/components/MatchCard";
 import Modal from "@/components/Modal";
 import { WhatsAppIcon } from "@/components/Icons";
 import { whatsappLink } from "@/lib/config";
-import { formatDay, formatDayLong, formatTime, isFull, matchStart, spotsLeft } from "@/lib/matches";
+import { CATEGORY_LABEL, formatDay, formatDayLong, formatTime, isFull, matchStart, spotsLeft } from "@/lib/matches";
+import { rowToMatch } from "@/lib/match-row";
+import NextRelease from "./NextRelease";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { supabaseClient } from "@/lib/supabase/lazy";
 import { publicRpc } from "@/lib/supabase/publicApi";
@@ -66,7 +68,17 @@ const BOOKING_ERRORS: Record<string, string> = {
   not_signed_in: "Ta session a expiré. Reconnecte-toi.",
 };
 
-export default function MatchBrowser({ matches }: { matches: Match[] }) {
+export default function MatchBrowser({
+  matches: initialMatches,
+  nextPublication: initialNext = null,
+}: {
+  matches: Match[];
+  nextPublication?: string | null;
+}) {
+  // The list can refresh in the browser when a scheduled publication time comes.
+  const [matches, setMatches] = useState(initialMatches);
+  const [nextPublication, setNextPublication] = useState(initialNext);
+  const [category, setCategory] = useState<string | null>(null);
   const [day, setDay] = useState<string | null>(null);
   const [format, setFormat] = useState<MatchFormat | null>(null);
   const [area, setArea] = useState<string | null>(null);
@@ -128,19 +140,39 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
     [matches],
   );
 
+  const categories = useMemo(() => Array.from(new Set(matches.map((m) => m.category ?? "mixte"))), [matches]);
+
   const filtered = live.filter(
     (m) =>
       (day === null || m.date === day) &&
       (format === null || m.format === format) &&
-      (area === null || m.area === area),
+      (area === null || m.area === area) &&
+      (category === null || (m.category ?? "mixte") === category),
   );
-  const filtering = day !== null || format !== null || area !== null;
+  const filtering = day !== null || format !== null || area !== null || category !== null;
+
+  // Scheduled publication reached: reload the list from the database.
+  const onReleased = useCallback(async () => {
+    try {
+      type Row = Parameters<typeof rowToMatch>[0];
+      const [rows, next] = await Promise.all([
+        publicRpc<Row>("public_matches", {}),
+        publicRpc<string | null>("next_publication", {}) as unknown as Promise<string | null>,
+      ]);
+      const now = Date.now();
+      setMatches(rows.map(rowToMatch).filter((m) => matchStart(m).getTime() > now));
+      setNextPublication(typeof next === "string" ? next : null);
+    } catch {
+      setNextPublication(null);
+    }
+  }, []);
   const openCount = filtered.filter((m) => !isFull(m)).length;
 
   function resetFilters() {
     setDay(null);
     setFormat(null);
     setArea(null);
+    setCategory(null);
   }
 
   async function loadShoeStock(m: Match) {
@@ -311,6 +343,11 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
 
   return (
     <>
+      {nextPublication && (
+        <div className="mb-6">
+          <NextRelease at={nextPublication} onReleased={onReleased} />
+        </div>
+      )}
       <div className="space-y-4">
         <FilterRow label="Jour">
           <Chip on={day === null} onClick={() => setDay(null)}>Tous</Chip>
@@ -331,6 +368,14 @@ export default function MatchBrowser({ matches }: { matches: Match[] }) {
             <Chip on={area === null} onClick={() => setArea(null)}>Tous</Chip>
             {areas.map((a) => (
               <Chip key={a} on={area === a} onClick={() => setArea(a)}>{a}</Chip>
+            ))}
+          </FilterRow>
+        )}
+        {categories.length > 1 && (
+          <FilterRow label="Catégorie">
+            <Chip on={category === null} onClick={() => setCategory(null)}>Toutes</Chip>
+            {categories.map((c) => (
+              <Chip key={c} on={category === c} onClick={() => setCategory(c)}>{CATEGORY_LABEL[c] ?? c}</Chip>
             ))}
           </FilterRow>
         )}

@@ -4,6 +4,7 @@ import TeamOfMonth from "@/components/community/TeamOfMonth";
 import Leaderboard from "./Leaderboard";
 import { pageMetadata } from "@/lib/seo";
 import PageSeo from "@/components/PageSeo";
+import JouerTabs from "@/components/JouerTabs";
 import RelatedLinks from "@/components/RelatedLinks";
 import { getDrawStatus, getDrawWinners, getMonthLeaderboard, getTeamOfMonth } from "@/lib/community-source";
 
@@ -31,6 +32,7 @@ export default async function ClassementPage() {
         Les buts sont comptés par l&apos;équipe après chaque match. Gardiens, défenseurs et milieux sont élus par les joueurs du match
         (vote ouvert 48 h). Seuls les matchs réservés avec un compte comptent.
       </p>
+      <JouerTabs current="/classement" className="mt-6" />
 
       <div className="mt-10">
         <Leaderboard initialMonth={leaderboard} />
