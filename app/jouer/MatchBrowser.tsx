@@ -140,7 +140,11 @@ export default function MatchBrowser({
     [matches],
   );
 
-  const categories = useMemo(() => Array.from(new Set(matches.map((m) => m.category ?? "mixte"))), [matches]);
+  // "Femmes" is never offered as a filter (women's matches still show under "Toutes").
+  const categories = useMemo(
+    () => Array.from(new Set(matches.map((m) => m.category ?? "mixte"))).filter((c) => c !== "femmes"),
+    [matches],
+  );
 
   const filtered = live.filter(
     (m) =>
