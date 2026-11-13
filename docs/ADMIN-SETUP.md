@@ -56,3 +56,12 @@ Retour arrière : supprimer la variable `MATCHES_SOURCE` dans Vercel → Redeplo
 - **Page publique du match** (`/match/…`, lien « Détails du match » sous chaque résultat) : score, buteurs, passeurs, cartons, joueurs élus, présents. Non indexée par Google.
 - **Avis des joueurs** : les joueurs marqués présents notent l'organisation, l'arbitrage, l'intensité et le niveau depuis leur compte, de 1 h à 49 h après le match. Les moyennes et commentaires (sans nom) s'affichent sur la fiche du match.
 - **Photos et vidéos** : sur la fiche du match, « Ajouter photos / vidéos » (JPG, PNG, WebP, HEIC, MP4, MOV, WebM ; 50 Mo max par fichier). Seuls le staff et les joueurs marqués **présents** peuvent les voir ; les autres voient seulement « N photos privées ». Pense à décocher « Présent » pour un absent avant d'ajouter les photos.
+
+## Points, niveaux, profils (Phase 4)
+
+- **Points** (calculés tout seuls à partir des matchs, aucun réglage) : match joué +10, victoire +5, nul +2, but +3, passe +2, élu du match +5, chaque 4ᵉ semaine d'affilée +10, avis donné +1, carton jaune −3, rouge −10, annulation à moins de 24 h −5. Victoires et cartons comptent seulement quand ils sont saisis dans le « Direct ».
+  Pour changer un barème : la fonction `points_rule` (base de données) **et** le texte dans `lib/points.ts`.
+- **Niveau** (1 à 10) = points de tous les temps. **Palier du mois** = points du mois : Bronze 20, Argent 60, Or 120, Diamant 200 (remis à zéro le 1er).
+- **Classement des points** et **recherche de joueur** en haut de /classement.
+- **Profil joueur** `/joueur/…` : prénom + initiale, poste, niveau, stats, badges, derniers matchs. Jamais téléphone, e-mail ou date de naissance. Chaque joueur peut le cacher dans son compte (« Profil public ») : plus de page ni de recherche, son nom reste dans le classement sans lien. Pages non indexées par Google.
+- Une erreur de présence, de but ou de carton corrigée dans l'admin corrige aussi les points.

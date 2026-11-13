@@ -56,8 +56,10 @@ export const RULES: RuleSection[] = [
   {
     title: "Stats et votes",
     items: [
-      "Le capitaine note les présences et les buts après le match.",
+      "Le capitaine note les présences, les équipes, les buts, les passes et les cartons pendant ou après le match.",
       "Les joueurs présents votent pour les meilleurs du match pendant 48 h : vote honnête, pas de vote pour un pote par principe.",
+      "Chaque match rapporte des points (présence, victoire, buts, passes, élections) qui font monter ton niveau et ton palier du mois. Un carton (−3 / −10) ou une annulation à moins de 24 h (−5) en retirent.",
+      "Ton profil joueur (prénom, initiale, stats) est public par défaut. Tu peux le cacher à tout moment dans ton compte.",
     ],
   },
 ];

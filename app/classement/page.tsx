@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import DrawInfo from "@/components/community/DrawInfo";
 import TeamOfMonth from "@/components/community/TeamOfMonth";
 import Leaderboard from "./Leaderboard";
+import PointsRanking from "./PointsRanking";
 import { pageMetadata } from "@/lib/seo";
 import PageSeo from "@/components/PageSeo";
 import JouerTabs from "@/components/JouerTabs";
 import RelatedLinks from "@/components/RelatedLinks";
-import { getDrawStatus, getDrawWinners, getMonthLeaderboard, getTeamOfMonth } from "@/lib/community-source";
+import { getDrawStatus, getDrawWinners, getMonthLeaderboard, getPointsLeaderboard, getTeamOfMonth } from "@/lib/community-source";
 
 export const metadata: Metadata = pageMetadata("classement");
 
@@ -15,7 +16,8 @@ export const metadata: Metadata = pageMetadata("classement");
 export const revalidate = 300;
 
 export default async function ClassementPage() {
-  const [leaderboard, team, drawStatus, winners] = await Promise.all([
+  const [points, leaderboard, team, drawStatus, winners] = await Promise.all([
+    getPointsLeaderboard(),
     getMonthLeaderboard(),
     getTeamOfMonth(),
     getDrawStatus(),
@@ -29,12 +31,17 @@ export default async function ClassementPage() {
         Chkoun <span className="text-primary">l&apos;m3allem</span> ?
       </p>
       <p className="mt-4 max-w-2xl text-ink-muted">
-        Les buts sont comptés par l&apos;équipe après chaque match. Gardiens, défenseurs et milieux sont élus par les joueurs du match
-        (vote ouvert 48 h). Seuls les matchs réservés avec un compte comptent.
+        Chaque match rapporte des points : présence, victoire, buts, passes, élections du match. Ils font monter ton niveau et ton palier
+        du mois. Gardiens, défenseurs et milieux sont élus par les joueurs du match (vote ouvert 48 h). Seuls les matchs réservés avec
+        un compte comptent.
       </p>
       <JouerTabs current="/classement" className="mt-6" />
 
       <div className="mt-10">
+        <PointsRanking initial={points} />
+      </div>
+
+      <div className="mt-12">
         <Leaderboard initialMonth={leaderboard} />
       </div>
 

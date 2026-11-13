@@ -6,4 +6,5 @@ export function refreshSite() {
   revalidateTag(MATCHES_TAG);
   for (const path of ["/", "/jouer", "/jouer/historique", "/classement", "/compte"]) revalidatePath(path);
   revalidatePath("/match/[id]", "page");
+  revalidatePath("/joueur/[code]", "page");
 }

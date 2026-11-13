@@ -22,6 +22,8 @@ import { positionLabel, type Position } from "@/lib/profile";
 import { supabaseClient } from "@/lib/supabase/lazy";
 import { useSessionUser } from "@/lib/supabase/useSession";
 import { PROFILE_SAVED_EVENT } from "./AccountPanel";
+import { LevelBar, TierPill } from "@/components/PlayerLevel";
+import { ordinal, playerPath } from "@/lib/points";
 
 type Booking = {
   match_id: string;
@@ -32,6 +34,14 @@ type Booking = {
   guest_shoe_size: number | null;
   attended: boolean;
   goals: number;
+};
+type Progress = {
+  points_total: number;
+  points_month: number;
+  rank_month: number | null;
+  code: string;
+  public_profile: boolean;
+  breakdown: Record<string, number>;
 };
 type Waiting = { match_id: string; match_date: string; match_start: string; promoted_at: string | null };
 type Ballot = {
@@ -49,12 +59,13 @@ export default function AccountDashboard({ matches }: { matches: Match[] }) {
   const [waiting, setWaiting] = useState<Waiting[]>([]);
   const [ballots, setBallots] = useState<Ballot[]>([]);
   const [feedbackDue, setFeedbackDue] = useState<Booking[]>([]);
+  const [progress, setProgress] = useState<Progress | null>(null);
   const byId = useMemo(() => new Map(matches.map((m) => [m.id, m])), [matches]);
 
   const load = useCallback(async () => {
     if (!user) return;
     const client = await supabaseClient();
-    const [profile, statsRes, bookingsRes, waitingRes] = await Promise.all([
+    const [profile, statsRes, bookingsRes, waitingRes, progressRes] = await Promise.all([
       client.from("profiles").select("id").eq("id", user.id).maybeSingle(),
       client.rpc("my_stats"),
       client
@@ -63,7 +74,9 @@ export default function AccountDashboard({ matches }: { matches: Match[] }) {
         .order("match_start", { ascending: false })
         .limit(60),
       client.from("waitlist").select("match_id, match_date, match_start, promoted_at").is("promoted_at", null),
+      client.rpc("my_progress"),
     ]);
+    setProgress(((progressRes.data ?? []) as Progress[])[0] ?? null);
     setHasProfile(Boolean(profile.data));
     setStats(((statsRes.data ?? []) as MyStats[])[0] ?? null);
     const allBookings = (bookingsRes.data ?? []) as Booking[];
@@ -114,6 +127,7 @@ export default function AccountDashboard({ matches }: { matches: Match[] }) {
   return (
     <div className="space-y-6">
       <StatsRow stats={stats} />
+      {progress && <ProgressCard progress={progress} userId={user.id} onChange={load} />}
       {ballots.filter((b) => b.done.size < VOTE_CATEGORIES.length && b.players.length > 0).map((b) => (
         <BallotCard key={b.booking.match_id} ballot={b} match={byId.get(b.booking.match_id)} onDone={load} />
       ))}
@@ -144,6 +158,66 @@ function Section({ title, eyebrow, children, action }: { title: string; eyebrow:
 }
 
 /** "Semaines" = consecutive weeks with at least one match. */
+/** Level (all-time points), this month's tier and rank, public profile switch. */
+function ProgressCard({ progress, userId, onChange }: { progress: Progress; userId: string; onChange: () => void }) {
+  const [busy, setBusy] = useState(false);
+  const [isPublic, setIsPublic] = useState(progress.public_profile);
+  useEffect(() => setIsPublic(progress.public_profile), [progress.public_profile]);
+  const b = progress.breakdown;
+  const parts = [
+    b.matches && `${b.matches} match${b.matches > 1 ? "s" : ""}`,
+    b.wins && `${b.wins} victoire${b.wins > 1 ? "s" : ""}`,
+    b.goals && `${b.goals} but${b.goals > 1 ? "s" : ""}`,
+    b.assists && `${b.assists} passe${b.assists > 1 ? "s" : ""}`,
+    b.awards && `${b.awards} élection${b.awards > 1 ? "s" : ""}`,
+    b.streak_bonus && "bonus série",
+    b.late_cancels && `${b.late_cancels} annulation${b.late_cancels > 1 ? "s" : ""} tardive${b.late_cancels > 1 ? "s" : ""}`,
+  ].filter(Boolean);
+
+  async function toggle() {
+    const next = !isPublic;
+    setIsPublic(next);
+    setBusy(true);
+    const { error } = await (await supabaseClient()).from("profiles").update({ public_profile: next }).eq("id", userId);
+    setBusy(false);
+    if (error) setIsPublic(!next);
+    else onChange();
+  }
+
+  return (
+    <Section
+      eyebrow="Ta progression"
+      title="Niveau et points"
+      action={
+        <Link href="/classement" className="text-sm font-semibold text-primary hover:underline">
+          Classement →
+        </Link>
+      }
+    >
+      <LevelBar points={progress.points_total} className="mt-4" />
+      <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+        <span className="font-semibold">Ce mois : {progress.points_month} pts</span>
+        <TierPill monthPoints={progress.points_month} />
+        {progress.rank_month && <span className="text-ink-muted">{ordinal(progress.rank_month)} du classement</span>}
+      </div>
+      {parts.length > 0 && <p className="mt-2 text-xs text-ink-muted">Ce mois : {parts.join(" · ")}</p>}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4 text-sm">
+        <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 font-semibold">
+          <input type="checkbox" className="h-5 w-5 accent-primary" checked={isPublic} disabled={busy} onChange={toggle} />
+          Profil public
+        </label>
+        {isPublic ? (
+          <Link href={playerPath(progress.code)} className="inline-flex min-h-11 items-center font-semibold text-primary hover:underline">
+            Voir mon profil public →
+          </Link>
+        ) : (
+          <span className="text-ink-muted">Caché : pas de page joueur, pas dans la recherche.</span>
+        )}
+      </div>
+    </Section>
+  );
+}
+
 function StatsRow({ stats }: { stats: MyStats }) {
   const items = [
     { label: "Matchs", value: stats.matches },

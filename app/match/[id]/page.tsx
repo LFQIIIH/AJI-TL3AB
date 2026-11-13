@@ -8,7 +8,8 @@ import MatchAwards from "@/components/community/MatchAwards";
 import type { Award } from "@/lib/community";
 import { MATCHES_REVALIDATE_SECONDS, MATCHES_SOURCE } from "@/lib/config";
 import { formatDayLong, formatTime, matchStart } from "@/lib/matches";
-import { getMatches, getMatchPlayers, MATCHES_TAG } from "@/lib/matches-source";
+import { getMatches, MATCHES_TAG } from "@/lib/matches-source";
+import { playerPath } from "@/lib/points";
 import { fullTitle } from "@/lib/seo";
 import { publicRpc } from "@/lib/supabase/publicApi";
 
@@ -18,6 +19,7 @@ export function generateStaticParams() {
   return [];
 }
 
+type RosterRow = { name: string; code: string | null; team: "home" | "away" | null; goals: number; assists: number };
 type MatchEvent = { kind: "goal" | "yellow" | "red"; team: "home" | "away" | null; minute: number | null; player: string | null; assist: string | null };
 
 const cache = { next: { revalidate: MATCHES_REVALIDATE_SECONDS, tags: [MATCHES_TAG] } };
@@ -58,7 +60,7 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
     db ? safe(() => publicRpc<MatchEvent>("public_match_events", { p_match_id: match.id }, cache), []) : [],
     db ? safe(() => publicRpc<Award>("match_awards", { p_match_ids: [match.id] }, cache), []) : [],
     db ? safe(async () => Number(await publicRpc<number>("match_media_count", { p_match_id: match.id }, cache)) || 0, 0) : 0,
-    db ? safe(() => getMatchPlayers([match.id]).then((p) => p[match.id] ?? []), []) : [],
+    db ? safe(() => publicRpc<RosterRow>("public_match_roster", { p_match_id: match.id }, cache), []) : [],
   ]);
   const { home, away } = match.result;
   const teamName = (t: MatchEvent["team"]) => (t === "home" ? home.name : t === "away" ? away.name : "");
@@ -113,11 +115,25 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
             Ils ont joué ({players.length})
           </h2>
           <ul className="mt-4 flex flex-wrap gap-2">
-            {players.map((p) => (
-              <li key={p} className="rounded-full bg-canvas-deep px-3 py-1 text-sm font-semibold">
-                {p}
-              </li>
-            ))}
+            {players.map((p, i) => {
+              const label = (
+                <>
+                  {p.name}
+                  {p.team && <span className="ml-1 text-xs font-normal text-ink-muted">· {teamName(p.team)}</span>}
+                </>
+              );
+              return (
+                <li key={`${p.name}-${i}`}>
+                  {p.code ? (
+                    <Link href={playerPath(p.code)} className="inline-flex min-h-11 items-center rounded-full bg-canvas-deep px-4 text-sm font-semibold hover:bg-highlight">
+                      {label}
+                    </Link>
+                  ) : (
+                    <span className="inline-flex min-h-11 items-center rounded-full bg-canvas-deep px-4 text-sm font-semibold">{label}</span>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </section>
       )}
