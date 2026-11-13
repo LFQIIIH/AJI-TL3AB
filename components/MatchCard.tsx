@@ -50,7 +50,7 @@ export default function MatchCard({ match, action }: MatchCardProps) {
           <span>
             <span className="text-ink-muted">Niveau :</span> <span className="font-semibold">{match.level}</span>
           </span>
-          {match.category && match.category !== "mixte" && (
+          {match.category && match.category !== "mixte" && match.category !== "femmes" && (
             <span className="ml-auto rounded-full bg-forest px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-highlight">
               {CATEGORY_LABEL[match.category]}
             </span>

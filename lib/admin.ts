@@ -11,7 +11,7 @@ export const LEVELS: MatchLevel[] = ["Tous niveaux", "Débutant", "Intermédiair
 export const CATEGORIES: { value: MatchCategory; label: string }[] = [
   { value: "mixte", label: "Mixte" },
   { value: "hommes", label: "Hommes" },
-  { value: "femmes", label: "Femmes" },
+  // "femmes" is allowed by the database but not offered for now (no women's matches planned).
   { value: "enfants", label: "Enfants" },
 ];
 export const STATUSES = [
