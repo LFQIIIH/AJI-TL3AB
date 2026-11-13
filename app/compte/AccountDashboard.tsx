@@ -48,6 +48,7 @@ export default function AccountDashboard({ matches }: { matches: Match[] }) {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [waiting, setWaiting] = useState<Waiting[]>([]);
   const [ballots, setBallots] = useState<Ballot[]>([]);
+  const [feedbackDue, setFeedbackDue] = useState<Booking[]>([]);
   const byId = useMemo(() => new Map(matches.map((m) => [m.id, m])), [matches]);
 
   const load = useCallback(async () => {
@@ -75,10 +76,14 @@ export default function AccountDashboard({ matches }: { matches: Match[] }) {
       return b.attended && now >= t + VOTE_OPENS_AFTER_MS && now <= t + VOTE_CLOSES_AFTER_MS;
     });
     if (open.length) {
-      const [players, votes] = await Promise.all([
+      const [players, votes, feedback] = await Promise.all([
         Promise.all(open.map((b) => client.rpc("match_players", { p_match_id: b.match_id }))),
         client.from("votes").select("match_id, category").in("match_id", open.map((b) => b.match_id)),
+        client.from("match_feedback").select("match_id").in("match_id", open.map((b) => b.match_id)),
       ]);
+      // No answer yet (an error, e.g. before the table exists, hides the card rather than risking a duplicate).
+      const answered = new Set(((feedback.data ?? []) as { match_id: string }[]).map((f) => f.match_id));
+      setFeedbackDue(feedback.error ? [] : open.filter((b) => !answered.has(b.match_id)));
       const done = (votes.data ?? []) as { match_id: string; category: VoteCategory }[];
       setBallots(
         open.map((b, i) => ({
@@ -89,6 +94,7 @@ export default function AccountDashboard({ matches }: { matches: Match[] }) {
       );
     } else {
       setBallots([]);
+      setFeedbackDue([]);
     }
     setReady(true);
   }, [user]);
@@ -110,6 +116,9 @@ export default function AccountDashboard({ matches }: { matches: Match[] }) {
       <StatsRow stats={stats} />
       {ballots.filter((b) => b.done.size < VOTE_CATEGORIES.length && b.players.length > 0).map((b) => (
         <BallotCard key={b.booking.match_id} ballot={b} match={byId.get(b.booking.match_id)} onDone={load} />
+      ))}
+      {feedbackDue.map((b) => (
+        <FeedbackCard key={b.match_id} booking={b} match={byId.get(b.match_id)} onDone={load} />
       ))}
       <Bookings upcoming={upcoming} waiting={waiting} past={past} byId={byId} onChange={load} />
       <Badges stats={stats} />
@@ -214,6 +223,98 @@ function BallotCard({ ballot, match, onDone }: { ballot: Ballot; match: Match | 
       </div>
       <button type="button" onClick={submit} disabled={pending || !todo.some((c) => choice[c.value])} className="btn-primary mt-6 w-full sm:w-auto">
         {pending ? "Envoi…" : "Envoyer mes votes"}
+      </button>
+      {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
+    </section>
+  );
+}
+
+const RATINGS = [
+  { key: "organisation", label: "Organisation", hint: "Accueil, horaires, terrain, ballons" },
+  { key: "refereeing", label: "Arbitrage", hint: "Fair-play et décisions" },
+  { key: "intensity", label: "Intensité", hint: "Rythme et engagement du match" },
+] as const;
+const SCALE = [
+  { value: 1, label: "Bof" },
+  { value: 2, label: "Bien" },
+  { value: 3, label: "Top" },
+];
+const LEVEL_VOTE = [
+  { value: -1, label: "Trop facile" },
+  { value: 0, label: "Équilibré" },
+  { value: 1, label: "Trop dur" },
+];
+type RatingKey = (typeof RATINGS)[number]["key"];
+
+/** "Ton avis sur le match": three quick 1–3 ratings, the level, an optional comment. Once per match. */
+function FeedbackCard({ booking, match, onDone }: { booking: Booking; match: Match | undefined; onDone: () => void }) {
+  const [rating, setRating] = useState<Partial<Record<RatingKey, number>>>({});
+  const [level, setLevel] = useState<number | null>(null);
+  const [comment, setComment] = useState("");
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
+  const complete = RATINGS.every((r) => rating[r.key]) && level !== null;
+
+  async function submit() {
+    if (!complete) return;
+    setPending(true);
+    setError("");
+    const { error } = await (await supabaseClient())
+      .from("match_feedback")
+      .insert({ match_id: booking.match_id, ...rating, level_vote: level, comment: comment.trim() || null });
+    setPending(false);
+    if (error && error.code !== "23505") setError("Ton avis n'a pas pu être envoyé. Réessaie.");
+    else onDone();
+  }
+
+  return (
+    <section className="card p-5 sm:p-6">
+      <p className="eyebrow">30 secondes · anonyme pour les autres joueurs</p>
+      <h2 className="headline mt-2 text-3xl">Ton avis sur le match</h2>
+      <p className="mt-1 text-sm text-ink-muted">{matchTitle(match, booking)}</p>
+      <div className="mt-5 space-y-5">
+        {RATINGS.map((r) => (
+          <fieldset key={r.key}>
+            <legend className="text-sm font-semibold">{r.label}</legend>
+            <p className="mb-2 text-xs text-ink-muted">{r.hint}</p>
+            <div className="flex flex-wrap gap-2">
+              {SCALE.map((o) => (
+                <button
+                  key={o.value}
+                  type="button"
+                  aria-pressed={rating[r.key] === o.value}
+                  onClick={() => setRating((prev) => ({ ...prev, [r.key]: o.value }))}
+                  className={`chip min-h-11 px-4 ${rating[r.key] === o.value ? "chip-on" : "chip-off"}`}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        ))}
+        <fieldset>
+          <legend className="mb-2 text-sm font-semibold">Le niveau du match pour toi</legend>
+          <div className="flex flex-wrap gap-2">
+            {LEVEL_VOTE.map((o) => (
+              <button
+                key={o.value}
+                type="button"
+                aria-pressed={level === o.value}
+                onClick={() => setLevel(o.value)}
+                className={`chip min-h-11 px-4 ${level === o.value ? "chip-on" : "chip-off"}`}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+        <label className="block">
+          <span className="mb-2 block text-sm font-semibold">Un mot pour l&apos;équipe (optionnel)</span>
+          <textarea className="input min-h-20" maxLength={300} value={comment} onChange={(e) => setComment(e.target.value)} />
+        </label>
+      </div>
+      <button type="button" onClick={submit} disabled={pending || !complete} className="btn-primary mt-6 w-full sm:w-auto">
+        {pending ? "Envoi…" : "Envoyer mon avis"}
       </button>
       {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
     </section>

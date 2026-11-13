@@ -45,3 +45,14 @@ Retour arrière : supprimer la variable `MATCHES_SOURCE` dans Vercel → Redeplo
 - Astuce : crée tous les matchs de la semaine avec la même date de publication (ex. samedi 23:59),
   comme ça tout le monde a la même chance de réserver.
 - Catégorie (Mixte / Hommes / Femmes / Enfants) : un filtre apparaît sur /jouer dès qu'il y a plusieurs catégories.
+
+## Direct, avis et photos (Phase 3)
+
+- **Direct du match** : sur la fiche d'un match, le bouton « ⚽ Direct » s'affiche de 30 min avant le coup d'envoi à 3 jours après (admin et capitaine du match). Sur le téléphone :
+  1. range chaque joueur en Équipe 1 ou 2 ;
+  2. pendant le match, « But Équipe 1/2 » → buteur → passeur (ou « Pas de passe décisive ») ; « Joueur invité / hors site » pour un pote ou un joueur inscrit par WhatsApp ;
+  3. cartons jaunes / rouges ; « Annuler » sur une ligne pour corriger.
+  Le score, les buts et les passes de chaque joueur se calculent tout seuls. Un score tapé à la main reste valable tant qu'aucun but n'est saisi dans le direct.
+- **Page publique du match** (`/match/…`, lien « Détails du match » sous chaque résultat) : score, buteurs, passeurs, cartons, joueurs élus, présents. Non indexée par Google.
+- **Avis des joueurs** : les joueurs marqués présents notent l'organisation, l'arbitrage, l'intensité et le niveau depuis leur compte, de 1 h à 49 h après le match. Les moyennes et commentaires (sans nom) s'affichent sur la fiche du match.
+- **Photos et vidéos** : sur la fiche du match, « Ajouter photos / vidéos » (JPG, PNG, WebP, HEIC, MP4, MOV, WebM ; 50 Mo max par fichier). Seuls le staff et les joueurs marqués **présents** peuvent les voir ; les autres voient seulement « N photos privées ». Pense à décocher « Présent » pour un absent avant d'ajouter les photos.

@@ -13,7 +13,7 @@ export default function ResultsGrid({ results }: { results: Match[] }) {
     <div className="mt-10 grid gap-4 sm:grid-cols-2">
       {results.map((m) => (
         <div key={m.id}>
-          <ResultCard match={m} />
+          <ResultCard match={m} details />
           <MatchAwards awards={awards.filter((a) => a.match_id === m.id)} />
         </div>
       ))}

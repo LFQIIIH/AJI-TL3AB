@@ -1,8 +1,10 @@
+import Link from "next/link";
 import type { Match } from "@/data/matches";
 import TeamCrest from "@/components/TeamCrest";
 import { formatDay, formatTime } from "@/lib/matches";
 
-export default function ResultCard({ match }: { match: Match }) {
+/** A played match. `details` adds a link to its page (/match/…) with scorers, cards and photos. */
+export default function ResultCard({ match, details = false }: { match: Match; details?: boolean }) {
   const result = match.result;
   if (!result) return null;
 
@@ -39,6 +41,14 @@ export default function ResultCard({ match }: { match: Match }) {
           </p>
         )}
       </div>
+      {details && (
+        <Link
+          href={`/match/${encodeURIComponent(match.id)}`}
+          className="-mb-2 mt-2 inline-flex min-h-11 items-center self-start text-sm font-semibold text-primary hover:underline"
+        >
+          Détails du match<span className="sr-only"> du {formatDay(match.date)}</span> →
+        </Link>
+      )}
     </article>
   );
 }

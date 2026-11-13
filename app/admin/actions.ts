@@ -1,16 +1,11 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { back, CATEGORIES, dbMessage, FORMATS, LEVELS, requireStaff, STATUSES } from "@/lib/admin";
 import { marrakechToDate, matchStart } from "@/lib/matches";
-import { getSheetMatchesForImport, MATCHES_TAG } from "@/lib/matches-source";
-
-// Every change refreshes the public pages right away (instead of within 5 min).
-function refreshSite() {
-  revalidateTag(MATCHES_TAG);
-  for (const path of ["/", "/jouer", "/classement", "/compte"]) revalidatePath(path);
-}
+import { getSheetMatchesForImport } from "@/lib/matches-source";
+import { refreshSite } from "@/lib/refresh-site";
 
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 const int = (f: FormData, k: string) => {
