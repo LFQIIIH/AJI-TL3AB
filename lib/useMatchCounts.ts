@@ -7,19 +7,27 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { publicRpc } from "@/lib/supabase/publicApi";
 
 /**
- * Online bookings + waiting list per match (public counts, no names).
+ * Online bookings + waiting list per match (public counts), plus the
+ * initials of the first players booked (public profiles only).
  * Until loaded — or without Supabase — returns {} and the sheet numbers stand.
  */
 export function useMatchCounts(matchIds: string[]) {
   const [counts, setCounts] = useState<MatchCounts>({});
+  const [initials, setInitials] = useState<Record<string, string[]>>({});
   const key = matchIds.join("|");
 
   const reload = useCallback(async () => {
     if (!isSupabaseConfigured || !key) return;
     try {
-      const rows = await publicRpc<{ match_id: string; booked: number; waiting: number }>("match_booking_counts", {
-        p_match_ids: key.split("|"),
-      });
+      const ids = key.split("|");
+      const [rows, faces] = await Promise.all([
+        publicRpc<{ match_id: string; booked: number; waiting: number }>("match_booking_counts", { p_match_ids: ids }),
+        // Optional decoration: a failure here must not hide the counts.
+        publicRpc<{ match_id: string; initial: string }>("match_booked_initials", { p_match_ids: ids }).catch(() => []),
+      ]);
+      const byMatch: Record<string, string[]> = {};
+      for (const f of faces) (byMatch[f.match_id] ??= []).push(f.initial);
+      setInitials(byMatch);
       const next: MatchCounts = {};
       for (const r of rows) {
         next[r.match_id] = { booked: r.booked, waiting: r.waiting };
@@ -32,7 +40,7 @@ export function useMatchCounts(matchIds: string[]) {
     reload();
   }, [reload]);
 
-  return { counts, reload };
+  return { counts, initials, reload };
 }
 
 /** The sheet's numbers plus online bookings. */

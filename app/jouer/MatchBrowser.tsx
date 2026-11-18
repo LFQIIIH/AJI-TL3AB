@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Match, MatchFormat } from "@/data/matches";
 import MatchCard from "@/components/MatchCard";
 import Modal from "@/components/Modal";
-import { WhatsAppIcon } from "@/components/Icons";
+import { BallIcon, WhatsAppIcon } from "@/components/Icons";
 import { whatsappLink } from "@/lib/config";
 import { CATEGORY_LABEL, formatDay, formatDayLong, formatTime, isFull, matchStart, spotsLeft } from "@/lib/matches";
 import { rowToMatch } from "@/lib/match-row";
@@ -102,7 +102,7 @@ export default function MatchBrowser({
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const ids = useMemo(() => matches.map((m) => m.id), [matches]);
-  const { counts, reload: reloadCounts } = useMatchCounts(ids);
+  const { counts, initials, reload: reloadCounts } = useMatchCounts(ids);
   const live = useMemo(() => matches.map((m) => withOnlineBookings(m, counts)), [matches, counts]);
 
   const loadMine = useCallback(async () => {
@@ -342,6 +342,7 @@ export default function MatchBrowser({
     }
     return (
       <button type="button" className="btn-primary px-5 py-2.5" onClick={() => openBooking(m)}>
+        <BallIcon className="h-4 w-4" />
         Réserver
       </button>
     );
@@ -436,12 +437,6 @@ export default function MatchBrowser({
         )}
       </div>
 
-      {isSupabaseConfigured && user === null && (
-        <p className="mt-4 rounded-xl bg-highlight/30 px-4 py-3 text-sm">
-          <Link href="/connexion" className="font-bold text-primary hover:underline">Connecte-toi</Link> pour réserver en un clic,
-          rejoindre la liste d&apos;attente et faire compter tes matchs pour le ranking et le tirage au sort du mois.
-        </p>
-      )}
 
       {filtered.length > 0 ? (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -449,7 +444,7 @@ export default function MatchBrowser({
             const waiting = counts[m.id]?.waiting ?? 0;
             return (
               <div key={m.id} className="flex flex-col">
-                <MatchCard match={m} action={action(m)} />
+                <MatchCard match={m} action={action(m)} initials={initials[m.id]} />
                 {isFull(m) && waiting > 0 && (
                   <p className="mt-2 text-center text-xs text-ink-muted">
                     {waiting} {waiting > 1 ? "joueurs" : "joueur"} sur la liste d&apos;attente
@@ -764,3 +759,4 @@ function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; chi
     </button>
   );
 }
+

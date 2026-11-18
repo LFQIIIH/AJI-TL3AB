@@ -1,5 +1,6 @@
 "use client";
 
+import { BallIcon } from "@/components/Icons";
 import Link from "next/link";
 import type { Match } from "@/data/matches";
 import MatchCard from "@/components/MatchCard";
@@ -9,7 +10,7 @@ import { useMatchCounts, withOnlineBookings } from "@/lib/useMatchCounts";
 /** Next matches on the home page, counting online bookings. */
 /** `countIds`: pass the same ids as NextMatchCard so both share one request. */
 export default function UpcomingCards({ matches, countIds }: { matches: Match[]; countIds: string[] }) {
-  const { counts } = useMatchCounts(countIds);
+  const { counts, initials } = useMatchCounts(countIds);
   return (
     <div className="mt-10 grid gap-4 md:grid-cols-3">
       {matches.map((raw) => {
@@ -18,6 +19,7 @@ export default function UpcomingCards({ matches, countIds }: { matches: Match[];
           <MatchCard
             key={m.id}
             match={m}
+            initials={initials[m.id]}
             action={
               isFull(m) ? (
                 <Link href="/jouer" className="btn-ghost px-5 py-2.5">
@@ -25,6 +27,7 @@ export default function UpcomingCards({ matches, countIds }: { matches: Match[];
                 </Link>
               ) : (
                 <Link href="/jouer" className="btn-primary px-5 py-2.5">
+                  <BallIcon className="h-4 w-4" />
                   Réserver<span className="sr-only"> ce match à {m.pitch}</span>
                 </Link>
               )

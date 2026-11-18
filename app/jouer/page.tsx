@@ -3,6 +3,7 @@ import { getNextPublication, getUpcomingMatches } from "@/lib/matches-source";
 import JouerTabs from "@/components/JouerTabs";
 import InfoStrip from "@/components/InfoStrip";
 import MatchBrowser from "./MatchBrowser";
+import JoinBanner from "./JoinBanner";
 import { jouerDescription, pageMetadata } from "@/lib/seo";
 import PageSeo from "@/components/PageSeo";
 import RelatedLinks from "@/components/RelatedLinks";
@@ -31,6 +32,7 @@ export default async function JouerPage() {
         Filtre par jour, format et quartier, choisis ton créneau et réserve en 30 secondes.
       </p>
       <JouerTabs current="/jouer" className="mt-6" />
+      <JoinBanner className="mt-6" />
       <InfoStrip
         className="mt-8"
         items={[

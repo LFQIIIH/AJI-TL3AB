@@ -1,4 +1,5 @@
 import type { Match } from "@/data/matches";
+import { Gauge } from "lucide-react";
 import { Icon } from "@/components/Icons";
 import RelativeDay from "@/components/RelativeDay";
 import { CATEGORY_LABEL, formatDay, formatTime, isAlmostFull, isFull, mapsLink, spotsLeft } from "@/lib/matches";
@@ -6,9 +7,15 @@ import { CATEGORY_LABEL, formatDay, formatTime, isAlmostFull, isFull, mapsLink, 
 type MatchCardProps = {
   match: Match;
   action?: React.ReactNode;
+  /** First letters of the first players booked online (public profiles only). */
+  initials?: string[];
 };
 
-export default function MatchCard({ match, action }: MatchCardProps) {
+/** Level as 1–3 bars; "Tous niveaux" has none. */
+const LEVEL_BARS: Record<string, number> = { "Débutant": 1, "Intermédiaire": 2, "Confirmé": 3 };
+const FACE_COLORS = ["bg-primary", "bg-forest", "bg-[#B8733A]", "bg-[#3BA7C9]"];
+
+export default function MatchCard({ match, action, initials = [] }: MatchCardProps) {
   const full = isFull(match);
   const almostFull = isAlmostFull(match);
   const left = spotsLeft(match);
@@ -46,9 +53,21 @@ export default function MatchCard({ match, action }: MatchCardProps) {
           </a>
         </li>
         <li className="flex items-center gap-2">
-          <Icon name="level" className="h-4 w-4 shrink-0 text-primary" />
-          <span>
-            <span className="text-ink-muted">Niveau :</span> <span className="font-semibold">{match.level}</span>
+          <Gauge className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+          <span className="flex items-center gap-2">
+            <span className="text-ink-muted">Niveau :</span>
+            {LEVEL_BARS[match.level] && (
+              <span className="inline-flex items-end gap-0.5" aria-hidden="true">
+                {[1, 2, 3].map((n) => (
+                  <span
+                    key={n}
+                    className={`w-1.5 rounded-sm ${n <= LEVEL_BARS[match.level] ? "bg-primary" : "bg-line-strong"}`}
+                    style={{ height: `${6 + n * 3}px` }}
+                  />
+                ))}
+              </span>
+            )}
+            <span className="font-semibold">{match.level}</span>
           </span>
           {match.category && match.category !== "mixte" && match.category !== "femmes" && (
             <span className="ml-auto rounded-full bg-forest px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-highlight">
@@ -61,7 +80,7 @@ export default function MatchCard({ match, action }: MatchCardProps) {
       <div className="mt-5">
         <div className="flex items-center justify-between gap-2 text-sm">
           {full ? (
-            <span className="font-bold uppercase tracking-wide text-ink-muted">Complet</span>
+            <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-red-800">Complet</span>
           ) : (
             <span className="flex flex-wrap items-center gap-2">
               <span>
@@ -74,9 +93,23 @@ export default function MatchCard({ match, action }: MatchCardProps) {
               )}
             </span>
           )}
-          <span className="flex shrink-0 items-center gap-1 text-ink-muted">
-            <Icon name="users" className="h-4 w-4" />
-            {match.spotsTaken}/{match.totalSpots}
+          <span className="flex shrink-0 items-center gap-2 text-ink-muted">
+            {initials.length > 0 && (
+              <span className="flex" aria-hidden="true">
+                {initials.map((l, i) => (
+                  <span
+                    key={i}
+                    className={`-ml-1.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-surface text-[10px] font-bold text-white first:ml-0 ${FACE_COLORS[i % FACE_COLORS.length]}`}
+                  >
+                    {l}
+                  </span>
+                ))}
+              </span>
+            )}
+            {!initials.length && <Icon name="users" className="h-4 w-4" />}
+            <span>
+              <span className="font-bold text-ink">{match.spotsTaken}</span>/{match.totalSpots}
+            </span>
           </span>
         </div>
         <div
@@ -87,7 +120,7 @@ export default function MatchCard({ match, action }: MatchCardProps) {
           aria-valuenow={match.spotsTaken}
           aria-label="Places réservées"
         >
-          <div className={`h-full rounded-full ${full ? "bg-ink-muted" : "bg-primary"}`} style={{ width: `${pct}%` }} />
+          <div className={`h-full rounded-full ${full ? "bg-red-600" : pct >= 80 ? "bg-amber-500" : "bg-primary"}`} style={{ width: `${pct}%` }} />
         </div>
       </div>
 
