@@ -10,6 +10,8 @@ import { whatsappLink } from "@/lib/config";
 import { CATEGORY_LABEL, formatDay, formatDayLong, formatTime, isFull, matchStart, spotsLeft } from "@/lib/matches";
 import { rowToMatch } from "@/lib/match-row";
 import NextRelease from "./NextRelease";
+import EmptyState from "@/components/EmptyState";
+import { RefreshCw } from "lucide-react";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { supabaseClient } from "@/lib/supabase/lazy";
 import { publicRpc } from "@/lib/supabase/publicApi";
@@ -345,13 +347,46 @@ export default function MatchBrowser({
     );
   }
 
+  const release = nextPublication && (
+    <div className="mb-6">
+      <NextRelease at={nextPublication} onReleased={onReleased} />
+    </div>
+  );
+
+  // Nothing to book at all: say so, and offer the WhatsApp alert instead of empty filters.
+  if (live.length === 0) {
+    return (
+      <>
+        {release}
+        <EmptyState
+          title="Pas de match pour l'instant"
+          text={
+            nextPublication
+              ? "Les prochains matchs sont publiés à la fin du compte à rebours. Préviens-toi pour ne pas rater les places."
+              : "Les prochains créneaux arrivent bientôt. Laisse-nous ton WhatsApp, on te prévient dès qu'ils sont en ligne."
+          }
+        >
+          <a
+            href={whatsappLink("Salam AJI TL3AB ! Préviens-moi quand de nouveaux matchs sont publiés.")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn bg-[#25D366] text-[#08361c] hover:brightness-95"
+          >
+            <WhatsAppIcon className="h-5 w-5" />
+            Préviens-moi sur WhatsApp
+          </a>
+          <button type="button" className="btn-ghost" onClick={() => window.location.reload()}>
+            <RefreshCw className="h-4 w-4" aria-hidden="true" />
+            Actualiser
+          </button>
+        </EmptyState>
+      </>
+    );
+  }
+
   return (
     <>
-      {nextPublication && (
-        <div className="mb-6">
-          <NextRelease at={nextPublication} onReleased={onReleased} />
-        </div>
-      )}
+      {release}
       <div className="space-y-4">
         <FilterRow label="Jour">
           <Chip on={day === null} onClick={() => setDay(null)}>Tous</Chip>
@@ -425,15 +460,13 @@ export default function MatchBrowser({
           })}
         </div>
       ) : (
-        <div className="card mt-8 p-8 text-center">
-          <p className="headline text-3xl">Walou pour l&apos;instant</p>
-          <p className="mt-2 text-ink-muted">Aucun match avec ces filtres. Essaie un autre jour, format ou quartier.</p>
+        <EmptyState className="mt-8" title="Walou avec ces filtres" text="Aucun match avec ces filtres. Essaie un autre jour, format ou quartier.">
           {filtering && (
-            <button type="button" onClick={resetFilters} className="btn-ghost mt-6">
+            <button type="button" onClick={resetFilters} className="btn-ghost">
               Voir tous les matchs
             </button>
           )}
-        </div>
+        </EmptyState>
       )}
 
       <Modal

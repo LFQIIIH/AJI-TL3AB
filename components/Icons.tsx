@@ -43,3 +43,14 @@ export function Icon({ name, className = "h-5 w-5" }: IconProps & { name: IconNa
     </svg>
   );
 }
+
+/** Football (drawn for AJI TL3AB in the same outline style as the Lucide icons). */
+export function BallIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9.5" />
+      <path d="M12 7.5l3.8 2.8-1.5 4.4H9.7l-1.5-4.4z" />
+      <path d="M12 7.5V2.6M15.8 10.3l4.5-1.6M14.3 14.7l2.8 4M9.7 14.7l-2.8 4M8.2 10.3 3.7 8.7" />
+    </svg>
+  );
+}

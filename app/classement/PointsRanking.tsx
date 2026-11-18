@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import EmptyState from "@/components/EmptyState";
 import { useEffect, useState } from "react";
 import { useRpc } from "@/components/community/useRpc";
 import { currentMonthRange, monthLabel } from "@/lib/community";
@@ -79,7 +80,11 @@ export default function PointsRanking({ initial }: { initial?: PointsRow[] }) {
       ) : rows === null ? (
         <p className="mt-4 text-ink-muted">Classement indisponible pour l&apos;instant.</p>
       ) : (
-        <p className="mt-4 text-ink-muted">Personne n&apos;a encore joué ce mois-ci. Le premier match te met en tête !</p>
+        <EmptyState className="mt-4" title="Classement vide" text="Personne n'a encore joué ce mois-ci. Le premier match te met en tête !">
+          <Link href="/jouer" className="btn-primary">
+            Voir les matchs
+          </Link>
+        </EmptyState>
       )}
 
       <PlayerSearch />

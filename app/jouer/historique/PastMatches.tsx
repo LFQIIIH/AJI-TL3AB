@@ -1,5 +1,6 @@
 "use client";
 
+import EmptyState from "@/components/EmptyState";
 import { useMemo, useState } from "react";
 import type { Match } from "@/data/matches";
 import ResultsGrid from "@/components/community/ResultsGrid";
@@ -35,12 +36,7 @@ export default function PastMatches({ results, players }: { results: Match[]; pl
   );
 
   if (!results.length) {
-    return (
-      <div className="card p-8 text-center">
-        <p className="headline text-3xl">Pas encore de résultats</p>
-        <p className="mt-2 text-ink-muted">Les scores apparaissent ici après chaque match.</p>
-      </div>
-    );
+    return <EmptyState title="Pas encore de résultats" text="Les scores apparaissent ici après chaque match." />;
   }
 
   return (
@@ -98,7 +94,7 @@ export default function PastMatches({ results, players }: { results: Match[]; pl
       {visible.length ? (
         <ResultsGrid results={visible} />
       ) : (
-        <p className="card mt-6 p-8 text-center text-ink-muted">Aucun match pour cette recherche.</p>
+        <EmptyState className="mt-6" title="Walou" text="Aucun match pour cette recherche. Essaie un autre prénom ou enlève un filtre." />
       )}
       {filtered.length > shown && (
         <div className="mt-8 text-center">
