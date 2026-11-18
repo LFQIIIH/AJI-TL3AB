@@ -1,3 +1,6 @@
+import { BallIcon, GoalIcon } from "@/components/Icons";
+import BadgeIcon from "@/components/BadgeIcon";
+import { Award, Flame, Forward, Trophy } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -88,13 +91,13 @@ export default async function PlayerPage({ params }: { params: Promise<{ code: s
     tickets_this_month: 0,
   };
   const badges = computeBadges(stats).filter((b) => b.earned);
-  const tiles: [string, number][] = [
-    ["Matchs", p.matches],
-    ["Victoires", p.wins],
-    ["Buts", p.goals],
-    ["Passes", p.assists],
-    ["Élu du match", p.awards],
-    ["Semaines d'affilée", p.week_streak],
+  const tiles: [string, number, React.ComponentType<{ className?: string }>][] = [
+    ["Matchs", p.matches, BallIcon],
+    ["Victoires", p.wins, Trophy],
+    ["Buts", p.goals, GoalIcon],
+    ["Passes", p.assists, Forward],
+    ["Élu du match", p.awards, Award],
+    ["Semaines d'affilée", p.week_streak, Flame],
   ];
 
   return (
@@ -113,8 +116,9 @@ export default async function PlayerPage({ params }: { params: Promise<{ code: s
       </section>
 
       <dl className="mt-6 grid grid-cols-3 gap-3">
-        {tiles.map(([label, value]) => (
-          <div key={label} className="card p-4 text-center">
+        {tiles.map(([label, value, TileIcon]) => (
+          <div key={label} className="card flex flex-col items-center p-4 text-center">
+            <TileIcon className="mb-1 h-5 w-5 text-primary" />
             <dd className="headline text-4xl">{value}</dd>
             <dt className="mt-1 text-xs font-semibold uppercase tracking-wide text-ink-muted">{label}</dt>
           </div>
@@ -128,8 +132,8 @@ export default async function PlayerPage({ params }: { params: Promise<{ code: s
           </h2>
           <ul className="mt-4 flex flex-wrap gap-2">
             {badges.map((b) => (
-              <li key={b.id} className="rounded-full bg-canvas-deep px-3 py-1.5 text-sm font-semibold">
-                <span aria-hidden="true">{b.icon}</span> {b.label}
+              <li key={b.id} className="inline-flex items-center gap-1.5 rounded-full bg-canvas-deep px-3 py-1.5 text-sm font-semibold">
+                <BadgeIcon id={b.id} className="h-4 w-4 text-primary" /> {b.label}
               </li>
             ))}
           </ul>

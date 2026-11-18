@@ -33,10 +33,10 @@ export function levelFor(points: number): Level {
 
 /** Monthly tier = points this month (resets on the 1st). */
 export const TIERS = [
-  { id: "diamant", label: "Diamant", min: 200, icon: "💎" },
-  { id: "or", label: "Or", min: 120, icon: "🥇" },
-  { id: "argent", label: "Argent", min: 60, icon: "🥈" },
-  { id: "bronze", label: "Bronze", min: 20, icon: "🥉" },
+  { id: "diamant", label: "Diamant", min: 200, color: "#3BA7C9" },
+  { id: "or", label: "Or", min: 120, color: "#D9A520" },
+  { id: "argent", label: "Argent", min: 60, color: "#8C99A6" },
+  { id: "bronze", label: "Bronze", min: 20, color: "#B8733A" },
 ] as const;
 
 export type Tier = (typeof TIERS)[number];

@@ -1,3 +1,4 @@
+import TierCrest from "@/components/TierCrest";
 import { levelFor, nextTier, tierFor } from "@/lib/points";
 
 /** "Niv. 3 · Régulier" with a progress bar to the next level (all-time points). */
@@ -25,13 +26,13 @@ export function LevelBar({ points, className = "" }: { points: number; className
   );
 }
 
-/** Monthly tier pill ("🥈 Argent") or the points still needed for Bronze. */
+/** Monthly tier pill (crest + "Argent") or the points still needed for Bronze. */
 export function TierPill({ monthPoints }: { monthPoints: number }) {
   const t = tierFor(monthPoints);
   if (t)
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-highlight px-3 py-1 text-sm font-bold text-highlight-ink">
-        <span aria-hidden="true">{t.icon}</span> {t.label}
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-highlight py-1 pl-1.5 pr-3 text-sm font-bold text-highlight-ink">
+        <TierCrest tier={t} className="h-6 w-5" /> {t.label}
       </span>
     );
   const n = nextTier(monthPoints);

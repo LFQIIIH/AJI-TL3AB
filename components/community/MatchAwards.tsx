@@ -1,5 +1,6 @@
 "use client";
 
+import { Trophy } from "lucide-react";
 import { useState } from "react";
 import { AWARD_LABELS, awardValueLabel, type Award, type AwardCategory } from "@/lib/community";
 
@@ -13,7 +14,7 @@ export default function MatchAwards({ awards }: { awards: Award[] }) {
     <ul className="mt-3 space-y-2">
       {sorted.map((a) => (
         <li key={a.category} className="flex items-center gap-3 rounded-xl bg-canvas-deep px-3 py-2 text-sm">
-          <span aria-hidden="true">🏆</span>
+          <Trophy className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
           <span className="min-w-0 flex-1">
             <span className="block text-xs font-semibold uppercase tracking-wide text-ink-muted">{AWARD_LABELS[a.category]}</span>
             <span className="font-semibold">{a.name}</span> <span className="text-ink-muted">· {awardValueLabel(a)}</span>

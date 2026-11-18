@@ -1,5 +1,8 @@
 "use client";
 
+import { BallIcon, GoalIcon } from "@/components/Icons";
+import BadgeIcon from "@/components/BadgeIcon";
+import { Award, Flame, Ticket } from "lucide-react";
 import { FULL_REFUND_HOURS } from "@/lib/rules";
 import { WALLET_CHANGED_EVENT } from "./WalletCard";
 import { formatMorocco } from "@/lib/morocco-time";
@@ -220,16 +223,17 @@ function ProgressCard({ progress, userId, onChange }: { progress: Progress; user
 
 function StatsRow({ stats }: { stats: MyStats }) {
   const items = [
-    { label: "Matchs", value: stats.matches },
-    { label: "Buts", value: stats.goals },
-    { label: "Prix", value: stats.awards },
-    { label: "Semaines", value: stats.week_streak },
-    { label: "Tickets", value: stats.tickets_this_month },
+    { label: "Matchs", value: stats.matches, icon: BallIcon },
+    { label: "Buts", value: stats.goals, icon: GoalIcon },
+    { label: "Prix", value: stats.awards, icon: Award },
+    { label: "Semaines", value: stats.week_streak, icon: Flame },
+    { label: "Tickets", value: stats.tickets_this_month, icon: Ticket },
   ];
   return (
     <div className="grid grid-cols-5 gap-px overflow-hidden rounded-2xl bg-forest-light">
       {items.map((i) => (
-        <div key={i.label} className="bg-forest px-1 py-4 text-center text-white sm:px-3">
+        <div key={i.label} className="flex flex-col items-center bg-forest px-1 py-4 text-center text-white sm:px-3">
+          <i.icon className="mb-1 h-4 w-4 text-white/60" />
           <p className="headline text-3xl text-highlight sm:text-4xl">{i.value}</p>
           <p className="mt-1 text-[10px] font-semibold uppercase tracking-wide text-white/70 sm:text-xs">{i.label}</p>
         </div>
@@ -499,7 +503,9 @@ function Badges({ stats }: { stats: MyStats }) {
             key={b.id}
             className={`rounded-xl border p-3 text-center ${b.earned ? "border-primary bg-highlight/30" : "border-line bg-canvas opacity-60 grayscale"}`}
           >
-            <span className="text-3xl" aria-hidden="true">{b.icon}</span>
+            <span className={`mx-auto flex h-11 w-11 items-center justify-center rounded-full ${b.earned ? "bg-primary text-primary-ink" : "bg-line text-ink-muted"}`}>
+              <BadgeIcon id={b.id} className="h-6 w-6" />
+            </span>
             <p className="mt-1 text-sm font-bold">{b.label}</p>
             <p className="text-xs text-ink-muted">{b.earned ? "Débloqué ✓" : b.hint}</p>
           </li>

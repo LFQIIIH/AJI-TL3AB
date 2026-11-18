@@ -1,5 +1,6 @@
 "use client";
 
+import TierCrest from "@/components/TierCrest";
 import Link from "next/link";
 import EmptyState from "@/components/EmptyState";
 import { useEffect, useState } from "react";
@@ -55,10 +56,7 @@ export default function PointsRanking({ initial }: { initial?: PointsRow[] }) {
                   </span>
                 </span>
                 {tier && (
-                  <span className="shrink-0 text-lg" title={tier.label}>
-                    <span aria-hidden="true">{tier.icon}</span>
-                    <span className="sr-only">{tier.label}</span>
-                  </span>
+                  <TierCrest tier={tier} className="h-7 w-6 shrink-0" />
                 )}
                 <span className="headline shrink-0 text-2xl">{r.points}</span>
               </>
@@ -106,7 +104,7 @@ export default function PointsRanking({ initial }: { initial?: PointsRow[] }) {
         <p className="mt-1 flex flex-wrap gap-3 text-sm text-ink-muted">
           {[...TIERS].reverse().map((t) => (
             <span key={t.id}>
-              <span aria-hidden="true">{t.icon}</span> {t.label} : {t.min} pts
+              <TierCrest tier={t} className="mr-1 inline h-5 w-4 align-[-4px]" /> {t.label} : {t.min} pts
             </span>
           ))}
         </p>

@@ -1,5 +1,6 @@
 "use client";
 
+import { CalendarClock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { formatMorocco } from "@/lib/morocco-time";
 
@@ -28,15 +29,22 @@ export default function NextRelease({ at, onReleased }: { at: string; onReleased
   const h = Math.floor((left % 86400000) / 3600000);
   const m = Math.floor((left % 3600000) / 60000);
   const s = Math.floor((left % 60000) / 1000);
-  const parts = d > 0 ? [`${pad(d)}j`, `${pad(h)}h`, `${pad(m)}m`] : [`${pad(h)}h`, `${pad(m)}m`, `${pad(s)}s`];
+  const parts: [string, string][] =
+    d > 0
+      ? [[pad(d), d > 1 ? "jours" : "jour"], [pad(h), "heures"], [pad(m), "min"]]
+      : [[pad(h), "heures"], [pad(m), "min"], [pad(s), "sec"]];
 
   return (
     <section aria-label="Prochaine publication de matchs" className="rounded-2xl bg-forest px-5 py-5 text-center text-white">
-      <p className="text-sm font-semibold">Nouveaux matchs publiés dans</p>
-      <p className="mt-2 flex justify-center gap-2" aria-live="off">
-        {(now === null ? ["--", "--", "--"] : parts).map((p, i) => (
-          <span key={i} className="headline rounded-lg bg-highlight px-3 py-1.5 text-3xl text-highlight-ink">
-            {p}
+      <p className="flex items-center justify-center gap-2 text-sm font-semibold">
+        <CalendarClock className="h-4 w-4 text-highlight" aria-hidden="true" />
+        Nouveaux matchs publiés dans
+      </p>
+      <p className="mt-3 flex justify-center gap-2" aria-live="off">
+        {parts.map(([value, unit], i) => (
+          <span key={i} className="flex min-w-[4.5rem] flex-col items-center rounded-xl bg-highlight px-3 pb-1.5 pt-2 text-highlight-ink">
+            <span className="headline text-4xl tabular-nums leading-none">{now === null ? "--" : value}</span>
+            <span className="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] opacity-75">{unit}</span>
           </span>
         ))}
       </p>

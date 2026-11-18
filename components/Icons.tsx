@@ -54,3 +54,13 @@ export function BallIcon({ className = "h-5 w-5" }: IconProps) {
     </svg>
   );
 }
+
+/** Goal net (in-house, Lucide outline style). */
+export function GoalIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M2 20V6h20v14" />
+      <path d="M2 6l3 4h14l3-4M5 10v10M19 10v10M12 10v10M5 15h14" />
+    </svg>
+  );
+}
