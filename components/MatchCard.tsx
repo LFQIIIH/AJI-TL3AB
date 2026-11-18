@@ -22,7 +22,7 @@ export default function MatchCard({ match, action, initials = [] }: MatchCardPro
   const pct = Math.min(100, Math.round((match.spotsTaken / match.totalSpots) * 100));
 
   return (
-    <article className={`card flex flex-col p-5 ${full ? "opacity-70" : ""}`}>
+    <article className="card flex flex-col p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-ink-muted">

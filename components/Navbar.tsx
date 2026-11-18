@@ -9,12 +9,12 @@ import { useSessionUser } from "@/lib/supabase/useSession";
 import { firstName } from "@/lib/profile";
 
 const LINKS = [
-  { href: "/jouer", label: "Jouer" },
-  { href: "/classement", label: "Ranking" },
+  { href: "/jouer", label: "Jouer", inTabBar: true },
+  { href: "/classement", label: "Classement", inTabBar: true },
   { href: "/prepa-physique", label: "Training" },
   { href: "/switch-off", label: "Switch Off" },
   { href: "/kids", label: "Enfants" },
-  { href: "/merch", label: "L7wayej" },
+  { href: "/merch", label: "Maillots" },
 ];
 
 export default function Navbar() {
@@ -46,7 +46,7 @@ export default function Navbar() {
             <li key={l.href}>
               <Link
                 href={l.href}
-                className={`whitespace-nowrap text-sm font-semibold uppercase tracking-wide transition hover:text-highlight ${
+                className={`flex min-h-11 items-center whitespace-nowrap text-sm font-semibold uppercase tracking-wide transition hover:text-highlight ${
                   pathname === l.href ? "text-highlight" : "text-white"
                 }`}
               >
@@ -58,7 +58,7 @@ export default function Navbar() {
             <li>
               <Link
                 href={account.href}
-                className={`flex items-center gap-2 whitespace-nowrap text-sm font-semibold uppercase tracking-wide transition hover:text-highlight ${
+                className={`flex min-h-11 items-center gap-2 whitespace-nowrap text-sm font-semibold uppercase tracking-wide transition hover:text-highlight ${
                   pathname === account.href ? "text-highlight" : "text-white"
                 }`}
               >
@@ -90,7 +90,8 @@ export default function Navbar() {
       {open && (
         <div className="border-t border-forest-light lg:hidden">
           <ul className="container-page flex flex-col py-4">
-            {LINKS.map((l) => (
+            {/* Jouer, Classement and the account are already in the bottom bar. */}
+            {LINKS.filter((l) => !("inTabBar" in l)).map((l) => (
               <li key={l.href}>
                 <Link
                   href={l.href}
@@ -100,17 +101,11 @@ export default function Navbar() {
                 </Link>
               </li>
             ))}
-            {account && (
-              <li className="mt-2 border-t border-forest-light pt-4">
-                <Link
-                  href={account.href}
-                  className={`flex items-center gap-3 py-2 text-lg font-semibold ${pathname === account.href ? "text-highlight" : ""}`}
-                >
-                  <UserIcon />
-                  {account.label}
-                </Link>
-              </li>
-            )}
+            <li className="mt-2 border-t border-forest-light pt-4">
+              <Link href="/regles" className={`flex min-h-11 items-center py-2 text-lg font-semibold ${pathname === "/regles" ? "text-highlight" : ""}`}>
+                Règlement
+              </Link>
+            </li>
           </ul>
         </div>
       )}

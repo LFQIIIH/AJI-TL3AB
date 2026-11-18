@@ -16,8 +16,8 @@ const config: Config = {
           light: "#1D4A3A", // borders / hovers on forest
         },
         primary: {
-          DEFAULT: "#1E8E5A", // primary buttons, accent text on light bg
-          hover: "#187A4C",
+          DEFAULT: "#187A4C", // primary buttons, accent text on light bg (≥4.5:1 on canvas, canvas-deep and white)
+          hover: "#12653E",
           ink: "#FFFFFF", // text on primary
         },
         highlight: {

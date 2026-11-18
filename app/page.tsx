@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import InfoStrip from "@/components/InfoStrip";
+import EmptyState from "@/components/EmptyState";
+import MatchAlertButton from "@/components/MatchAlertButton";
 import DrawInfo from "@/components/community/DrawInfo";
 import ResultsGrid from "@/components/community/ResultsGrid";
 import TeamOfMonth from "@/components/community/TeamOfMonth";
@@ -137,10 +139,13 @@ export default async function HomePage() {
           {upcoming.length > 0 ? (
             <UpcomingCards matches={upcoming} countIds={allUpcoming.slice(0, NEXT_MATCH_CANDIDATES).map((m) => m.id)} />
           ) : (
-            <div className="card mt-10 p-8 text-center">
-              <p className="headline text-3xl">Nouveaux matchs très bientôt</p>
-              <p className="mt-2 text-ink-muted">Suis-nous sur Instagram ou écris-nous sur WhatsApp pour être prévenu.</p>
-            </div>
+            <EmptyState
+              className="mt-10"
+              title="Nouveaux matchs très bientôt"
+              text="Les prochains créneaux arrivent. Laisse-nous ton WhatsApp, on te prévient dès qu'ils sont en ligne."
+            >
+              <MatchAlertButton />
+            </EmptyState>
           )}
         </div>
       </section>
@@ -164,7 +169,7 @@ export default async function HomePage() {
               <h2 className="headline mt-3 text-5xl sm:text-7xl">Joue, vote, gagne</h2>
             </div>
             <Link href="/classement" className="inline-flex min-h-11 items-center text-sm font-bold uppercase tracking-wide text-primary hover:underline">
-              Voir le ranking →
+              Voir le classement →
             </Link>
           </div>
           <TeamOfMonth initial={team} />

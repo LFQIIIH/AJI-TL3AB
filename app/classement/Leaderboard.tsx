@@ -34,7 +34,7 @@ export default function Leaderboard({ initialMonth }: { initialMonth?: Leaderboa
   const rows = useRpc<LeaderboardRow>("leaderboard", { p_from: range.from, p_to: range.to, p_limit: 10 }, true, initialMonth);
 
   if (!isSupabaseConfigured) {
-    return <p className="card p-6 text-ink-muted">Le ranking arrive bientôt.</p>;
+    return <p className="card p-6 text-ink-muted">Le classement arrive bientôt.</p>;
   }
 
   return (

@@ -11,6 +11,7 @@ import { CATEGORY_LABEL, formatDay, formatDayLong, formatTime, isFull, matchStar
 import { rowToMatch } from "@/lib/match-row";
 import NextRelease from "./NextRelease";
 import EmptyState from "@/components/EmptyState";
+import MatchAlertButton from "@/components/MatchAlertButton";
 import { RefreshCw } from "lucide-react";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { supabaseClient } from "@/lib/supabase/lazy";
@@ -367,15 +368,7 @@ export default function MatchBrowser({
               : "Les prochains créneaux arrivent bientôt. Laisse-nous ton WhatsApp, on te prévient dès qu'ils sont en ligne."
           }
         >
-          <a
-            href={whatsappLink("Salam AJI TL3AB ! Préviens-moi quand de nouveaux matchs sont publiés.")}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn bg-[#25D366] text-[#08361c] hover:brightness-95"
-          >
-            <WhatsAppIcon className="h-5 w-5" />
-            Préviens-moi sur WhatsApp
-          </a>
+          <MatchAlertButton />
           <button type="button" className="btn-ghost" onClick={() => window.location.reload()}>
             <RefreshCw className="h-4 w-4" aria-hidden="true" />
             Actualiser
@@ -505,11 +498,11 @@ export default function MatchBrowser({
                     {user ? (
                       <>
                         <Link href="/compte" className="font-bold text-primary hover:underline">Complète ton profil</Link> pour réserver en
-                        un clic et faire compter ce match pour le ranking et le tirage au sort.
+                        un clic et faire compter ce match pour le classement et le tirage au sort.
                       </>
                     ) : (
                       <>
-                        Sans compte, ce match ne compte pas pour le ranking ni le tirage au sort du mois.{" "}
+                        Sans compte, ce match ne compte pas pour le classement ni le tirage au sort du mois.{" "}
                         <Link href="/connexion" className="font-bold text-primary hover:underline">Se connecter</Link>
                       </>
                     )}
@@ -736,7 +729,7 @@ function PlusOne({ checked, onChange, disabled }: { checked: boolean; onChange: 
       <span>
         <span className="font-semibold">+1 pote</span>
         <span className="block text-xs text-ink-muted">
-          {disabled ? "Plus assez de places pour deux." : "Même prix pour lui, réservé avec toi. Il ne compte pas pour le ranking."}
+          {disabled ? "Plus assez de places pour deux." : "Même prix pour lui, réservé avec toi. Il ne compte pas pour le classement."}
         </span>
       </span>
     </label>

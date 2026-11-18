@@ -119,7 +119,7 @@ export default async function SwitchOffPage() {
                   <span className="flex h-11 w-11 items-center justify-center rounded-full bg-highlight text-highlight-ink">
                     <Icon name={p.icon} className="h-6 w-6" />
                   </span>
-                  <span className="headline text-4xl text-line-strong">0{i + 1}</span>
+                  <span className="headline text-4xl text-ink-muted" aria-hidden="true">0{i + 1}</span>
                 </div>
                 <h3 className="headline mt-4 text-3xl">{p.title}</h3>
                 <p className="mt-2 text-sm text-ink-muted">{p.text}</p>
