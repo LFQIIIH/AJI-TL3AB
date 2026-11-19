@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppFab from "@/components/WhatsAppFab";
 import MobileTabBar from "@/components/MobileTabBar";
+import ErrorReporter from "@/components/ErrorReporter";
 import { IS_PRODUCTION_SITE, SITE_URL } from "@/lib/config";
 import { fullTitle, PAGES } from "@/lib/seo";
 import "./globals.css";
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="flex-1">{children}</main>
         <Footer />
         <MobileTabBar />
+        <ErrorReporter />
         <WhatsAppFab />
       </body>
     </html>

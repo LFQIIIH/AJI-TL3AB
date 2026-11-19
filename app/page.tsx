@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import InfoStrip from "@/components/InfoStrip";
 import EmptyState from "@/components/EmptyState";
+import PhotoStrip from "@/components/home/PhotoStrip";
+import { getSitePhotos } from "@/lib/site-photos";
 import MatchAlertButton from "@/components/MatchAlertButton";
 import DrawInfo from "@/components/community/DrawInfo";
 import ResultsGrid from "@/components/community/ResultsGrid";
@@ -44,12 +46,13 @@ const STEPS = [
 
 
 export default async function HomePage() {
-  const [allUpcoming, results, team, drawStatus, winners] = await Promise.all([
+  const [allUpcoming, results, team, drawStatus, winners, photos] = await Promise.all([
     getUpcomingMatches(),
     getRecentResults(4),
     getTeamOfMonth(),
     getDrawStatus(),
     getDrawWinners(1),
+    getSitePhotos(8),
   ]);
   const upcoming = allUpcoming.slice(0, 3);
   const openMatches = allUpcoming.filter((m) => !isFull(m));
@@ -110,27 +113,29 @@ export default async function HomePage() {
       )}
 
       {/* How it works */}
-      <section id="comment-ca-marche" className="container-page scroll-mt-20 py-16 sm:py-24">
+      <section id="comment-ca-marche" className="container-page scroll-mt-20 py-12 sm:py-24">
         <p className="eyebrow">Comment ça marche</p>
-        <h2 className="headline mt-3 text-5xl sm:text-7xl">3 étapes, c&apos;est tout</h2>
-        <ol className="mt-10 grid gap-4 md:grid-cols-3">
+        <h2 className="headline mt-3 text-4xl sm:text-7xl">3 étapes, c&apos;est tout</h2>
+        <ol className="mt-8 grid gap-3 sm:mt-10 sm:gap-4 md:grid-cols-3">
           {STEPS.map((s) => (
-            <li key={s.n} className="card p-6">
-              <span className="headline text-6xl text-primary">{s.n}</span>
-              <h3 className="headline mt-4 text-3xl">{s.title}</h3>
-              <p className="mt-2 text-ink-muted">{s.text}</p>
+            <li key={s.n} className="card grid grid-cols-[auto_1fr] gap-x-4 p-5 sm:block sm:p-6">
+              <span className="headline row-span-2 text-4xl text-primary sm:text-6xl">{s.n}</span>
+              <h3 className="headline text-2xl sm:mt-4 sm:text-3xl">{s.title}</h3>
+              <p className="mt-1 text-sm text-ink-muted sm:mt-2 sm:text-base">{s.text}</p>
             </li>
           ))}
         </ol>
       </section>
 
+      <PhotoStrip photos={photos} />
+
       {/* Upcoming matches */}
       <section className="border-y border-line bg-canvas-deep">
-        <div className="container-page py-16 sm:py-24">
+        <div className="container-page py-12 sm:py-24">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <p className="eyebrow">Prochains matchs</p>
-              <h2 className="headline mt-3 text-5xl sm:text-7xl">Ça joue bientôt</h2>
+              <h2 className="headline mt-3 text-4xl sm:text-7xl">Ça joue bientôt</h2>
             </div>
             <Link href="/jouer" className="inline-flex min-h-11 items-center text-sm font-bold uppercase tracking-wide text-primary hover:underline">
               Voir tous les matchs →
@@ -152,21 +157,24 @@ export default async function HomePage() {
 
       {/* Results history */}
       {results.length > 0 && (
-        <section id="historique" className="container-page scroll-mt-20 pt-16 sm:pt-24">
+        <section id="historique" className="container-page scroll-mt-20 pt-12 sm:pt-24">
           <p className="eyebrow">Historique</p>
-          <h2 className="headline mt-3 text-5xl sm:text-7xl">Derniers résultats</h2>
+          <h2 className="headline mt-3 text-4xl sm:text-7xl">Derniers résultats</h2>
           <p className="mt-4 max-w-xl text-ink-muted">Chkoun rbe7 ? Les scores des derniers matchs et les joueurs élus par leurs coéquipiers.</p>
-          <ResultsGrid results={results} />
+          <ResultsGrid results={results} phoneLimit={2} />
+          <Link href="/jouer/historique" className="mt-4 inline-flex min-h-11 items-center text-sm font-bold uppercase tracking-wide text-primary hover:underline sm:hidden">
+            Tous les résultats →
+          </Link>
         </section>
       )}
 
       {/* Community: team of the month + monthly draw */}
       {isSupabaseConfigured && (
-        <section className="container-page space-y-4 pt-16 sm:pt-24">
+        <section className="container-page space-y-4 pt-12 sm:pt-24">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <p className="eyebrow">Communauté</p>
-              <h2 className="headline mt-3 text-5xl sm:text-7xl">Joue, vote, gagne</h2>
+              <h2 className="headline mt-3 text-4xl sm:text-7xl">Joue, vote, gagne</h2>
             </div>
             <Link href="/classement" className="inline-flex min-h-11 items-center text-sm font-bold uppercase tracking-wide text-primary hover:underline">
               Voir le classement →
@@ -178,28 +186,28 @@ export default async function HomePage() {
       )}
 
       {/* Kids + Merch teasers */}
-      <section className="container-page grid gap-4 py-16 sm:py-24 md:grid-cols-2">
-        <Link href="/kids" className="card group relative overflow-hidden p-8 transition hover:border-primary sm:p-10">
+      <section className="container-page grid gap-4 py-12 sm:py-24 md:grid-cols-2">
+        <Link href="/kids" className="card group relative overflow-hidden p-6 transition hover:border-primary sm:p-10">
           <p className="eyebrow">Enfants · La fierté de demain</p>
-          <h2 className="headline mt-3 text-5xl sm:text-6xl">
+          <h2 className="headline mt-3 text-4xl sm:text-6xl">
             Sghar f l&apos;3mer, <span className="text-primary">kbar</span> f terrain
           </h2>
           <p className="mt-4 max-w-sm text-ink-muted">
             Matchs et activités encadrés pour les 5–14 ans. Vous réservez, vous les amenez, on s&apos;occupe du reste.
           </p>
-          <span className="mt-8 inline-block text-sm font-bold uppercase tracking-wide text-primary group-hover:underline">
+          <span className="mt-5 inline-block text-sm font-bold uppercase tracking-wide text-primary group-hover:underline sm:mt-8">
             Découvrir les activités →
           </span>
         </Link>
-        <Link href="/merch" className="group relative overflow-hidden rounded-2xl bg-forest p-8 text-white transition hover:bg-forest-light sm:p-10">
+        <Link href="/merch" className="group relative overflow-hidden rounded-2xl bg-forest p-6 text-white transition hover:bg-forest-light sm:p-10">
           <p className="eyebrow text-highlight">L7wayej</p>
-          <h2 className="headline mt-3 text-5xl sm:text-6xl">
+          <h2 className="headline mt-3 text-4xl sm:text-6xl">
             Porte les <span className="text-highlight">couleurs</span>
           </h2>
           <p className="mt-4 max-w-sm opacity-80">
             Maillots des grands clubs en stock, de S à XL. Commande sur WhatsApp, paiement à la livraison.
           </p>
-          <span className="mt-8 inline-block text-sm font-bold uppercase tracking-wide text-highlight group-hover:underline">
+          <span className="mt-5 inline-block text-sm font-bold uppercase tracking-wide text-highlight group-hover:underline sm:mt-8">
             Voir la boutique →
           </span>
         </Link>
@@ -207,10 +215,10 @@ export default async function HomePage() {
 
       {/* FAQ */}
       <section id="faq" className="scroll-mt-20 border-t border-line">
-        <div className="container-page grid gap-10 py-16 sm:py-24 lg:grid-cols-[1fr_2fr]">
+        <div className="container-page grid gap-8 py-12 sm:gap-10 sm:py-24 lg:grid-cols-[1fr_2fr]">
           <div>
             <p className="eyebrow">FAQ</p>
-            <h2 className="headline mt-3 text-5xl sm:text-7xl">Des questions ?</h2>
+            <h2 className="headline mt-3 text-4xl sm:text-7xl">Des questions ?</h2>
             <p className="mt-4 text-ink-muted">Ma l9itich jawab ? Écris-nous directement.</p>
             <a
               href={whatsappLink("Salam, 3ndi wa7d so2al :")}

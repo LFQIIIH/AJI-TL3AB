@@ -73,3 +73,8 @@ Sur la fiche d'un match (admin ou capitaine du match), « Tirage des équipes »
 2. choisis 2, 3 ou 4 équipes, puis « Tirer au sort » : équipes de même taille (à un joueur près), gardiens répartis en premier, noms d'équipes au hasard (modifiables) et numéros de maillot de 1 à 99, tous différents ;
 3. « Enregistrer le tirage » le garde sur le match. Avec 2 équipes, il remplit aussi le Direct : noms d'équipes et équipe de chaque joueur inscrit, avec son numéro ;
 4. « Envoyer sur WhatsApp » ou « Copier » pour partager la compo dans le groupe.
+
+## Photos du site et erreurs
+
+- **Photos** (/admin/photos) : ajoute de vraies photos de vos matchs. Les 8 plus récentes s'affichent sur l'accueil (« Ça se passe comme ça ») ; sans photo, la section est cachée. Elles sont réduites automatiquement avant l'envoi. Demande l'accord des personnes qu'on reconnaît.
+- **Erreurs** (/admin/erreurs) : les erreurs vues par les visiteurs (navigateur) et par le serveur (réservations, enregistrement du profil), regroupées par message, gardées 90 jours. Si une erreur revient, envoie une capture de la page pour la faire corriger, puis « Tout effacer » une fois réglée.

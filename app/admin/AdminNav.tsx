@@ -7,6 +7,8 @@ const LINKS = [
   { href: "/admin/joueurs", label: "Joueurs", adminOnly: true },
   { href: "/admin/terrains", label: "Terrains", adminOnly: true },
   { href: "/admin/equipe", label: "Équipe", adminOnly: true },
+  { href: "/admin/photos", label: "Photos", adminOnly: true },
+  { href: "/admin/erreurs", label: "Erreurs", adminOnly: true },
 ];
 
 /** Header of every admin page: title, tabs, flash message. */

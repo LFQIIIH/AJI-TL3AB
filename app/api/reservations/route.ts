@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { reportServerError } from "@/lib/report-error";
 import { SHOE_SIZES } from "@/lib/shoes";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
@@ -68,6 +69,7 @@ export async function POST(request: NextRequest) {
     ] as const) {
       if (m.includes(code)) return fail(status, code === "match_full" ? "full" : code === "match_unavailable" ? "match_started" : code);
     }
+    await reportServerError(`book_match ${error.code}: ${error.message}`, "/jouer (réserver)");
     return fail(400, "booking_failed");
   }
   return NextResponse.json({ ok: true, paid: paid as number }, { headers: noStore });
@@ -80,6 +82,9 @@ export async function DELETE(request: NextRequest) {
 
   const matchId = request.nextUrl.searchParams.get("matchId") ?? "";
   const { data, error } = await auth.supabase.rpc("cancel_booking", { p_match_id: matchId });
-  if (error) return fail(error.message.includes("no_booking") ? 404 : 400, "cancel_failed");
+  if (error) {
+    if (!error.message.includes("no_booking")) await reportServerError(`cancel_booking ${error.code}: ${error.message}`, "/compte (annuler)");
+    return fail(error.message.includes("no_booking") ? 404 : 400, "cancel_failed");
+  }
   return NextResponse.json({ ok: true, promoted: data as number }, { headers: noStore });
 }

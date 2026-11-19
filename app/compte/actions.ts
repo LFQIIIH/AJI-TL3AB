@@ -1,5 +1,6 @@
 "use server";
 
+import { reportServerError } from "@/lib/report-error";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import {
@@ -65,6 +66,7 @@ export async function saveProfile(input: ProfileInput): Promise<SaveProfileResul
   if (error) {
     // Shows up in the Vercel logs (no personal data: code and message only).
     console.error("saveProfile failed", error.code, error.message);
+    await reportServerError(`saveProfile ${error.code}: ${error.message}`, "/compte (enregistrer le profil)");
     if (error.message.includes("check constraint")) return { error: "Une info n'est pas acceptée. Vérifie la date, le niveau et le téléphone." };
     return { error: `L'enregistrement a échoué (${error.code || "erreur serveur"}). Réessaie dans un instant.` };
   }
