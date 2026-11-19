@@ -3,11 +3,12 @@ import DrawInfo from "@/components/community/DrawInfo";
 import TeamOfMonth from "@/components/community/TeamOfMonth";
 import Leaderboard from "./Leaderboard";
 import PointsRanking from "./PointsRanking";
+import { previousMonth } from "@/lib/community";
 import { pageMetadata } from "@/lib/seo";
 import PageSeo from "@/components/PageSeo";
 import JouerTabs from "@/components/JouerTabs";
 import RelatedLinks from "@/components/RelatedLinks";
-import { getDrawStatus, getDrawWinners, getMonthLeaderboard, getPointsLeaderboard, getTeamOfMonth } from "@/lib/community-source";
+import { getDrawStatus, getDrawWinners, getMonthLeaderboard, getRankingTable, getTeamOfMonth } from "@/lib/community-source";
 
 export const metadata: Metadata = pageMetadata("classement");
 
@@ -16,8 +17,9 @@ export const metadata: Metadata = pageMetadata("classement");
 export const revalidate = 300;
 
 export default async function ClassementPage() {
-  const [points, leaderboard, team, drawStatus, winners] = await Promise.all([
-    getPointsLeaderboard(),
+  const [points, lastMonth, leaderboard, team, drawStatus, winners] = await Promise.all([
+    getRankingTable(),
+    getRankingTable(previousMonth(), 1),
     getMonthLeaderboard(),
     getTeamOfMonth(),
     getDrawStatus(),
@@ -38,7 +40,7 @@ export default async function ClassementPage() {
       <JouerTabs current="/classement" className="mt-6" />
 
       <div className="mt-10">
-        <PointsRanking initial={points} />
+        <PointsRanking initial={points} initialMvp={lastMonth?.[0] ?? null} />
       </div>
 
       <div className="mt-12">

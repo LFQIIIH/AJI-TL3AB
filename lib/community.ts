@@ -52,6 +52,12 @@ function todayParts(now = new Date()) {
 
 const iso = (y: number, m: number, d: number) => `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 
+/** First day of last month ("2026-10-01"), for last month's MVP. */
+export function previousMonth(now = new Date()): string {
+  const { y, m } = todayParts(now);
+  return m === 1 ? iso(y - 1, 12, 1) : iso(y, m - 1, 1);
+}
+
 export function currentMonthRange(now = new Date()) {
   const { y, m } = todayParts(now);
   const last = new Date(Date.UTC(y, m, 0)).getUTCDate();

@@ -54,3 +54,6 @@ export const playerPath = (code: string) => `/joueur/${code}`;
 
 /** French ordinal: 1er, 2ᵉ, 3ᵉ… */
 export const ordinal = (n: number) => (n === 1 ? "1er" : `${n}ᵉ`);
+
+/** Levels for the guide: level, name and points needed. */
+export const LEVEL_TABLE = LEVEL_STARTS.map((min, i) => ({ level: i + 1, name: LEVEL_NAMES[i], min }));

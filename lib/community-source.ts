@@ -1,4 +1,4 @@
-import type { PointsRow } from "@/app/classement/PointsRanking";
+import type { RankingRow } from "@/app/classement/PointsRanking";
 import type { LeaderboardRow } from "@/app/classement/Leaderboard";
 import type { DrawStatus, DrawWinner } from "@/components/community/DrawInfo";
 import type { TeamOfMonthRow } from "@/components/community/TeamOfMonth";
@@ -41,6 +41,6 @@ export function getDrawWinners(limit: number) {
   return safe(() => publicSelect<DrawWinner>(`draws?select=month,winner_name,entrants&order=month.desc&limit=${limit}`, init()));
 }
 
-export function getPointsLeaderboard() {
-  return safe(() => publicRpc<PointsRow>("points_leaderboard", { p_month: currentMonthRange().month, p_limit: 20 }, init()));
+export function getRankingTable(month = currentMonthRange().month, limit = 50) {
+  return safe(() => publicRpc<RankingRow>("ranking_table", { p_month: month, p_limit: limit }, init()));
 }
