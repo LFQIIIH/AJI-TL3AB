@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CATEGORIES, formatAdminDate, requireStaff, type AdminMatch, type Pitch } from "@/lib/admin";
 import MatchMedia from "@/components/MatchMedia";
+import TeamDrawPanel from "./TeamDrawPanel";
 import AdminNav from "../../AdminNav";
 import MatchForm from "../../MatchForm";
 import { deleteMatch, duplicateMatch, setMatchStatus, setResult, updateBooking, updateMatch } from "../../actions";
@@ -114,6 +115,28 @@ export default async function AdminMatchPage({
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Prix</p>
           <p className="mt-1 font-semibold">{match.price_mad} MAD</p>
         </div>
+      </section>
+
+      {/* Team draw */}
+      <section aria-labelledby="tirage" className="mt-10">
+        <h2 id="tirage" className="headline text-3xl">
+          Tirage des équipes
+        </h2>
+        <p className="mt-1 mb-4 text-sm text-ink-muted">
+          Équipes, noms d&apos;équipes et numéros de maillot tirés au sort. Les gardiens sont répartis en premier.
+        </p>
+        <TeamDrawPanel
+          matchId={match.id}
+          title={`${formatAdminDate(match.starts_at)} · ${match.pitches?.name ?? ""}`}
+          roster={booked.map((p) => ({
+            user_id: p.user_id,
+            name: p.player_name ?? "Joueur",
+            goalkeeper: p.player_position === "gardien",
+            guests: p.guests,
+            attended: p.attended,
+          }))}
+          initial={match.team_draw}
+        />
       </section>
 
       {/* Roster */}

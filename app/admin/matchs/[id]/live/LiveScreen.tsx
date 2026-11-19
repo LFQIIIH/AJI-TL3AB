@@ -134,6 +134,7 @@ export default function LiveScreen({ matchId, initial }: { matchId: string; init
             {state.players.map((p) => (
               <li key={p.user_id} className={`flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line px-3 py-2 ${p.attended === false ? "opacity-50" : ""}`}>
                 <span className="min-w-0 text-sm">
+                  {state.numbers[p.user_id] && <span className="mr-1.5 font-bold tabular-nums text-primary">#{state.numbers[p.user_id]}</span>}
                   <span className="font-semibold">{p.name}</span>
                   {p.guests > 0 && <span className="ml-1 text-ink-muted">+1</span>}
                   {p.attended === false && <span className="ml-1 text-ink-muted">(absent)</span>}
@@ -195,6 +196,7 @@ export default function LiveScreen({ matchId, initial }: { matchId: string; init
 
             {picker.kind === "goal" && picker.step === "scorer" && (
               <PlayerList
+                numbers={state.numbers}
                 players={[...teamOf(picker.team), ...teamOf(null)]}
                 split={teamOf(picker.team).length}
                 disabled={pending}
@@ -209,6 +211,7 @@ export default function LiveScreen({ matchId, initial }: { matchId: string; init
 
             {picker.kind === "goal" && picker.step === "assist" && (
               <PlayerList
+                numbers={state.numbers}
                 players={[...teamOf(picker.team), ...teamOf(null)].filter((p) => p.user_id !== picker.scorer)}
                 split={teamOf(picker.team).filter((p) => p.user_id !== picker.scorer).length}
                 disabled={pending}
@@ -219,6 +222,7 @@ export default function LiveScreen({ matchId, initial }: { matchId: string; init
 
             {picker.kind !== "goal" && (
               <PlayerList
+                numbers={state.numbers}
                 players={present}
                 split={present.length}
                 disabled={pending}
@@ -234,12 +238,14 @@ export default function LiveScreen({ matchId, initial }: { matchId: string; init
 
 /** Big tap targets; players after `split` are shown under "Sans équipe". */
 function PlayerList({
+  numbers = {},
   players,
   split,
   disabled,
   onPick,
   extra,
 }: {
+  numbers?: Record<string, number>;
   players: LivePlayer[];
   split: number;
   disabled: boolean;
@@ -249,6 +255,7 @@ function PlayerList({
   const button = (p: LivePlayer) => (
     <li key={p.user_id}>
       <button type="button" disabled={disabled} onClick={() => onPick(p.user_id)} className="btn-ghost min-h-12 w-full justify-start">
+        {numbers[p.user_id] && <span className="font-bold tabular-nums text-primary">#{numbers[p.user_id]}</span>}
         {p.name}
       </button>
     </li>

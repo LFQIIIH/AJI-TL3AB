@@ -1,4 +1,5 @@
 import type { getSupabaseServerClient } from "@/lib/supabase/server";
+import type { TeamDraw } from "@/lib/team-draw";
 
 type Client = Awaited<ReturnType<typeof getSupabaseServerClient>>;
 
@@ -26,6 +27,8 @@ export type LiveState = {
   awayName: string;
   homeScore: number | null;
   awayScore: number | null;
+  /** Shirt numbers from the team draw, by player id. */
+  numbers: Record<string, number>;
 };
 
 type RosterRow = {
@@ -44,7 +47,7 @@ export async function loadLive(supabase: Client, matchId: string): Promise<LiveS
   const [roster, events, match] = await Promise.all([
     supabase.rpc("staff_match_roster", { p_match_id: matchId }),
     supabase.rpc("staff_match_events", { p_match_id: matchId }),
-    supabase.from("matches").select("home_name, away_name, home_score, away_score").eq("id", matchId).maybeSingle(),
+    supabase.from("matches").select("home_name, away_name, home_score, away_score, team_draw").eq("id", matchId).maybeSingle(),
   ]);
   const players = ((roster.data ?? []) as RosterRow[])
     .filter((r) => r.status === "booked")
@@ -65,5 +68,8 @@ export async function loadLive(supabase: Client, matchId: string): Promise<LiveS
     awayName: match.data?.away_name || "Équipe 2",
     homeScore: match.data?.home_score ?? null,
     awayScore: match.data?.away_score ?? null,
+    numbers: Object.fromEntries(
+      ((match.data?.team_draw as TeamDraw | null)?.teams ?? []).flatMap((t) => t.players.filter((pl) => pl.user_id).map((pl) => [pl.user_id as string, pl.number])),
+    ),
   };
 }

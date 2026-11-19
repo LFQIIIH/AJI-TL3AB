@@ -40,6 +40,7 @@ export type AdminMatch = {
   mvp_name: string | null;
   notes: string | null;
   publish_at: string | null;
+  team_draw: import("@/lib/team-draw").TeamDraw | null;
   pitches: { name: string; area: string } | null;
 };
 

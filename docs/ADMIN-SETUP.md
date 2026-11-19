@@ -65,3 +65,11 @@ Retour arrière : supprimer la variable `MATCHES_SOURCE` dans Vercel → Redeplo
 - **Classement des points** et **recherche de joueur** en haut de /classement.
 - **Profil joueur** `/joueur/…` : prénom + initiale, poste, niveau, stats, badges, derniers matchs. Jamais téléphone, e-mail ou date de naissance. Chaque joueur peut le cacher dans son compte (« Profil public ») : plus de page ni de recherche, son nom reste dans le classement sans lien. Pages non indexées par Google.
 - Une erreur de présence, de but ou de carton corrigée dans l'admin corrige aussi les points.
+
+## Tirage des équipes
+
+Sur la fiche d'un match (admin ou capitaine du match), « Tirage des équipes » :
+1. coche les joueurs inscrits en ligne présents (les potes « +1 » sont ajoutés tout seuls) et ajoute les autres noms, un par ligne ;
+2. choisis 2, 3 ou 4 équipes, puis « Tirer au sort » : équipes de même taille (à un joueur près), gardiens répartis en premier, noms d'équipes au hasard (modifiables) et numéros de maillot de 1 à 99, tous différents ;
+3. « Enregistrer le tirage » le garde sur le match. Avec 2 équipes, il remplit aussi le Direct : noms d'équipes et équipe de chaque joueur inscrit, avec son numéro ;
+4. « Envoyer sur WhatsApp » ou « Copier » pour partager la compo dans le groupe.
