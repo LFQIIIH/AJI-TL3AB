@@ -128,7 +128,8 @@ export default function MatchBrowser({
       bookings: new Map(((bookings.data ?? []) as { match_id: string; guests: number }[]).map((b) => [b.match_id, b.guests])),
       waiting: new Map(((waiting.data ?? []) as { match_id: string; promoted_at: string | null }[]).map((w) => [w.match_id, w.promoted_at])),
     });
-  }, [user, ids]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reload for another person, not on a session refresh
+  }, [user?.id, ids]);
 
   useEffect(() => {
     loadMine();

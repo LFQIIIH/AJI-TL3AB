@@ -25,6 +25,7 @@ import {
   type Profile,
 } from "@/lib/profile";
 import { clearStoredReferral, readStoredReferral } from "@/lib/community";
+import { saveProfile, type SaveProfileResult } from "./actions";
 
 /** Fired after a save so the dashboard reloads (e.g. right after profile creation). */
 export const PROFILE_SAVED_EVENT = "ajitl3ab:profile-saved";
@@ -79,7 +80,8 @@ export default function AccountPanel() {
     return () => {
       cancelled = true;
     };
-  }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reload only for another person, not on a session refresh
+  }, [user?.id]);
 
   const isNew = profile === null;
   const normalizedPhone = normalizePhone(phone);
@@ -98,26 +100,27 @@ export default function AccountPanel() {
     e.preventDefault();
     if (!user || !canSave || !normalizedPhone) return;
     setStatus({ kind: "saving" });
-    const row = {
-      id: user.id,
-      full_name: fullName.trim().replace(/\s+/g, " "),
-      phone: normalizedPhone,
-      position,
-      birth_date: birthDate,
-      level,
-      preferred_foot: foot || null,
-      consent_at: profile?.consent_at ?? new Date().toISOString(),
-      ...(isNew && referral.trim() ? { referral_input: referral.trim() } : {}),
-    };
-    const { data, error } = await getSupabaseBrowserClient()
-      .from("profiles")
-      .upsert(row)
-      .select(PROFILE_COLUMNS)
-      .single<Profile>();
-    if (error) {
-      setStatus({ kind: "error", message: "L'enregistrement a échoué. Vérifie tes infos et réessaie." });
+    let result: SaveProfileResult;
+    try {
+      result = await saveProfile({
+        fullName,
+        phone,
+        position,
+        birthDate,
+        level,
+        foot,
+        consent,
+        referral: isNew ? referral : "",
+      });
+    } catch {
+      setStatus({ kind: "error", message: "Pas de connexion internet. Vérifie ton réseau et réessaie." });
       return;
     }
+    if ("error" in result) {
+      setStatus({ kind: "error", message: result.error });
+      return;
+    }
+    const data = result.profile;
     setProfile(data);
     setPhone(formatPhone(data.phone));
     setStatus({ kind: "saved" });

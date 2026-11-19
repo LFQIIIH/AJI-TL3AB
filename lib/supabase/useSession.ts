@@ -29,8 +29,12 @@ export function useSessionUser(): User | null | undefined {
     import("./client").then(({ getSupabaseBrowserClient }) => {
       if (cancelled) return;
       const supabase = getSupabaseBrowserClient();
-      supabase.auth.getSession().then(({ data }) => !cancelled && setUser(data.session?.user ?? null));
-      const { data } = supabase.auth.onAuthStateChange((_event, session) => setUser(session?.user ?? null));
+      // Keep the same object while it's the same person: Supabase re-announces the
+      // session (token refresh, coming back to the tab…) and a new object each
+      // time would make every component reload its data in a loop.
+      const update = (next: User | null) => setUser((prev) => (prev && next && prev.id === next.id ? prev : next));
+      supabase.auth.getSession().then(({ data }) => !cancelled && update(data.session?.user ?? null));
+      const { data } = supabase.auth.onAuthStateChange((_event, session) => update(session?.user ?? null));
       unsubscribe = () => data.subscription.unsubscribe();
     });
 
