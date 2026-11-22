@@ -65,7 +65,7 @@ const BOOKING_ERRORS: Record<string, string> = {
   already_booked: "Tu es déjà inscrit à ce match.",
   match_started: "Ce match a déjà commencé.",
   profile_missing: "Complète ton profil avant de réserver.",
-  profile_incomplete: "Ajoute ta date de naissance et ton niveau dans Mon compte avant de réserver.",
+  profile_incomplete: "Complète ton profil (photo, date de naissance, niveau) dans Mon compte avant de réserver.",
   rules_not_accepted: "Accepte le règlement pour réserver.",
   insufficient_balance: "Solde insuffisant. Recharge ton portefeuille dans Mon compte.",
   not_signed_in: "Ta session a expiré. Reconnecte-toi.",
@@ -114,7 +114,7 @@ export default function MatchBrowser({
     }
     const client = await supabaseClient();
     const [profile, bookings, waiting, walletRes] = await Promise.all([
-      client.from("profiles").select("full_name, birth_date, level, rules_version").eq("id", user.id).maybeSingle(),
+      client.from("profiles").select("full_name, birth_date, level, rules_version, avatar_path").eq("id", user.id).maybeSingle(),
       client.from("bookings").select("match_id, guests").in("match_id", ids),
       client.from("waitlist").select("match_id, promoted_at").in("match_id", ids),
       client.rpc("my_wallet"),
@@ -526,7 +526,7 @@ export default function MatchBrowser({
                   </p>
                   {!profileComplete ? (
                     <p className="rounded-xl bg-highlight/40 px-4 py-3 text-sm font-semibold text-highlight-ink">
-                      Ajoute ta date de naissance et ton niveau pour réserver.{" "}
+                      Ajoute ta photo, ta date de naissance et ton niveau pour réserver.{" "}
                       <Link href="/compte" className="underline">Compléter mon profil</Link>
                     </p>
                   ) : (

@@ -299,3 +299,15 @@ export async function setTrusted(f: FormData) {
   if (error) back(path, "erreur", dbMessage(error));
   back(path, "ok", trusted ? "Joueur de confiance : il peut réserver et payer sur place." : "Joueur de confiance retiré.");
 }
+
+/** Removes a player's photo (inappropriate / wrong person); they must add a new one before booking. */
+export async function removeAvatar(f: FormData) {
+  const { supabase } = await requireStaff({ adminOnly: true });
+  const userId = str(f, "user_id");
+  const path = `/admin/joueurs?joueur=${encodeURIComponent(userId)}&q=${encodeURIComponent(str(f, "q"))}`;
+  const { data: old, error } = await supabase.rpc("admin_remove_avatar", { p_user: userId });
+  if (error) back(path, "erreur", dbMessage(error));
+  if (typeof old === "string" && old) await supabase.storage.from("avatars").remove([old]);
+  refreshSite();
+  back(path, "ok", "Photo retirée.");
+}

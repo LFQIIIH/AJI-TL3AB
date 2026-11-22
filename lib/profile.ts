@@ -31,13 +31,15 @@ export type Profile = {
   level: Level | null;
   preferred_foot: Foot | null;
   rules_version: number | null;
+  avatar_path: string | null;
 };
 
 /** Columns read for a Profile. */
-export const PROFILE_COLUMNS = "id, full_name, phone, position, consent_at, birth_date, level, preferred_foot, rules_version";
+export const PROFILE_COLUMNS = "id, full_name, phone, position, consent_at, birth_date, level, preferred_foot, rules_version, avatar_path";
 
 /** Booking needs these on top of name / phone / position. */
-export const isProfileComplete = (p: Pick<Profile, "birth_date" | "level"> | null | undefined) => Boolean(p?.birth_date && p?.level);
+export const isProfileComplete = (p: Pick<Profile, "birth_date" | "level" | "avatar_path"> | null | undefined) =>
+  Boolean(p?.birth_date && p?.level && p?.avatar_path);
 
 export function levelLabel(l: Level | null | undefined): string {
   return LEVELS.find((x) => x.value === l)?.label ?? "";

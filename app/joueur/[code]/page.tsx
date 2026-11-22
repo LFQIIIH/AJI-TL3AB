@@ -1,4 +1,5 @@
 import { BallIcon, GoalIcon } from "@/components/Icons";
+import Avatar from "@/components/Avatar";
 import BadgeIcon from "@/components/BadgeIcon";
 import { Award, Flame, Forward, Trophy } from "lucide-react";
 import type { Metadata } from "next";
@@ -50,6 +51,7 @@ type Profile = {
   red: number;
   referrals_played: number;
   recent: Recent[];
+  avatar: string | null;
 };
 
 async function getProfile(code: string): Promise<Profile | null> {
@@ -102,8 +104,13 @@ export default async function PlayerPage({ params }: { params: Promise<{ code: s
 
   return (
     <div className="container-page max-w-3xl py-12 sm:py-16">
-      <p className="eyebrow">Joueur AJI TL3AB{p.player_position ? ` · ${positionLabel(p.player_position)}` : ""}</p>
-      <h1 className="headline mt-3 text-6xl sm:text-7xl">{p.name}</h1>
+      <div className="flex items-center gap-5">
+        <Avatar name={p.name} path={p.avatar} size={96} className="ring-4 ring-highlight" />
+        <div className="min-w-0">
+          <p className="eyebrow">Joueur AJI TL3AB{p.player_position ? ` · ${positionLabel(p.player_position)}` : ""}</p>
+          <h1 className="headline mt-2 break-words text-5xl sm:text-7xl">{p.name}</h1>
+        </div>
+      </div>
       <JouerTabs current="/classement" className="mt-6" />
 
       <section className="card mt-8 p-5 sm:p-6">

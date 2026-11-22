@@ -7,14 +7,14 @@ export const metadata: Metadata = pageMetadata("confidentialite");
 
 // TODO before launch: fill in the legal entity, address and CNDP declaration number.
 const CONTROLLER = "AJI TL3AB [raison sociale à compléter], Marrakech";
-const UPDATED = "30 octobre 2026";
+const UPDATED = "22 novembre 2026";
 
 const SECTIONS = [
   {
     title: "Ce qu'on collecte",
     body: [
-      "Quand tu crées ton profil : ton nom complet, ton numéro de téléphone, ton poste préféré et ton adresse e-mail (celle de ton compte Google ou celle que tu as saisie pour te connecter).",
-      "On ne reçoit jamais ton mot de passe Google, et la connexion par e-mail se fait sans mot de passe.",
+      "Quand tu crées ton profil : ta photo de profil, ton nom complet, ton numéro de téléphone, ton poste préféré, ta date de naissance, ton niveau, ton pied préféré (si tu le donnes) et ton adresse e-mail (celle de ton compte Google ou celle que tu as saisie pour te connecter).",
+      "On ne reçoit jamais ton mot de passe Google. Si tu te connectes par e-mail avec un mot de passe, il est stocké chiffré par notre hébergeur : personne, nous compris, ne peut le lire.",
     ],
   },
   {
@@ -30,7 +30,8 @@ const SECTIONS = [
     title: "Qui peut voir tes données",
     body: [
       "Ton numéro de téléphone et ton e-mail sont privés : seuls toi et l'équipe AJI TL3AB y ont accès. Les autres joueurs ne les voient jamais.",
-      "Sur le classement, les prix de match, l'équipe du mois et le tirage au sort, seuls ton prénom, l'initiale de ton nom (ex : « Yassine B. ») et ton poste apparaissent.",
+      "Sur le classement, les prix de match, l'équipe du mois et le tirage au sort, seuls ton prénom, l'initiale de ton nom (ex : « Yassine B. »), ton poste et ta photo de profil apparaissent.",
+      "Ta photo de profil est publique tant que ton profil joueur est public ; si tu le caches, elle n'apparaît plus nulle part. L'équipe AJI TL3AB peut retirer une photo inappropriée.",
       "Pour voter, les joueurs d'un même match voient les prénoms (+ initiale) et postes des autres joueurs de ce match.",
       "Les votes sont anonymes : personne ne voit pour qui tu as voté.",
       "On ne vend ni ne partage tes données avec des tiers à des fins commerciales.",

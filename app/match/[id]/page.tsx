@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Avatar from "@/components/Avatar";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import JouerTabs from "@/components/JouerTabs";
@@ -19,7 +20,7 @@ export function generateStaticParams() {
   return [];
 }
 
-type RosterRow = { name: string; code: string | null; team: "home" | "away" | null; goals: number; assists: number };
+type RosterRow = { name: string; code: string | null; team: "home" | "away" | null; goals: number; assists: number; avatar: string | null };
 type MatchEvent = { kind: "goal" | "yellow" | "red"; team: "home" | "away" | null; minute: number | null; player: string | null; assist: string | null };
 
 const cache = { next: { revalidate: MATCHES_REVALIDATE_SECONDS, tags: [MATCHES_TAG] } };
@@ -118,6 +119,7 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
             {players.map((p, i) => {
               const label = (
                 <>
+                  <Avatar name={p.name} path={p.avatar} size={28} className="-ml-2 mr-2" />
                   {p.name}
                   {p.team && <span className="ml-1 text-xs font-normal text-ink-muted">· {teamName(p.team)}</span>}
                 </>

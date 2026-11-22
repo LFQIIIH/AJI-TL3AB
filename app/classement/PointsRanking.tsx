@@ -1,5 +1,6 @@
 "use client";
 
+import Avatar from "@/components/Avatar";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, Crown, Flame, Info } from "lucide-react";
@@ -30,12 +31,14 @@ export type RankingRow = {
   awards: number;
   week_streak: number;
   form: string;
+  avatar: string | null;
 };
 type Found = {
   code: string;
   name: string;
   player_position: Position | null;
   matches: number;
+  avatar: string | null;
 };
 type View = "general" | "attaque";
 
@@ -201,12 +204,15 @@ export default function PointsRanking({
                           {view === "general" && (
                             <Move change={r.rank_change} />
                           )}
-                          {tier && (
-                            <TierCrest
-                              tier={tier}
-                              className="h-6 w-5 shrink-0"
-                            />
-                          )}
+                          <span className="relative shrink-0">
+                            <Avatar name={r.name} path={r.avatar} size={34} />
+                            {tier && (
+                              <TierCrest
+                                tier={tier}
+                                className="absolute -bottom-1 -right-1.5 h-4 w-3.5"
+                              />
+                            )}
+                          </span>
                           <span className="min-w-0">
                             {r.code ? (
                               <Link
@@ -404,12 +410,20 @@ function MvpCard({ row }: { row: RankingRow }) {
   );
   return (
     <div className="mt-6 grid gap-4 rounded-2xl bg-forest p-5 text-white sm:grid-cols-[auto_1fr] sm:items-center">
-      <div>
-        <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-highlight">
-          <Crown className="h-4 w-4" aria-hidden="true" />
-          MVP · {monthLabel(previousMonthOf(currentMonthRange().month))}
-        </p>
-        <p className="headline mt-1 text-3xl">{name}</p>
+      <div className="flex items-center gap-3">
+        <Avatar
+          name={row.name}
+          path={row.avatar}
+          size={56}
+          className="ring-2 ring-highlight"
+        />
+        <div>
+          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-highlight">
+            <Crown className="h-4 w-4" aria-hidden="true" />
+            MVP · {monthLabel(previousMonthOf(currentMonthRange().month))}
+          </p>
+          <p className="headline mt-1 text-3xl">{name}</p>
+        </div>
       </div>
       <dl className="grid grid-cols-3 gap-3 sm:grid-cols-6">
         {stats.map(([label, value]) => (
@@ -561,9 +575,12 @@ function PlayerSearch() {
               <li key={f.code}>
                 <Link
                   href={playerPath(f.code)}
-                  className="flex min-h-11 items-center justify-between rounded-xl px-3 hover:bg-canvas-deep"
+                  className="flex min-h-11 items-center justify-between gap-3 rounded-xl px-3 hover:bg-canvas-deep"
                 >
-                  <span className="font-semibold">{f.name}</span>
+                  <span className="flex items-center gap-2.5 font-semibold">
+                    <Avatar name={f.name} path={f.avatar} size={30} />
+                    {f.name}
+                  </span>
                   <span className="text-sm text-ink-muted">
                     {f.matches} match{f.matches > 1 ? "s" : ""}
                     {f.player_position

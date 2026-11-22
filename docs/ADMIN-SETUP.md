@@ -78,3 +78,9 @@ Sur la fiche d'un match (admin ou capitaine du match), « Tirage des équipes »
 
 - **Photos** (/admin/photos) : ajoute de vraies photos de vos matchs. Les 8 plus récentes s'affichent sur l'accueil (« Ça se passe comme ça ») ; sans photo, la section est cachée. Elles sont réduites automatiquement avant l'envoi. Demande l'accord des personnes qu'on reconnaît.
 - **Erreurs** (/admin/erreurs) : les erreurs vues par les visiteurs (navigateur) et par le serveur (réservations, enregistrement du profil), regroupées par message, gardées 90 jours. Si une erreur revient, envoie une capture de la page pour la faire corriger, puis « Tout effacer » une fois réglée.
+
+## Photos de profil des joueurs
+
+- Chaque joueur ajoute une photo de profil en créant son compte (obligatoire). Elle est recadrée en carré et réduite sur son téléphone. Sans photo, il ne peut pas réserver (comme pour la date de naissance et le niveau).
+- Elle s'affiche sur son profil joueur, au classement, dans la recherche et sur les pages de match, seulement si son profil est public.
+- Photo inappropriée : /admin → Joueurs → ouvre le joueur → « Retirer la photo ». Il devra en remettre une avant sa prochaine réservation.

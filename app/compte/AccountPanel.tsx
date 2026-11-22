@@ -26,6 +26,8 @@ import {
 } from "@/lib/profile";
 import { clearStoredReferral, readStoredReferral } from "@/lib/community";
 import { saveProfile, type SaveProfileResult } from "./actions";
+import Avatar from "@/components/Avatar";
+import { AVATARS_BUCKET, avatarUrl, squareAvatar } from "@/lib/avatar";
 
 /** Fired after a save so the dashboard reloads (e.g. right after profile creation). */
 export const PROFILE_SAVED_EVENT = "ajitl3ab:profile-saved";
@@ -44,6 +46,9 @@ export default function AccountPanel() {
   const [foot, setFoot] = useState<Foot | "">("");
   const [consent, setConsent] = useState(false);
   const [referral, setReferral] = useState("");
+  const [avatarPath, setAvatarPath] = useState("");
+  const [avatarBusy, setAvatarBusy] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   // A complete profile is shown as a short summary; the form opens on demand.
   const [editing, setEditing] = useState(false);
@@ -73,6 +78,7 @@ export default function AccountPanel() {
         setBirthDate(data?.birth_date ?? "");
         setLevel(data?.level ?? "");
         setFoot(data?.preferred_foot ?? "");
+        setAvatarPath(data?.avatar_path ?? "");
         // Older profiles: ask for the fields booking now needs.
         if (data && !isProfileComplete(data)) setEditing(true);
         if (!data) setReferral(readStoredReferral());
@@ -93,6 +99,8 @@ export default function AccountPanel() {
     birthDate >= BIRTH_DATE_MIN &&
     birthDate <= BIRTH_DATE_MAX &&
     level !== "" &&
+    avatarPath !== "" &&
+    !avatarBusy &&
     (!isNew || consent) &&
     status.kind !== "saving";
 
@@ -111,6 +119,7 @@ export default function AccountPanel() {
         foot,
         consent,
         referral: isNew ? referral : "",
+        avatarPath,
       });
     } catch {
       setStatus({ kind: "error", message: "Pas de connexion internet. Vérifie ton réseau et réessaie." });
@@ -121,6 +130,10 @@ export default function AccountPanel() {
       return;
     }
     const data = result.profile;
+    const previous = profile?.avatar_path;
+    if (previous && previous !== data.avatar_path) {
+      getSupabaseBrowserClient().storage.from(AVATARS_BUCKET).remove([previous]).catch(() => {});
+    }
     setProfile(data);
     setPhone(formatPhone(data.phone));
     setStatus({ kind: "saved" });
@@ -150,6 +163,7 @@ export default function AccountPanel() {
     setBirthDate(profile.birth_date ?? "");
     setLevel(profile.level ?? "");
     setFoot(profile.preferred_foot ?? "");
+    setAvatarPath(profile.avatar_path ?? "");
     setStatus({ kind: "idle" });
     setEditing(false);
   }
@@ -157,10 +171,15 @@ export default function AccountPanel() {
   if (profile && !editing) {
     return (
       <div className="card w-full p-6 sm:p-8">
-        <p className="eyebrow">Espace joueur</p>
-        <h1 className="headline mt-3 text-5xl">
-          Salam <span className="whitespace-nowrap">{firstName(profile.full_name)} 👋</span>
-        </h1>
+        <div className="flex items-center gap-4">
+          <Avatar name={profile.full_name} path={profile.avatar_path} size={72} className="ring-4 ring-highlight" />
+          <div>
+            <p className="eyebrow">Espace joueur</p>
+            <h1 className="headline mt-2 text-5xl">
+              Salam <span className="whitespace-nowrap">{firstName(profile.full_name)} 👋</span>
+            </h1>
+          </div>
+        </div>
         <p className="mt-3 flex flex-wrap items-center gap-2 text-ink-muted">
           <span className="rounded-full bg-highlight px-3 py-1 text-sm font-bold text-highlight-ink">⚽ {positionLabel(profile.position)}</span>
           {profile.level && <span className="rounded-full bg-canvas-deep px-3 py-1 text-sm font-semibold text-ink">{levelLabel(profile.level)}</span>}
@@ -197,11 +216,24 @@ export default function AccountPanel() {
       </p>
       {profile && !isProfileComplete(profile) && (
         <p className="mt-4 rounded-xl bg-highlight/40 px-4 py-3 text-sm font-semibold text-highlight-ink" role="status">
-          Nouveau : ajoute ta date de naissance et ton niveau pour pouvoir réserver. On s&apos;en sert pour équilibrer les matchs.
+          Pour pouvoir réserver, complète ton profil : photo, date de naissance et niveau. On s&apos;en sert pour équilibrer les matchs.
         </p>
       )}
 
       <form onSubmit={save} className="mt-8 space-y-5">
+        <AvatarPicker
+          userId={user.id}
+          name={fullName || "?"}
+          path={avatarPath}
+          busy={avatarBusy}
+          error={avatarError}
+          onBusy={setAvatarBusy}
+          onError={setAvatarError}
+          onUploaded={(p) => {
+            setAvatarPath(p);
+            setStatus({ kind: "idle" });
+          }}
+        />
         <label className="block">
           <span className="mb-2 block text-sm font-semibold">Nom complet</span>
           <input
@@ -398,6 +430,100 @@ function LockIcon() {
     <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
       <rect x="5" y="11" width="14" height="10" rx="2" />
       <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    </svg>
+  );
+}
+
+/** Round photo picker: square crop + 400 px JPEG on the phone, uploaded to the player's own folder. */
+function AvatarPicker({
+  userId,
+  name,
+  path,
+  busy,
+  error,
+  onBusy,
+  onError,
+  onUploaded,
+}: {
+  userId: string;
+  name: string;
+  path: string;
+  busy: boolean;
+  error: string;
+  onBusy: (b: boolean) => void;
+  onError: (e: string) => void;
+  onUploaded: (path: string) => void;
+}) {
+  async function pick(file: File | undefined) {
+    if (!file) return;
+    onError("");
+    onBusy(true);
+    try {
+      const blob = await squareAvatar(file);
+      const newPath = `${userId}/${crypto.randomUUID()}.jpg`;
+      const { error: upErr } = await getSupabaseBrowserClient().storage.from(AVATARS_BUCKET).upload(newPath, blob, { contentType: "image/jpeg" });
+      if (upErr) throw upErr;
+      onUploaded(newPath);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "";
+      onError(
+        msg.includes("no_blob") || msg.includes("decode") || msg.includes("InvalidStateError") || msg === ""
+          ? "Cette photo ne passe pas. Choisis une photo JPG ou PNG (ou fais une capture d'écran de ta photo)."
+          : "L'envoi de la photo a échoué. Vérifie ta connexion et réessaie.",
+      );
+    } finally {
+      onBusy(false);
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-4">
+      <label className={`relative cursor-pointer rounded-full ${busy ? "opacity-60" : ""}`}>
+        {path ? (
+          // eslint-disable-next-line @next/next/no-img-element -- the photo just uploaded
+          <img src={avatarUrl(path) ?? ""} alt="Toi" className="h-24 w-24 rounded-full object-cover ring-4 ring-highlight" />
+        ) : (
+          <span className="flex h-24 w-24 flex-col items-center justify-center rounded-full border-2 border-dashed border-line-strong bg-canvas-deep text-ink-muted">
+            <CameraIcon />
+            <span className="mt-1 text-[11px] font-bold uppercase">Photo</span>
+          </span>
+        )}
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+          className="sr-only"
+          disabled={busy}
+          aria-label={path ? "Changer ta photo de profil" : "Ajouter ta photo de profil"}
+          onChange={(e) => pick(e.target.files?.[0])}
+        />
+      </label>
+      <div className="min-w-0 text-sm">
+        <p className="font-semibold">
+          Photo de profil <span className="text-red-700">*</span>
+        </p>
+        <p className="mt-1 text-xs text-ink-muted">
+          {busy
+            ? "Envoi…"
+            : path
+              ? "Touche la photo pour la changer."
+              : "Une photo de toi, visage visible. Elle s'affiche sur ton profil joueur et au classement."}
+        </p>
+        {error && (
+          <p role="alert" className="mt-1 text-xs font-semibold text-red-700">
+            {error}
+          </p>
+        )}
+        <span className="sr-only">{name}</span>
+      </div>
+    </div>
+  );
+}
+
+function CameraIcon() {
+  return (
+    <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z" />
+      <circle cx="12" cy="13" r="3" />
     </svg>
   );
 }

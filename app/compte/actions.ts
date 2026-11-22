@@ -1,5 +1,6 @@
 "use server";
 
+import { isOwnAvatarPath } from "@/lib/avatar";
 import { reportServerError } from "@/lib/report-error";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
@@ -23,6 +24,7 @@ export type ProfileInput = {
   foot: string;
   consent: boolean;
   referral?: string;
+  avatarPath: string;
 };
 
 export type SaveProfileResult = { profile: Profile } | { error: string };
@@ -46,6 +48,9 @@ export async function saveProfile(input: ProfileInput): Promise<SaveProfileResul
   if (!(input.birthDate >= BIRTH_DATE_MIN && input.birthDate <= BIRTH_DATE_MAX)) return { error: "Date de naissance invalide." };
   if (!LEVELS.some((l) => l.value === input.level)) return { error: "Choisis ton niveau." };
   if (input.foot && !FEET.some((f) => f.value === input.foot)) return { error: "Pied préféré invalide." };
+  const avatarPath = String(input.avatarPath ?? "");
+  if (!avatarPath) return { error: "Ajoute ta photo de profil." };
+  if (!isOwnAvatarPath(avatarPath, auth.user.id)) return { error: "Photo invalide. Choisis-la à nouveau." };
 
   const { data: existing } = await supabase.from("profiles").select("consent_at").eq("id", auth.user.id).maybeSingle();
   if (!existing && !input.consent) return { error: "Accepte la politique de confidentialité pour créer ton profil." };
@@ -59,6 +64,7 @@ export async function saveProfile(input: ProfileInput): Promise<SaveProfileResul
     birth_date: input.birthDate,
     level: input.level,
     preferred_foot: input.foot || null,
+    avatar_path: avatarPath,
     consent_at: existing?.consent_at ?? new Date().toISOString(),
     ...(!existing && referral ? { referral_input: referral } : {}),
   };
