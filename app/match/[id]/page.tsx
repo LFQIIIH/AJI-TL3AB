@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ShareMatchButtons from "@/components/ShareMatchButtons";
 import Avatar from "@/components/Avatar";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -79,6 +80,7 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
       <div className="mt-8">
         <ResultCard match={match} />
         <MatchAwards awards={awards} />
+        <ShareMatchButtons matchId={match.id} />
       </div>
 
       <section aria-labelledby="faits" className="mt-10">

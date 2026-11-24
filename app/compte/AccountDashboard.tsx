@@ -1,5 +1,8 @@
 "use client";
 
+import MatchRecap from "./MatchRecap";
+import ChallengesCard from "./ChallengesCard";
+import NotificationsCard from "./NotificationsCard";
 import { BallIcon, GoalIcon } from "@/components/Icons";
 import BadgeIcon from "@/components/BadgeIcon";
 import { Award, Flame, Ticket } from "lucide-react";
@@ -129,8 +132,10 @@ export default function AccountDashboard({ matches }: { matches: Match[] }) {
 
   return (
     <div className="space-y-6">
+      <MatchRecap />
       <StatsRow stats={stats} />
       {progress && <ProgressCard progress={progress} userId={user.id} onChange={load} />}
+      <ChallengesCard />
       {ballots.filter((b) => b.done.size < VOTE_CATEGORIES.length && b.players.length > 0).map((b) => (
         <BallotCard key={b.booking.match_id} ballot={b} match={byId.get(b.booking.match_id)} onDone={load} />
       ))}
@@ -139,6 +144,7 @@ export default function AccountDashboard({ matches }: { matches: Match[] }) {
       ))}
       <Bookings upcoming={upcoming} waiting={waiting} past={past} byId={byId} onChange={load} />
       <Badges stats={stats} />
+      <NotificationsCard />
       <Referral stats={stats} />
       <DrawCard stats={stats} />
     </div>

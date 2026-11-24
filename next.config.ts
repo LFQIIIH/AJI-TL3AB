@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
   // (/jouer/og.png is re-rendered every 5 min on the server, so it needs them there).
   outputFileTracingIncludes: {
     "/api/carte": ["./assets/fonts/**", "./assets/logo-mark.png"],
+    "/api/carte/joueur": ["./assets/fonts/**", "./assets/logo-mark.png"],
+    "/api/carte/match": ["./assets/fonts/**", "./assets/logo-mark.png"],
     "/og.png": ["./assets/fonts/**", "./assets/logo-mark.png"],
     "/*/og.png": ["./assets/fonts/**", "./assets/logo-mark.png", "./public/merch/**"],
   },
@@ -26,6 +28,8 @@ const nextConfig: NextConfig = {
     return [
       { source: "/merch/:path*", headers: cache },
       { source: "/logo-mark.png", headers: cache },
+      // The service worker must always be re-checked, or phones keep an old one.
+      { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache" }, { key: "Service-Worker-Allowed", value: "/" }] },
       // Browsers only ever use HTTPS for the site (2 years). No includeSubDomains:
       // other subdomains (e.g. for email) aren't ours to force onto HTTPS.
       { source: "/:path*", headers: [{ key: "Strict-Transport-Security", value: "max-age=63072000" }] },

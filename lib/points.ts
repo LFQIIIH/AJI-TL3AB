@@ -16,6 +16,9 @@ export const POINTS: { key: string; label: string; value: number }[] = [
   { key: "late_cancel", label: "Annulation moins de 24 h avant", value: -5 },
 ];
 
+/** Shown under the points table: the monthly challenges add their own bonus. */
+export const CHALLENGES_NOTE = "Défis du mois réussis : +10 à +30 chacun (3 défis par mois, visibles dans ton compte).";
+
 /** Level = all-time points. Level n starts at LEVEL_STARTS[n - 1]. */
 const LEVEL_STARTS = [0, 50, 120, 220, 350, 520, 750, 1050, 1450, 2000];
 const LEVEL_NAMES = ["Nouveau", "Habitué", "Régulier", "Titulaire", "Pilier", "Capitaine", "Cadre", "Crack", "Star", "Légende"];

@@ -9,7 +9,7 @@ import Modal from "@/components/Modal";
 import TierCrest from "@/components/TierCrest";
 import { useRpc } from "@/components/community/useRpc";
 import { currentMonthRange, monthLabel } from "@/lib/community";
-import { LEVEL_TABLE, playerPath, POINTS, tierFor, TIERS } from "@/lib/points";
+import { CHALLENGES_NOTE, LEVEL_TABLE, playerPath, POINTS, tierFor, TIERS } from "@/lib/points";
 import { positionLabel, type Position } from "@/lib/profile";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { publicRpc } from "@/lib/supabase/publicApi";
@@ -504,6 +504,7 @@ function Guide() {
             </li>
           ))}
         </ul>
+        <p className="mt-2 text-xs font-semibold text-primary">{CHALLENGES_NOTE}</p>
       </section>
       <section>
         <h3 className="font-bold">Paliers du mois</h3>

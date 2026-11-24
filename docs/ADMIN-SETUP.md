@@ -84,3 +84,11 @@ Sur la fiche d'un match (admin ou capitaine du match), « Tirage des équipes »
 - Chaque joueur ajoute une photo de profil en créant son compte (obligatoire). Elle est recadrée en carré et réduite sur son téléphone. Sans photo, il ne peut pas réserver (comme pour la date de naissance et le niveau).
 - Elle s'affiche sur son profil joueur, au classement, dans la recherche et sur les pages de match, seulement si son profil est public.
 - Photo inappropriée : /admin → Joueurs → ouvre le joueur → « Retirer la photo ». Il devra en remettre une avant sa prochaine réservation.
+
+## Gamification : cartes, récap, défis, notifications
+
+- **Carte du match** : chaque joueur présent a sa carte story (score, buts, passes, points gagnés, photo) : bouton « Ma carte du match » sur la page du match et dans le récap. La carte du **résultat** (score, buteurs, homme du match) se partage depuis la page du match : publie-la sur Instagram après chaque match.
+- **Récap** : à la première visite après un match (score saisi), le joueur voit ses points gagnés, sa barre de niveau qui monte, ses nouveaux badges et sa place au classement.
+- **Défis du mois** : 3 défis qui changent chaque mois tout seuls (jouer, marquer/passer, gagner/donner son avis), +10 à +30 points chacun, visibles dans le compte. Pour changer les défis : fonction `month_challenges` (base de données).
+- **Notifications** : le joueur les active dans son compte (sur iPhone, après « Sur l'écran d'accueil »). Envoyées automatiquement toutes les 10 minutes si besoin : nouveaux matchs publiés, carte du match prête (score saisi), vote ouvert, et le jeudi soir « ta série est en jeu ». Jamais deux fois la même. Service : Edge Function Supabase `push-dispatch` + tâche planifiée `push-dispatch` (pg_cron).
+- Tout repose sur le **Direct** et le **score** saisis : sans eux, pas de carte ni de notification « carte prête ».
