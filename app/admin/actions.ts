@@ -311,3 +311,27 @@ export async function removeAvatar(f: FormData) {
   refreshSite();
   back(path, "ok", "Photo retirée.");
 }
+
+/** The player paid the Pack Régulier (cash / transfer): give them the tickets. */
+export async function activatePack(f: FormData) {
+  const { supabase } = await requireStaff({ adminOnly: true });
+  const userId = str(f, "user_id");
+  const path = `/admin/joueurs?joueur=${encodeURIComponent(userId)}&q=${encodeURIComponent(str(f, "q"))}`;
+  const { error } = await supabase.rpc("admin_activate_pack", { p_user: userId, p_method: str(f, "method"), p_note: str(f, "note") });
+  if (error) back(path, "erreur", dbMessage(error));
+  revalidatePath("/admin/packs");
+  back(path, "ok", "Pack activé : 4 matchs + 4 trainings, valable 30 jours.");
+}
+
+/** Undo a pack activated by mistake. */
+export async function cancelPack(f: FormData) {
+  const { supabase } = await requireStaff({ adminOnly: true });
+  const userId = str(f, "user_id");
+  const path = userId
+    ? `/admin/joueurs?joueur=${encodeURIComponent(userId)}&q=${encodeURIComponent(str(f, "q"))}`
+    : "/admin/packs";
+  const { error } = await supabase.rpc("admin_cancel_pack", { p_pack: int(f, "pack_id") });
+  if (error) back(path, "erreur", dbMessage(error));
+  revalidatePath("/admin/packs");
+  back(path, "ok", "Pack annulé.");
+}

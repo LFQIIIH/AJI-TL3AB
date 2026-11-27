@@ -4,6 +4,7 @@ import JouerTabs from "@/components/JouerTabs";
 import InfoStrip from "@/components/InfoStrip";
 import MatchBrowser from "./MatchBrowser";
 import JoinBanner from "./JoinBanner";
+import PackOffer from "@/components/PackOffer";
 import { jouerDescription, pageMetadata } from "@/lib/seo";
 import PageSeo from "@/components/PageSeo";
 import RelatedLinks from "@/components/RelatedLinks";
@@ -43,6 +44,7 @@ export default async function JouerPage() {
           { icon: "calendar", label: "Annulation", value: "Remboursée à 100 % jusqu'à 24 h avant" },
         ]}
       />
+      <PackOffer variant="jouer" className="mt-8" />
       <div className="mt-10">
         <MatchBrowser matches={matches} nextPublication={nextPublication} />
       </div>

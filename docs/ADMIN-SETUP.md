@@ -92,3 +92,14 @@ Sur la fiche d'un match (admin ou capitaine du match), « Tirage des équipes »
 - **Défis du mois** : 3 défis qui changent chaque mois tout seuls (jouer, marquer/passer, gagner/donner son avis), +10 à +30 points chacun, visibles dans le compte. Pour changer les défis : fonction `month_challenges` (base de données).
 - **Notifications** : le joueur les active dans son compte (sur iPhone, après « Sur l'écran d'accueil »). Envoyées automatiquement toutes les 10 minutes si besoin : nouveaux matchs publiés, carte du match prête (score saisi), vote ouvert, et le jeudi soir « ta série est en jeu ». Jamais deux fois la même. Service : Edge Function Supabase `push-dispatch` + tâche planifiée `push-dispatch` (pg_cron).
 - Tout repose sur le **Direct** et le **score** saisis : sans eux, pas de carte ni de notification « carte prête ».
+
+## Pack Régulier (4 matchs + 4 trainings, 325 MAD)
+
+- **Vendre un pack** : le joueur paie (cash / virement), puis **/admin → Joueurs** → le joueur → **Activer un pack**. Rien n'est ajouté au portefeuille : les tickets ne servent qu'aux matchs 5v5 / 7v7 et au training.
+- **Validité** : 30 jours à partir du jour d'activation (affiché « valable jusqu'au … »).
+- **Utilisation** : automatique. En réservant un match 5v5 ou 7v7, la place du joueur utilise un ticket (le +1 et les chaussures restent payés par le portefeuille). « Je viens » sur une séance de training utilise un ticket training. Les matchs 9v9 se paient normalement.
+- **Annulation** : jusqu'à 24 h avant → ticket rendu. Après → ticket perdu. Match annulé par l'admin → ticket rendu.
+- **Erreur d'activation** : bouton « Annuler (erreur) » sur la fiche du joueur, ou « Annuler » dans **/admin → Packs**.
+- **Suivi des ventes** : **/admin → Packs** (packs en cours, total encaissé par mois, tickets utilisés par joueur).
+- **Notification** : 5 jours avant la fin, les joueurs qui ont activé les notifications reçoivent « ⏳ Ton pack expire dans … » s'il leur reste des tickets.
+- **Changer le prix ou le contenu** : à modifier à deux endroits, `public.pack_offer()` (base de données) et `lib/packs.ts` (texte du site).

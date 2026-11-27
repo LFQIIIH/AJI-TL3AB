@@ -4,7 +4,8 @@ import { formatMorocco } from "@/lib/morocco-time";
 import { formatPhone, levelLabel, type Level } from "@/lib/profile";
 import { METHOD_LABEL, signedMad, TX_LABEL, type WalletTx } from "@/lib/wallet";
 import AdminNav from "../AdminNav";
-import { removeAvatar, setTrusted, walletAdd } from "../actions";
+import { activatePack, cancelPack, removeAvatar, setTrusted, walletAdd } from "../actions";
+import { PACK, packLastDay, ticketsLine, type AdminPack } from "@/lib/packs";
 import Avatar from "@/components/Avatar";
 
 type Player = {
@@ -45,6 +46,12 @@ export default async function PlayersPage({
         .limit(20)
     : { data: [] };
   const txs = (txData ?? []) as WalletTx[];
+  const { data: packData } = selected
+    ? await supabase.rpc("admin_packs", { p_user: selected.user_id, p_limit: 5 })
+    : { data: [] };
+  const packs = (packData ?? []) as AdminPack[];
+  const now = Date.now();
+  const running = packs.filter((k) => !k.cancelled_at && new Date(k.expires_at).getTime() > now);
   const owed = players
     .filter((p) => p.balance < 0)
     .reduce((n, p) => n - p.balance, 0);
@@ -170,6 +177,48 @@ export default async function PlayersPage({
               Enregistrer
             </button>
           </form>
+
+          <div className="mt-4 border-t border-line pt-4 text-sm">
+            <p className="font-semibold">{PACK.name}</p>
+            {running.map((k) => (
+              <form key={k.id} action={cancelPack} className="mt-2 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-canvas-deep px-4 py-3">
+                <input type="hidden" name="user_id" value={selected.user_id} />
+                <input type="hidden" name="q" value={q} />
+                <input type="hidden" name="pack_id" value={k.id} />
+                <span>
+                  Reste <span className="font-bold">{ticketsLine(k.match_tickets - k.match_used, k.training_tickets - k.training_used)}</span> · valable
+                  jusqu&apos;au {packLastDay(k.expires_at)}
+                </span>
+                <button type="submit" className="text-xs font-semibold text-ink-muted hover:text-red-700 hover:underline">
+                  Annuler (erreur)
+                </button>
+              </form>
+            ))}
+            <form action={activatePack} className="mt-3 flex flex-wrap items-end gap-3">
+              <input type="hidden" name="user_id" value={selected.user_id} />
+              <input type="hidden" name="q" value={q} />
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold">Payé en</span>
+                <select className="input" name="method" defaultValue="cash">
+                  <option value="cash">Cash</option>
+                  <option value="virement">Virement</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="autre">Autre</option>
+                </select>
+              </label>
+              <label className="block min-w-40 flex-1">
+                <span className="mb-2 block text-sm font-semibold">Note (optionnel)</span>
+                <input className="input" name="note" maxLength={200} placeholder="Ex : cash au terrain" />
+              </label>
+              <button type="submit" className="btn-primary">
+                Activer un pack ({PACK.priceMad} MAD)
+              </button>
+            </form>
+            <p className="mt-2 text-xs text-ink-muted">
+              {PACK.matches} matchs ({PACK.formats.join(" ou ")}) + {PACK.trainings} trainings, valable {PACK.validDays} jours. N&apos;ajoute rien au
+              portefeuille : encaisse le paiement avant d&apos;activer.
+            </p>
+          </div>
 
           <form
             action={setTrusted}

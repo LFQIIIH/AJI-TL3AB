@@ -21,7 +21,7 @@ async function signedInClient() {
   const supabase = await getSupabaseServerClient();
   const { data } = await supabase.auth.getUser();
   if (!data.user) return { error: fail(401, "not_signed_in") } as const;
-  return { supabase } as const;
+  return { supabase, userId: data.user.id } as const;
 }
 
 /**
@@ -72,7 +72,9 @@ export async function POST(request: NextRequest) {
     await reportServerError(`book_match ${error.code}: ${error.message}`, "/jouer (réserver)");
     return fail(400, "booking_failed");
   }
-  return NextResponse.json({ ok: true, paid: paid as number }, { headers: noStore });
+  // Did the player's own place use a Pack Régulier ticket?
+  const { data: row } = await supabase.from("bookings").select("pack_id").eq("match_id", matchId).eq("user_id", auth.userId).maybeSingle();
+  return NextResponse.json({ ok: true, paid: paid as number, withPack: Boolean((row as { pack_id: number | null } | null)?.pack_id) }, { headers: noStore });
 }
 
 /** Cancel the signed-in player's booking; freed spots go to the waiting list. */

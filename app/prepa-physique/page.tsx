@@ -16,6 +16,7 @@ import {
   TRAINING_PLACE,
 } from "@/lib/training";
 import SessionSignups from "@/components/SessionSignups";
+import PackOffer from "@/components/PackOffer";
 import { pageMetadata } from "@/lib/seo";
 import PageSeo from "@/components/PageSeo";
 import RelatedLinks from "@/components/RelatedLinks";
@@ -191,6 +192,7 @@ export default async function PrepaPhysiquePage() {
             </a>
           </div>
         </div>
+        <PackOffer variant="training" className="mt-4 max-w-4xl" />
         <p className="mt-4 max-w-4xl text-sm text-ink-muted">
           Abonné ou pas, inscris-toi à chaque séance avec « Je viens » pour qu&apos;elle compte dans les {MIN_PARTICIPANTS}.
         </p>

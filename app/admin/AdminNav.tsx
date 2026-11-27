@@ -5,6 +5,7 @@ import { signOutAdmin } from "./actions";
 const LINKS = [
   { href: "/admin", label: "Matchs", adminOnly: false },
   { href: "/admin/joueurs", label: "Joueurs", adminOnly: true },
+  { href: "/admin/packs", label: "Packs", adminOnly: true },
   { href: "/admin/terrains", label: "Terrains", adminOnly: true },
   { href: "/admin/equipe", label: "Équipe", adminOnly: true },
   { href: "/admin/photos", label: "Photos", adminOnly: true },

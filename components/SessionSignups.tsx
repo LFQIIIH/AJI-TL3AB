@@ -9,6 +9,8 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { publicRpc } from "@/lib/supabase/publicApi";
 import { useSessionUser } from "@/lib/supabase/useSession";
 import { sessionPlace, SESSIONS_SHOWN, type TrainingSession } from "@/lib/training";
+import { PACK, packLastDay, type MyPack } from "@/lib/packs";
+import { FULL_REFUND_HOURS } from "@/lib/rules";
 
 type Counts = Record<string, number>;
 
@@ -41,6 +43,11 @@ export default function SessionSignups({ sessions: all, program }: { sessions: T
   const [counts, setCounts] = useState<Counts | null>(null);
   const [countsFailed, setCountsFailed] = useState(false);
   const [mine, setMine] = useState<Set<string>>(new Set());
+  // Training only: sign-ups paid with a Pack Régulier ticket, and the player's packs.
+  const usesPack = program.table === "training_signups";
+  const [packed, setPacked] = useState<Set<string>>(new Set());
+  const [packs, setPacks] = useState<MyPack[]>([]);
+  const [reloadKey, setReloadKey] = useState(0);
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -77,18 +84,22 @@ export default function SessionSignups({ sessions: all, program }: { sessions: T
     let cancelled = false;
     (async () => {
       const client = await supabase();
-      const [signups, profile] = await Promise.all([
-        client.from(program.table).select("session_id").in("session_id", idsKey.split("|")),
+      const [signups, profile, packRes] = await Promise.all([
+        client.from(program.table).select(usesPack ? "session_id, pack_id" : "session_id").in("session_id", idsKey.split("|")),
         client.from("profiles").select("id").eq("id", user.id).maybeSingle(),
+        usesPack ? client.rpc("my_packs") : Promise.resolve({ data: [], error: null }),
       ]);
       if (cancelled) return;
-      setMine(new Set((signups.data ?? []).map((r: { session_id: string }) => r.session_id)));
+      const rows = (signups.data ?? []) as unknown as { session_id: string; pack_id?: number | null }[];
+      setMine(new Set(rows.map((r) => r.session_id)));
+      setPacked(new Set(rows.filter((r) => r.pack_id).map((r) => r.session_id)));
+      if (!packRes.error) setPacks((packRes.data ?? []) as MyPack[]);
       setHasProfile(Boolean(profile.data));
     })();
     return () => {
       cancelled = true;
     };
-  }, [user, idsKey, program.table]);
+  }, [user, idsKey, program.table, usesPack, reloadKey]);
 
   async function toggle(session: TrainingSession) {
     if (!user || busy) return;
@@ -97,6 +108,11 @@ export default function SessionSignups({ sessions: all, program }: { sessions: T
     setError("");
     const client = await supabase();
     const joined = mine.has(id);
+    const lateCancel = joined && packed.has(id) && new Date(session.start).getTime() - Date.now() < FULL_REFUND_HOURS * 3_600_000;
+    if (lateCancel && !window.confirm(`Moins de ${FULL_REFUND_HOURS} h avant la séance : ton ticket de pack sera perdu. Annuler quand même ?`)) {
+      setBusy(null);
+      return;
+    }
     const { error } = joined
       ? await client.from(program.table).delete().eq("session_id", id).eq("user_id", user.id)
       : await client.from(program.table).insert({ session_start: session.start });
@@ -116,6 +132,7 @@ export default function SessionSignups({ sessions: all, program }: { sessions: T
       setCounts((prev) => (prev ? { ...prev, [id]: Math.max(0, (prev[id] ?? 0) + (joined ? -1 : 1)) } : prev));
     }
     setBusy(null);
+    if (usesPack) setReloadKey((k) => k + 1);
     if (idsKey) loadCounts(idsKey.split("|"));
   }
 
@@ -128,8 +145,15 @@ export default function SessionSignups({ sessions: all, program }: { sessions: T
     );
   }
 
+  const trainingLeft = packs.reduce((n, k) => n + k.training_left, 0);
   return (
     <>
+      {usesPack && user && trainingLeft > 0 && (
+        <p className="mb-4 rounded-xl bg-highlight/40 px-4 py-3 text-sm font-semibold text-highlight-ink">
+          🎟️ Il te reste {trainingLeft} training{trainingLeft > 1 ? "s" : ""} dans ton {PACK.name} (jusqu&apos;au{" "}
+          {packLastDay(packs.find((k) => k.training_left > 0)!.expires_at)}) : utilisé automatiquement quand tu cliques « Je viens ».
+        </p>
+      )}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {sessions.map((session) => {
           const { id, date, time } = session;
@@ -214,6 +238,7 @@ export default function SessionSignups({ sessions: all, program }: { sessions: T
               )}
 
               <div className="mt-6 border-t border-line pt-4">
+                {joined && packed.has(id) && <p className="mb-2 text-center text-xs font-semibold text-primary">🎟️ Payé avec ton pack</p>}
                 <SessionAction
                   session={session}
                   program={program}

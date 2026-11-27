@@ -19,6 +19,7 @@ type RosterRow = {
   attended: boolean | null;
   goals: number | null;
   paid_mad: number | null;
+  with_pack?: boolean;
   team: "home" | "away" | null;
   assists: number | null;
 };
@@ -159,7 +160,8 @@ export default async function AdminMatchPage({
                       {p.player_position ? POSITION[p.player_position] : ""}
                       {p.shoe_size ? ` · chaussures ${p.shoe_size}` : ""}
                       {p.guest_shoe_size ? ` · pote ${p.guest_shoe_size}` : ""}
-                      {p.paid_mad !== null ? ` · payé ${p.paid_mad} MAD` : " · paie sur place"}
+                      {p.with_pack ? " · 🎟️ pack" : ""}
+                      {p.paid_mad !== null ? (p.with_pack && !p.paid_mad ? "" : ` · payé ${p.paid_mad} MAD`) : " · paie sur place"}
                       {p.team ? ` · ${p.team === "home" ? "Équipe 1" : "Équipe 2"}` : ""}
                       {p.assists ? ` · ${p.assists} passe${p.assists > 1 ? "s" : ""}` : ""}
                     </p>

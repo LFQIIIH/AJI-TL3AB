@@ -4,6 +4,7 @@ import AccountDashboard from "./AccountDashboard";
 import AccountPanel from "./AccountPanel";
 import StaffLink from "./StaffLink";
 import WalletCard from "./WalletCard";
+import PackCard from "./PackCard";
 
 export const metadata: Metadata = {
   title: "Mon compte",
@@ -23,6 +24,7 @@ export default async function ComptePage() {
       <div className="lg:sticky lg:top-24 lg:order-2">
         <StaffLink />
         <WalletCard />
+        <PackCard />
         <AccountPanel />
       </div>
     </div>
